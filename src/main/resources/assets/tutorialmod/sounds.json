@@ -1,0 +1,8 @@
+  {
+    "motosignir_sound_wave": {
+      "subtitle": "sounds.tutorialmod.motosignir_sound_wave",
+      "sounds": [
+        "tutorialmod:motosignir_sound_wave"
+      ]
+    }
+  }

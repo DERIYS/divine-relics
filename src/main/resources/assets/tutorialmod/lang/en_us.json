@@ -1,3 +1,5 @@
 {
-  "item.tutorialmod.motosignir": "Motosignir"
+  "item.tutorialmod.motosignir": "Motosignir",
+
+  "sounds.tutorialmod.motosignir_sound_wave": "Motosignir released its sound wave"
 }
