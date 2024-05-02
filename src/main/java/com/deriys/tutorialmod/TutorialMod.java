@@ -1,5 +1,7 @@
 package com.deriys.tutorialmod;
 
+import com.deriys.tutorialmod.core.networking.ModMessages;
+import com.deriys.tutorialmod.effects.ModEffects;
 import com.deriys.tutorialmod.items.ModItems;
 import com.deriys.tutorialmod.sound.ModSounds;
 import com.mojang.logging.LogUtils;
@@ -29,13 +31,14 @@ public class TutorialMod
         modEventBus.addListener(this::commonSetup);
         ModItems.register(modEventBus);
         ModSounds.register(modEventBus);
+        ModEffects.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-
+        ModMessages.register();
     }
 
 

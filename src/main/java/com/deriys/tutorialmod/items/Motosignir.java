@@ -1,5 +1,8 @@
-package com.deriys.tutorialmod.items.custom;
+package com.deriys.tutorialmod.items;
 
+import com.deriys.tutorialmod.core.networking.ModMessages;
+import com.deriys.tutorialmod.core.networking.packets.MotosignirParticleS2CPacket;
+import com.deriys.tutorialmod.effects.ModEffects;
 import com.deriys.tutorialmod.sound.ModSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
@@ -48,16 +51,15 @@ public class Motosignir extends Item {
         if (!level.isClientSide()) {
 
             releaseSoundWave(level, player, playerX, playerY, playerZ);
-
             if (hand == InteractionHand.MAIN_HAND) {
                 player.getCooldowns().addCooldown(this, 200);
             }
             else {
                 player.getCooldowns().addCooldown(this, 400);
             }
-        }
-        else {
-            addSoundWaveParticles(level, playerX, playerY, playerZ, viewVector);
+
+            MotosignirParticleS2CPacket particlePacket = new MotosignirParticleS2CPacket(playerX, playerY, playerZ, viewVector.x, viewVector.z);
+            ModMessages.sendToChunk(particlePacket, level.getChunkAt(player.blockPosition()));
         }
         return InteractionResultHolder.success(player.getItemInHand(hand));
     }
@@ -77,11 +79,11 @@ public class Motosignir extends Item {
         return new Vec3(x, y, z);
     }
 
-    private void addSoundWaveParticles(Level level, double playerX, double playerY, double playerZ, Vec3 viewVector) {
+    public static void addSoundWaveParticles(Level level, double playerX, double playerY, double playerZ, double viewVectorX, double viewVectorZ) {
         int particles = 50;
 
         for (int i = 0; i < particles; i++) {
-            level.addParticle(ParticleTypes.LAVA, playerX + viewVector.x, playerY + 1D, playerZ + viewVector.z,
+            level.addParticle(ParticleTypes.LAVA, playerX + viewVectorX, playerY + 1D, playerZ + viewVectorZ,
                     0D, 0D, 0D);
             for (int j = 0; j < particles; j++) {
                 double horizontalAngle = 2 * Math.PI * i / particles;
@@ -135,12 +137,14 @@ public class Motosignir extends Item {
                 double ratioX = -Math.cos(angle);
                 double ratioZ = -Math.sin(angle);
 
-                float baseDamage = 20F; // Your initial damage value
+                float baseDamage = 20F;
                 float armorModifier = livingEntity.getArmorValue() * 1.5F;
                 float adjustedDamage = baseDamage + armorModifier;
 
                 livingEntity.hurt(DamageSource.playerAttack(player), adjustedDamage);
-                livingEntity.knockback(1f, ratioX, ratioZ);
+                if (!livingEntity.hasEffect(ModEffects.BIFROST_PROTECTION.get())) {
+                    livingEntity.knockback(1f, ratioX, ratioZ);
+                }
                 gainPotionEffects(livingEntity, NEGATIVE_EFFECTS, EFFECTS_DURATION, AMPLIFIER);
             }
         }
