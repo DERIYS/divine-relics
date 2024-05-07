@@ -115,8 +115,6 @@ public class HeimdallGauntlet extends Item {
         BlockPos above = middle.above();
         BlockPos above1 = above.above();
 
-        if (level.getBlockState(middle).getBlock() == Blocks.FIRE) {return new TPData(0, false);}
-
         boolean isMiddleEmpty = isCollEmpty(level, level.getBlockState(middle), middle);
         boolean isAboveEmpty = isCollEmpty(level, level.getBlockState(above), above);
         boolean isAbove1Empty = isCollEmpty(level, level.getBlockState(above1), above1);
@@ -129,7 +127,7 @@ public class HeimdallGauntlet extends Item {
             } else if (!isBelowEmpty){
                 return new TPData(-1, true);
             }
-        } else if (isAboveEmpty && isAbove1Empty) {
+        } else if (isAboveEmpty && isAbove1Empty && level.getBlockState(middle).getBlock() != Blocks.FIRE) {
             return new TPData(1, true);
         }
 
