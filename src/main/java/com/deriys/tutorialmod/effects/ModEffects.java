@@ -14,7 +14,7 @@ public class ModEffects {
             = DeferredRegister.create(ForgeRegistries.MOB_EFFECTS, TutorialMod.MODID);
 
     public static RegistryObject<MobEffect> BIFROST_PROTECTION = MOB_EFFECTS.register("bifrost_protection",
-            () -> new BifrostProtection(MobEffectCategory.BENEFICIAL, 3124687));
+            () -> new BifrostProtection(MobEffectCategory.BENEFICIAL, 10439102));
 
     public static void register(IEventBus eventBus) {
         MOB_EFFECTS.register(eventBus);
