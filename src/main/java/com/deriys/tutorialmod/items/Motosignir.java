@@ -4,8 +4,11 @@ import com.deriys.tutorialmod.core.networking.ModMessages;
 import com.deriys.tutorialmod.core.networking.packets.MotosignirParticleS2CPacket;
 import com.deriys.tutorialmod.effects.ModEffects;
 import com.deriys.tutorialmod.sound.ModSounds;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -13,14 +16,17 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -39,6 +45,14 @@ public class Motosignir extends Item {
         super(properties);
     }
 
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag flag) {
+        if(Screen.hasShiftDown()) {
+            components.add(Component.literal("Sindri's tuning fork. Somehow it survived Ragnarok..."));
+        } else {
+            components.add(Component.literal("Press SHIFT for more info").withStyle(ChatFormatting.YELLOW));
+        }
+    }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
@@ -65,9 +79,9 @@ public class Motosignir extends Item {
     }
 
     @NotNull
-    private static Vec3 getViewVector(Player player) {
-        float yaw = player.getYRot();
-        float pitch = player.getXRot();
+    public static Vec3 getViewVector(Entity entity) {
+        float yaw = entity.getYRot();
+        float pitch = entity.getXRot();
 
         double yawRad = Math.toRadians(yaw);
         double pitchRad = Math.toRadians(pitch);
@@ -118,7 +132,7 @@ public class Motosignir extends Item {
 
     private void releaseSoundWave(Level level, Player player, double playerX, double playerY, double playerZ) {
         level.playSound(null, player.getOnPos(), ModSounds.MOTOSIGNIR_SOUND_WAVE.get(), SoundSource.PLAYERS,
-                3.0f, 1);
+                1.0f, 1);
 
         int radius = 10;
 
@@ -145,14 +159,14 @@ public class Motosignir extends Item {
                 if (!livingEntity.hasEffect(ModEffects.BIFROST_PROTECTION.get())) {
                     livingEntity.knockback(1f, ratioX, ratioZ);
                 }
-                gainPotionEffects(livingEntity, NEGATIVE_EFFECTS, EFFECTS_DURATION, AMPLIFIER);
+                gainMobEffects(livingEntity, NEGATIVE_EFFECTS, EFFECTS_DURATION, AMPLIFIER);
             }
         }
     }
 
-    private void gainPotionEffects(LivingEntity livingEntity, MobEffect[] negativeEffects, int effectsDuration, int amplifier) {
-        for(MobEffect poisonEffect: negativeEffects) {
-            livingEntity.addEffect(new MobEffectInstance(poisonEffect, effectsDuration, amplifier));
+    public static void gainMobEffects(LivingEntity livingEntity, MobEffect[] mobEffects, int effectsDuration, int amplifier) {
+        for(MobEffect mobEffect: mobEffects) {
+            livingEntity.addEffect(new MobEffectInstance(mobEffect, effectsDuration, amplifier));
         }
     }
 }
