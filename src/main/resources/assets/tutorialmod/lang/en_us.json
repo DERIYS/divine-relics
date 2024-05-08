@@ -4,5 +4,6 @@
 
   "effect.tutorialmod.bifrost_protection": "Bifrost Protection",
 
-  "sounds.tutorialmod.motosignir_sound_wave": "Motosignir released its sound wave"
+  "sounds.tutorialmod.motosignir_sound_wave": "Motosignir released its sound wave",
+  "itemGroup.modtab": "Divine Relics"
 }
