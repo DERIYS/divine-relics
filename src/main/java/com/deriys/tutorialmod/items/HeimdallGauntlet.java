@@ -12,9 +12,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,7 +25,7 @@ import java.util.Random;
 
 import static com.deriys.tutorialmod.items.Motosignir.gainMobEffects;
 
-public class HeimdallGauntlet extends Item {
+public class HeimdallGauntlet extends SwordItem {
 
     private static final Random RAND = new Random();
     public static final double VECTOR_ANGLE_CONSTANT = 3 * Math.PI / 2 - Math.PI / 4;
@@ -39,9 +37,10 @@ public class HeimdallGauntlet extends Item {
     private final int EFFECTS_DURATION = 300;
     private final int AMPLIFIER = 0;
 
-    public HeimdallGauntlet(Properties p_41383_) {
-        super(p_41383_);
+    public HeimdallGauntlet(Tier p_43269_, int p_43270_, float p_43271_, Properties p_43272_) {
+        super(p_43269_, p_43270_, p_43271_, p_43272_);
     }
+
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag flag) {
@@ -78,14 +77,14 @@ public class HeimdallGauntlet extends Item {
         double baseAngle = Math.atan2(normVector.y, normVector.x);
         double angle = baseAngle + vectorAngle;
 
-        return new Vec3(-Math.cos(angle), 0.0D, -Math.sin(angle));
+        return new Vec3(-Math.cos(angle), 0, -Math.sin(angle));
     }
 
     public static Vec3 rotateVector(Vec2 normVector, double vectorAngle, double length) {
         double baseAngle = Math.atan2(normVector.y, normVector.x);
         double angle = baseAngle + vectorAngle;
 
-        return new Vec3(-Math.cos(angle), 0.0D, -Math.sin(angle)).scale(length);
+        return new Vec3(-Math.cos(angle), 0, -Math.sin(angle)).scale(length);
     }
 
     public static Vec3 getTPVector(Level level, Vec2 normVector, Vec3 entityPos, double scale) {
@@ -100,7 +99,7 @@ public class HeimdallGauntlet extends Item {
             TPData isSafe = isSafeTP(level, tpVector);
 
             if (isSafe.getStatus()) {
-                return tpVector.add(new Vec3(0.0D, isSafe.getOffset(), 0.0D));
+                return tpVector.add(new Vec3(0, isSafe.getOffset(), 0));
             }
         }
         // if unsafe > 5 times
@@ -147,12 +146,12 @@ public class HeimdallGauntlet extends Item {
                     pX + rX,
                     pY + (double) i / 97,
                     pZ + rZ,
-                    0.0D, 0.0D, 0.0D);
+                    0, 0, 0);
             level.addParticle(ParticleTypes.PORTAL,
                     tpX + rX,
                     pY + (double) i / 97,
                     tpZ + rZ,
-                    0.0D, 0.0D, 0.0D);
+                    0, 0, 0);
         }
     }
 }

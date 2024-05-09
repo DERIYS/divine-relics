@@ -19,9 +19,7 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -31,7 +29,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 
-public class Motosignir extends Item {
+public class Motosignir extends SwordItem {
     private final MobEffect[] NEGATIVE_EFFECTS = {
             MobEffects.CONFUSION,
             MobEffects.MOVEMENT_SLOWDOWN,
@@ -41,9 +39,10 @@ public class Motosignir extends Item {
     private final int EFFECTS_DURATION = 140;
     private final int AMPLIFIER = 1;
 
-    public Motosignir(Properties properties) {
-        super(properties);
+    public Motosignir(Tier p_43269_, int p_43270_, float p_43271_, Properties p_43272_) {
+        super(p_43269_, p_43270_, p_43271_, p_43272_);
     }
+
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag flag) {
