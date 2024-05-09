@@ -4,6 +4,7 @@ import com.deriys.tutorialmod.TutorialMod;
 import com.deriys.tutorialmod.core.networking.ModMessages;
 import com.deriys.tutorialmod.core.networking.packets.GauntletParticleS2CPacket;
 import com.deriys.tutorialmod.effects.ModEffects;
+import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -36,11 +37,14 @@ public class ModEvents {
                 Level level = livingEntity.getLevel();
                 if (livingEntity.hasEffect(ModEffects.BIFROST_PROTECTION.get())){
                     if (isValidAttacker(attacker)){
-                        Vec3 hurtEntityPos = livingEntity.position();
+                        Vec3 entityPos = livingEntity.position();
                         Vec3 attackerPos = attacker.position();
 
-                        Vec2 attackVector = new Vec2((float) (hurtEntityPos.x - attackerPos.x), (float) (hurtEntityPos.z - attackerPos.z));
+                        Vec2 attackVector = new Vec2((float) (entityPos.x - attackerPos.x), (float) (entityPos.z - attackerPos.z));
                         dodgeAttack(level, livingEntity, attackVector);
+                        if (!(attacker instanceof AbstractArrow)) {
+                            hurtEntity.lookAt(EntityAnchorArgument.Anchor.EYES, attackerPos.add(0, attacker.getBbHeight() * 0.8, 0));
+                        }
                         event.setCanceled(true);
                     }
                 }
@@ -51,7 +55,7 @@ public class ModEvents {
             return attacker instanceof AbstractArrow || (attacker instanceof LivingEntity livingEntity && livingEntity.getMainHandItem().getItem() != Items.TRIDENT && !livingEntity.hasEffect(ModEffects.BIFROST_PROTECTION.get()));
         }
 
-        public static void dodgeAttack(Level level, LivingEntity hurtEntity, Vec2 attackVector) {
+        public static void dodgeAttack(Level level, LivingEntity hurtEntity,  Vec2 attackVector) {
             Vec3 entityPos = hurtEntity.position();
 
             double entityX = hurtEntity.getX();
