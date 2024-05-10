@@ -53,13 +53,15 @@ public class HeimdallGauntlet extends SwordItem {
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
-        gainMobEffects(player, EFFECTS, EFFECTS_DURATION, AMPLIFIER);
-//        if (interactionHand == InteractionHand.MAIN_HAND) {
-//            player.getCooldowns().addCooldown(this, 1200);
-//        }
-//        else {
-//            player.getCooldowns().addCooldown(this, 1400);
-//        }
+        if (!level.isClientSide()) {
+            gainMobEffects(player, EFFECTS, EFFECTS_DURATION, AMPLIFIER);
+//            if (interactionHand == InteractionHand.MAIN_HAND) {
+//                player.getCooldowns().addCooldown(this, 1200);
+//            }
+//            else {
+//                player.getCooldowns().addCooldown(this, 1400);
+//            }
+        }
         return InteractionResultHolder.success(player.getItemInHand(interactionHand));
     }
 

@@ -6,7 +6,6 @@ import com.deriys.tutorialmod.effects.ModEffects;
 import com.deriys.tutorialmod.sound.ModSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
@@ -36,7 +35,7 @@ public class Motosignir extends SwordItem {
             MobEffects.WEAKNESS
     };
 
-    private final int EFFECTS_DURATION = 140;
+    private final int EFFECTS_DURATION = 200;
     private final int AMPLIFIER = 1;
 
     public Motosignir(Tier p_43269_, int p_43270_, float p_43271_, Properties p_43272_) {
@@ -138,27 +137,56 @@ public class Motosignir extends SwordItem {
         AABB aabb = new AABB(playerX - radius, playerY - radius, playerZ - radius,
                 playerX + radius, playerY + radius, playerZ + radius);
 
-        List<LivingEntity> entitiesInRadius = level.getEntitiesOfClass(LivingEntity.class, aabb);
+        List<LivingEntity> entitiesInRadius = getEntitiesInArea(level, playerX - radius, playerY - radius, playerZ - radius,
+                playerX + radius, playerY + radius, playerZ + radius);
 
-        for(LivingEntity livingEntity: entitiesInRadius) {
+        hurtAndKnockbackEntites(level, entitiesInRadius, player, NEGATIVE_EFFECTS, 20f, 1f, AMPLIFIER, EFFECTS_DURATION);
+    }
+
+    public static List<LivingEntity> getEntitiesInArea(Level level, double x1, double y1, double z1, double x2, double y2, double z3) {
+        AABB aabb = new AABB(x1, y1, z1, x2, y2, z3);
+        return  level.getEntitiesOfClass(LivingEntity.class, aabb);
+    }
+
+    public static void hurtAndKnockbackEntites (Level level, List<LivingEntity> entities, Player player, Entity attacker, float baseDamage, double force) {
+        for(LivingEntity livingEntity: entities) {
             if(livingEntity != player) {
-                BlockPos entityPos = livingEntity.blockPosition();
-                int entityX = entityPos.getX();
-                int entityZ = entityPos.getZ();
+                double entityX = livingEntity.getX();
+                double entityZ = livingEntity.getZ();
 
-                double angle = Math.atan2(entityZ - playerZ, entityX - playerX);
+                double angle = Math.atan2(entityZ - attacker.getZ(), entityX - attacker.getX());
                 double ratioX = -Math.cos(angle);
                 double ratioZ = -Math.sin(angle);
 
-                float baseDamage = 20F;
                 float armorModifier = livingEntity.getArmorValue() * 1.5F;
                 float adjustedDamage = baseDamage + armorModifier;
 
                 livingEntity.hurt(DamageSource.playerAttack(player), adjustedDamage);
                 if (!livingEntity.hasEffect(ModEffects.BIFROST_PROTECTION.get())) {
-                    livingEntity.knockback(1f, ratioX, ratioZ);
+                    livingEntity.knockback(force, ratioX, ratioZ);
                 }
-                gainMobEffects(livingEntity, NEGATIVE_EFFECTS, EFFECTS_DURATION, AMPLIFIER);
+            }
+        }
+    }
+
+    public static void hurtAndKnockbackEntites (Level level, List<LivingEntity> entities, Player player, MobEffect[] mobEffects, float baseDamage, double force, int amplifier, int duration) {
+        for(LivingEntity livingEntity: entities) {
+            if(livingEntity != player) {
+                double entityX = livingEntity.getX();
+                double entityZ = livingEntity.getZ();
+
+                double angle = Math.atan2(entityZ - player.getZ(), entityX - player.getX());
+                double ratioX = -Math.cos(angle);
+                double ratioZ = -Math.sin(angle);
+
+                float armorModifier = livingEntity.getArmorValue() * 1.5F;
+                float adjustedDamage = baseDamage + armorModifier;
+
+                livingEntity.hurt(DamageSource.playerAttack(player), adjustedDamage);
+                if (!livingEntity.hasEffect(ModEffects.BIFROST_PROTECTION.get())) {
+                    livingEntity.knockback(force, ratioX, ratioZ);
+                }
+                gainMobEffects(livingEntity, mobEffects, duration, amplifier);
             }
         }
     }

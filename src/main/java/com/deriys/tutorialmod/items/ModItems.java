@@ -2,7 +2,6 @@ package com.deriys.tutorialmod.items;
 
 import com.deriys.tutorialmod.TutorialMod;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Tiers;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -14,10 +13,14 @@ public class ModItems {
             DeferredRegister.create(ForgeRegistries.ITEMS, TutorialMod.MODID);
 
     public static final RegistryObject<Item> MOTOSIGNIR = ITEMS.register("motosignir",
-            () -> new Motosignir(Tiers.NETHERITE, -3, -1.5F, new Item.Properties().fireResistant().tab(ModCreativeTab.TUTORIAL_TAB)));
+            () -> new Motosignir(ModTiers.MOTOSIGNIR, -3, -1.5F, new Item.Properties().fireResistant().tab(ModCreativeTab.TUTORIAL_TAB)));
 
     public static final RegistryObject<Item> HEIMDALL_GAUNTLET = ITEMS.register("heimdall_gauntlet",
-            () -> new HeimdallGauntlet(Tiers.NETHERITE, -3, -3F, new Item.Properties().fireResistant().tab(ModCreativeTab.TUTORIAL_TAB)));
+            () -> new HeimdallGauntlet(ModTiers.HEIMDALL_GAUNTLET, -3, -3F, new Item.Properties().fireResistant().tab(ModCreativeTab.TUTORIAL_TAB)));
+
+    public static final RegistryObject<Item> SPEAR = ITEMS.register("spear",
+            () -> new Spear(new Item.Properties().fireResistant().tab(ModCreativeTab.TUTORIAL_TAB)));
+
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
