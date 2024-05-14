@@ -36,7 +36,7 @@ import java.util.Random;
 import java.util.UUID;
 
 public class DraupnirSpear extends Item implements Vanishable {
-    public static final int THROW_THRESHOLD_TIME = 10;
+    public static final int THROW_THRESHOLD_TIME = 8;
     public static final float BASE_DAMAGE = 8.0F;
     public static final float SHOOT_POWER = 3.5F;
     public static final Random RAND = new Random();
@@ -50,13 +50,13 @@ public class DraupnirSpear extends Item implements Vanishable {
     public DraupnirSpear(Item.Properties p_43381_) {
         super(p_43381_);
         ImmutableMultimap.Builder<Attribute, AttributeModifier> $$1 = ImmutableMultimap.builder();
-        $$1.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", 8.0, AttributeModifier.Operation.ADDITION));
+        $$1.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", BASE_DAMAGE, AttributeModifier.Operation.ADDITION));
         $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -2.0000000953674316, AttributeModifier.Operation.ADDITION));
         this.defaultModifiers = $$1.build();
     }
 
-    public boolean canAttackBlock(BlockState p_43409_, Level p_43410_, BlockPos p_43411_, Player p_43412_) {
-        return !p_43412_.isCreative();
+    public boolean canAttackBlock(BlockState blockState, Level level, BlockPos blockPos, Player player) {
+        return !player.isCreative();
     }
 
     public UseAnim getUseAnimation(ItemStack p_43417_) {
@@ -127,16 +127,17 @@ public class DraupnirSpear extends Item implements Vanishable {
 
         int thrownCount = getThrownCount(itemStack);
         int delayTicks = getDelayTicks(itemStack);
+        boolean isShiftDown = player.isShiftKeyDown();
 
-        if (thrownCount < THROWN_SPEARS_THRESHOLD && delayTicks == 0){
+        if (thrownCount < THROWN_SPEARS_THRESHOLD && delayTicks == 0 && !isShiftDown){
             player.startUsingItem(interactionHand);
             if (thrownCount == THROWN_SPEARS_THRESHOLD - 1) { setDelayTicks(itemStack, 15); }
             return InteractionResultHolder.pass(itemStack);
-        } else if (delayTicks == 0){
+        } else if (delayTicks == 0 || isShiftDown){
             level.playSound(null, player.getOnPos(), ModSounds.DRAUPNIR_SPEAR_EXPLOSION_HIT.get(), SoundSource.PLAYERS, 2.0F, RANDOM_SOUND_PITCH);
             setDelayTicks(itemStack, 10);
             setExplosionState(itemStack, true);
-            player.getCooldowns().addCooldown(this, 200);
+            player.getCooldowns().addCooldown(this, 40 * thrownCount);
             return InteractionResultHolder.consume(itemStack);
         }
         return InteractionResultHolder.fail(itemStack);
@@ -215,7 +216,7 @@ public class DraupnirSpear extends Item implements Vanishable {
     public void releaseUsing(ItemStack itemStack, Level level, LivingEntity livingEntity, int timeLeft) {
         if (livingEntity instanceof Player player) {
             int i = this.getUseDuration(itemStack) - timeLeft;
-            if (i >= 8) {
+            if (i >= THROW_THRESHOLD_TIME) {
                 if (!level.isClientSide) {
                     int thrownCount = getThrownCount(itemStack);
                     ThrownDraupnirSpear thrownSpear = new ThrownDraupnirSpear(level, player, itemStack);
