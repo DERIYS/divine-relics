@@ -4,6 +4,7 @@ import com.deriys.tutorialmod.TutorialMod;
 import com.deriys.tutorialmod.core.networking.ModMessages;
 import com.deriys.tutorialmod.core.networking.packets.GauntletParticleS2CPacket;
 import com.deriys.tutorialmod.effects.ModEffects;
+import com.deriys.tutorialmod.items.ModItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -12,7 +13,6 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -52,7 +52,7 @@ public class ModEvents {
         }
 
         private static boolean isValidAttacker(Entity attacker) {
-            return attacker instanceof AbstractArrow || (attacker instanceof LivingEntity livingEntity && livingEntity.getMainHandItem().getItem() != Items.TRIDENT && !livingEntity.hasEffect(ModEffects.BIFROST_PROTECTION.get()));
+            return attacker instanceof AbstractArrow || (attacker instanceof LivingEntity livingEntity && livingEntity.getMainHandItem().getItem() != ModItems.DRAUPNIR_SPEAR.get() && !livingEntity.hasEffect(ModEffects.BIFROST_PROTECTION.get()));
         }
 
         public static void dodgeAttack(Level level, LivingEntity hurtEntity,  Vec2 attackVector) {

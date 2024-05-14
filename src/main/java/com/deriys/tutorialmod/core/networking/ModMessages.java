@@ -3,6 +3,8 @@ package com.deriys.tutorialmod.core.networking;
 import com.deriys.tutorialmod.TutorialMod;
 import com.deriys.tutorialmod.core.networking.packets.GauntletParticleS2CPacket;
 import com.deriys.tutorialmod.core.networking.packets.MotosignirParticleS2CPacket;
+import com.deriys.tutorialmod.core.networking.packets.SpearExplosionParticleS2CPacket;
+import com.deriys.tutorialmod.core.networking.packets.SpearParticleS2CPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.chunk.LevelChunk;
@@ -40,6 +42,18 @@ public class ModMessages {
                 .decoder(GauntletParticleS2CPacket::new)
                 .encoder(GauntletParticleS2CPacket::toBytes)
                 .consumerMainThread(GauntletParticleS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(SpearExplosionParticleS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SpearExplosionParticleS2CPacket::new)
+                .encoder(SpearExplosionParticleS2CPacket::toBytes)
+                .consumerMainThread(SpearExplosionParticleS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(SpearParticleS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(SpearParticleS2CPacket::new)
+                .encoder(SpearParticleS2CPacket::toBytes)
+                .consumerMainThread(SpearParticleS2CPacket::handle)
                 .add();
     }
 

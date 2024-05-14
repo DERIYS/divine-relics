@@ -3,7 +3,6 @@ package com.deriys.tutorialmod.core.networking.packets;
 import com.deriys.tutorialmod.items.HeimdallGauntlet;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -46,7 +45,6 @@ public class GauntletParticleS2CPacket {
             Minecraft mc = Minecraft.getInstance();
             ClientLevel level = mc.level;
             if (level != null) {
-                level.addParticle(ParticleTypes.PORTAL, playerX, playerY, playerZ, 0.0D, 0.0D, 0.0D);
                 HeimdallGauntlet.addTeleportParticles(level, playerX, playerY, playerZ, tpX, tpZ);
             }
         });

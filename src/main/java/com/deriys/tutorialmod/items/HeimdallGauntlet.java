@@ -66,13 +66,13 @@ public class HeimdallGauntlet extends SwordItem {
     }
 
     public static Vec2 findNormVec(Vec2 vector) {
-        double x = vector.x;
-        double z = vector.y;
+        float x = vector.x;
+        float z = vector.y;
 
-        double zn = x / (Math.sqrt(x*x + z*z));
-        double xn = -z*zn/x;
+        float zn = (float) (x / (Math.sqrt(x*x + z*z)));
+        float xn = -z*zn/x;
 
-        return new Vec2((float) xn, (float) zn);
+        return new Vec2(xn, zn);
     }
 
     public static Vec3 rotateVector(Vec2 normVector, double vectorAngle) {
@@ -90,13 +90,12 @@ public class HeimdallGauntlet extends SwordItem {
     }
 
     public static Vec3 getTPVector(Level level, Vec2 normVector, Vec3 entityPos, double scale) {
-        Vec3 tpVector = null;
         for (int i = 0; i < 5; i++) {
             double vectorAngle = RAND.nextFloat() * VECTOR_ANGLE_CONSTANT;
             Vec3 vector = rotateVector(normVector, vectorAngle, scale);
 
             // setting the teleportation vector
-            tpVector = entityPos.add(vector);
+            Vec3 tpVector = entityPos.add(vector);
 
             TPData isSafe = isSafeTP(level, tpVector);
 

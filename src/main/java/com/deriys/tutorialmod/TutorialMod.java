@@ -2,9 +2,12 @@ package com.deriys.tutorialmod;
 
 import com.deriys.tutorialmod.core.networking.ModMessages;
 import com.deriys.tutorialmod.effects.ModEffects;
+import com.deriys.tutorialmod.entities.ModEntitiyTypes;
+import com.deriys.tutorialmod.entities.client.render.ThrownDraupnirSpearRenderer;
 import com.deriys.tutorialmod.items.ModItems;
 import com.deriys.tutorialmod.sound.ModSounds;
 import com.mojang.logging.LogUtils;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -32,6 +35,7 @@ public class TutorialMod
         ModItems.register(modEventBus);
         ModSounds.register(modEventBus);
         ModEffects.register(modEventBus);
+        ModEntitiyTypes.register(modEventBus);
 
         // Register ourselves for server and other game events we are interested in
         MinecraftForge.EVENT_BUS.register(this);
@@ -48,7 +52,7 @@ public class TutorialMod
     {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-
+            EntityRenderers.register(ModEntitiyTypes.THROWN_DRAUPNIR_SPEAR.get(), ThrownDraupnirSpearRenderer::new);
         }
     }
 }

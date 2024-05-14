@@ -16,6 +16,17 @@ public class ModSounds {
     public static final RegistryObject<SoundEvent> MOTOSIGNIR_SOUND_WAVE =
             registerSoundEvent("motosignir_sound_wave");
 
+    public static final RegistryObject<SoundEvent> DRAUPNIR_SPEAR_THROWING =
+            registerSoundEvent("draupnir_spear_throwing");
+    public static final RegistryObject<SoundEvent> DRAUPNIR_SPEAR_LANDING =
+            registerSoundEvent("draupnir_spear_landing");
+    public static final RegistryObject<SoundEvent> DRAUPNIR_SPEAR_HIT =
+            registerSoundEvent("draupnir_spear_hit");
+    public static final RegistryObject<SoundEvent> DRAUPNIR_SPEAR_EXPLOSION_HIT =
+            registerSoundEvent("draupnir_spear_explosion_hit");
+    public static final RegistryObject<SoundEvent> DRAUPNIR_SPEAR_EXPLOSION =
+            registerSoundEvent("draupnir_spear_explosion");
+
     public static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> new SoundEvent(new ResourceLocation(TutorialMod.MODID, name)));
     }

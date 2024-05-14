@@ -18,8 +18,8 @@ public class ModItems {
     public static final RegistryObject<Item> HEIMDALL_GAUNTLET = ITEMS.register("heimdall_gauntlet",
             () -> new HeimdallGauntlet(ModTiers.HEIMDALL_GAUNTLET, -3, -3F, new Item.Properties().fireResistant().tab(ModCreativeTab.TUTORIAL_TAB)));
 
-    public static final RegistryObject<Item> SPEAR = ITEMS.register("spear",
-            () -> new Spear(new Item.Properties().fireResistant().tab(ModCreativeTab.TUTORIAL_TAB)));
+    public static final RegistryObject<Item> DRAUPNIR_SPEAR = ITEMS.register("draupnir_spear",
+            () -> new DraupnirSpear(new Item.Properties().stacksTo(1).fireResistant().tab(ModCreativeTab.TUTORIAL_TAB)));
 
 
     public static void register(IEventBus eventBus) {

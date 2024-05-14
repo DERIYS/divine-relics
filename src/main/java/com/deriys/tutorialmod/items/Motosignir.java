@@ -22,7 +22,6 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -58,7 +57,7 @@ public class Motosignir extends SwordItem {
         double playerY = player.getY();
         double playerZ = player.getZ();
 
-        Vec3 viewVector = getViewVector(player).normalize();
+        Vec3 viewVector = player.getLookAngle().normalize();
 
         if (!level.isClientSide()) {
 
@@ -74,21 +73,6 @@ public class Motosignir extends SwordItem {
             ModMessages.sendToChunk(particlePacket, level.getChunkAt(player.blockPosition()));
         }
         return InteractionResultHolder.success(player.getItemInHand(hand));
-    }
-
-    @NotNull
-    public static Vec3 getViewVector(Entity entity) {
-        float yaw = entity.getYRot();
-        float pitch = entity.getXRot();
-
-        double yawRad = Math.toRadians(yaw);
-        double pitchRad = Math.toRadians(pitch);
-
-        double x = -Math.sin(yawRad) * Math.cos(pitchRad);
-        double y = -Math.sin(pitchRad);
-        double z = Math.cos(yawRad) * Math.cos(pitchRad);
-
-        return new Vec3(x, y, z);
     }
 
     public static void addSoundWaveParticles(Level level, double playerX, double playerY, double playerZ, double viewVectorX, double viewVectorZ) {
@@ -137,14 +121,14 @@ public class Motosignir extends SwordItem {
         AABB aabb = new AABB(playerX - radius, playerY - radius, playerZ - radius,
                 playerX + radius, playerY + radius, playerZ + radius);
 
-        List<LivingEntity> entitiesInRadius = getEntitiesInArea(level, playerX - radius, playerY - radius, playerZ - radius,
-                playerX + radius, playerY + radius, playerZ + radius);
+        List<LivingEntity> entitiesInRadius = getEntitiesInArea(level, playerX, playerY, playerZ, radius);
 
         hurtAndKnockbackEntites(level, entitiesInRadius, player, NEGATIVE_EFFECTS, 20f, 1f, AMPLIFIER, EFFECTS_DURATION);
     }
 
-    public static List<LivingEntity> getEntitiesInArea(Level level, double x1, double y1, double z1, double x2, double y2, double z3) {
-        AABB aabb = new AABB(x1, y1, z1, x2, y2, z3);
+    public static List<LivingEntity> getEntitiesInArea(Level level, double x, double y, double z, double radius) {
+        AABB aabb = new AABB(x - radius, y - radius, z - radius,
+                x + radius, y + radius, z + radius);
         return  level.getEntitiesOfClass(LivingEntity.class, aabb);
     }
 
