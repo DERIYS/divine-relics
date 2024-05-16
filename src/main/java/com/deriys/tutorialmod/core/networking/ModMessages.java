@@ -1,10 +1,7 @@
 package com.deriys.tutorialmod.core.networking;
 
 import com.deriys.tutorialmod.TutorialMod;
-import com.deriys.tutorialmod.core.networking.packets.GauntletParticleS2CPacket;
-import com.deriys.tutorialmod.core.networking.packets.MotosignirParticleS2CPacket;
-import com.deriys.tutorialmod.core.networking.packets.SpearExplosionParticleS2CPacket;
-import com.deriys.tutorialmod.core.networking.packets.SpearParticleS2CPacket;
+import com.deriys.tutorialmod.core.networking.packets.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.chunk.LevelChunk;

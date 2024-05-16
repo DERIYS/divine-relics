@@ -75,6 +75,10 @@ public class HeimdallGauntlet extends SwordItem {
         return new Vec2(xn, zn);
     }
 
+    public static Vec2 findNormVec(Vec3 vector) {
+        return findNormVec(new Vec2((float) vector.x, (float) vector.y));
+    }
+
     public static Vec3 rotateVector(Vec2 normVector, double vectorAngle) {
         double baseAngle = Math.atan2(normVector.y, normVector.x);
         double angle = baseAngle + vectorAngle;

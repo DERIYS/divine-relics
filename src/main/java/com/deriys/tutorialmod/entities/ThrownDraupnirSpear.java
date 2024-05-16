@@ -2,6 +2,7 @@ package com.deriys.tutorialmod.entities;
 
 import com.deriys.tutorialmod.core.networking.ModMessages;
 import com.deriys.tutorialmod.core.networking.packets.SpearParticleS2CPacket;
+import com.deriys.tutorialmod.items.DraupnirSpear;
 import com.deriys.tutorialmod.items.ModItems;
 import com.deriys.tutorialmod.sound.ModSounds;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -13,7 +14,6 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -32,7 +32,6 @@ import net.minecraftforge.network.NetworkHooks;
 import javax.annotation.Nullable;
 
 public class ThrownDraupnirSpear extends AbstractArrow {
-
     private static final EntityDataAccessor<Boolean> ID_FOIL;
     private ItemStack spearItem;
     private boolean dealtDamage;
@@ -51,17 +50,23 @@ public class ThrownDraupnirSpear extends AbstractArrow {
 
     public ThrownDraupnirSpear(Level level, LivingEntity livingEntity, ItemStack itemStack) {
         super(ModEntitiyTypes.THROWN_DRAUPNIR_SPEAR.get(), livingEntity, level);
-        this.spearItem = new ItemStack(ModItems.DRAUPNIR_SPEAR.get());
-        this.spearItem = itemStack.copy();
+        this.spearItem = itemStack;
         this.entityData.set(ID_FOIL, itemStack.hasFoil());
     }
 
-    public static void spawnSpearParticles(ClientLevel level, double x, double y, double z) {
-        BlockParticleOption particleOption = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.HONEY_BLOCK.defaultBlockState());
+    public static void spawnSpearParticles(ClientLevel level, double x, double y, double z, float pitch, float yaw, float height) {
+        BlockParticleOption particleOption = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.WHITE_CONCRETE.defaultBlockState());
+
+        double pitchRadians = Math.toRadians(Math.abs(pitch) - 90);
+
+        double offsetX = 0;
+        double offsetY = height * Math.cos(pitchRadians);
+        double offsetZ = 0;
+
         level.addParticle(particleOption,
-                x + (Math.random() * 0.2 - 0.1),
-                y + (Math.random() * 0.2 - 0.1),
-                z + (Math.random() * 0.2 - 0.1),
+                x + offsetX + (Math.random() * 0.2 - 0.1),
+                y + offsetY + (Math.random() * 0.2 - 0.1),
+                z + offsetZ + (Math.random() * 0.2 - 0.1),
                 0, 0, 0);
     }
 
@@ -76,7 +81,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
         }
         if (!level.isClientSide && this.tickCount % 4 == 0) {
             ServerLevel serverLevel = ((ServerLevel) this.getLevel());
-            SpearParticleS2CPacket packet = new SpearParticleS2CPacket(this.getX(), this.getY(), this.getZ());
+            SpearParticleS2CPacket packet = new SpearParticleS2CPacket(this.getX(), this.getY(), this.getZ(), this.getXRot(), this.getYRot(), 0.8F);
             ModMessages.sendToChunk(packet, serverLevel.getChunkAt(this.getOnPos()));
         }
         super.tick();
@@ -90,8 +95,6 @@ public class ThrownDraupnirSpear extends AbstractArrow {
     protected EntityHitResult findHitEntity(Vec3 p_37575_, Vec3 p_37576_) {
         return this.dealtDamage ? null : super.findHitEntity(p_37575_, p_37576_);
     }
-
-
 
     protected void onHitEntity(EntityHitResult hitResult) {
         Entity hurtEntity = hitResult.getEntity();
@@ -115,23 +118,20 @@ public class ThrownDraupnirSpear extends AbstractArrow {
                     EnchantmentHelper.doPostDamageEffects((LivingEntity)owner, livingEntityHurt);
                 }
 
+                if (this.spearItem.getItem() instanceof DraupnirSpear draupnirSpear) {
+                    draupnirSpear.addThrownSpear(this.spearItem, hurtEntity.getUUID());
+
+                    DraupnirSpear.sendExplosionPacket(this.level, this.getX(), this.getY(), this.getZ(), 1D, 0.5D, 10);
+
+                    this.discard();
+                }
+
                 this.doPostHurtEffects(livingEntityHurt);
             }
         }
 
-        this.setDeltaMovement(this.getDeltaMovement().multiply(-0.001, -0.01, -0.001));
-
-        this.playSound(soundEvent, 1.0F, 1.0F);
+        this.playSound(soundEvent, 2.0F, 1.0F);
     }
-
-//    @Override
-//    public void playSound(SoundEvent sound, float volume, float pitch) {
-//        if (sound == SoundEvents.TRIDENT_HIT_GROUND) {
-//            this.level.playSound(null, this.getX(), this.getY(), this.getZ(), ModSounds.DRAUPNIR_SPEAR_LANDING.get(), this.getSoundSource(), volume, pitch);
-//        } else {
-//            super.playSound(sound, volume, pitch);
-//        }
-//    }
 
     public boolean isFoil() {
         return (Boolean)this.entityData.get(ID_FOIL);

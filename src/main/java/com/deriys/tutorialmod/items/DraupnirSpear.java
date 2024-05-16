@@ -28,6 +28,7 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
@@ -63,36 +64,36 @@ public class DraupnirSpear extends Item implements Vanishable {
         return UseAnim.SPEAR;
     }
 
-    private int getThrownCount(ItemStack stack) {
+    public int getThrownCount(ItemStack stack) {
         return stack.getOrCreateTag().getInt("ThrownCount");
     }
 
-    private void setThrownCount(ItemStack stack, int count) {
+    public void setThrownCount(ItemStack stack, int count) {
         stack.getOrCreateTag().putInt("ThrownCount", count);
     }
 
-    private int getDelayTicks(ItemStack stack) {
+    public int getDelayTicks(ItemStack stack) {
         return stack.getOrCreateTag().getInt("DelayTicks");
     }
 
-    private void setDelayTicks(ItemStack stack, int count) {
+    public void setDelayTicks(ItemStack stack, int count) {
         stack.getOrCreateTag().putInt("DelayTicks", count);
     }
 
-    private boolean getExplosionState(ItemStack stack) {
+    public boolean getExplosionState(ItemStack stack) {
         return stack.getOrCreateTag().getBoolean("ExplosionState");
     }
 
-    private void setExplosionState(ItemStack stack, boolean state) { stack.getOrCreateTag().putBoolean("ExplosionState", state); }
+    public void setExplosionState(ItemStack stack, boolean state) { stack.getOrCreateTag().putBoolean("ExplosionState", state); }
 
-    private void addThrownSpear(ItemStack stack, UUID uuid) {
+    public void addThrownSpear(ItemStack stack, UUID uuid) {
         CompoundTag tag = stack.getOrCreateTag();
         ListTag spearsTag = tag.getList("ThrownSpears", 8);
         spearsTag.add(StringTag.valueOf(uuid.toString()));
         tag.put("ThrownSpears", spearsTag);
     }
 
-    private void setThrownSpears(ItemStack stack, List<UUID> list) {
+    public void setThrownSpears(ItemStack stack, List<UUID> list) {
         CompoundTag tag = stack.getOrCreateTag();
         ListTag spearsTag = new ListTag();
         for (UUID uuid: list) {
@@ -101,7 +102,7 @@ public class DraupnirSpear extends Item implements Vanishable {
         tag.put("ThrownSpears", spearsTag);
     }
 
-    private List<UUID> getThrownSpears(ItemStack stack) {
+    public List<UUID> getThrownSpears(ItemStack stack) {
         CompoundTag tag = stack.getOrCreateTag();
         ListTag spearsTag = tag.getList("ThrownSpears", 8);
         List<UUID> uuids = new ArrayList<>();
@@ -111,15 +112,19 @@ public class DraupnirSpear extends Item implements Vanishable {
         return uuids;
     }
 
-    private void resetItemStackState(ItemStack itemStack) {
+    public void resetNBT(ItemStack itemStack) {
         setDelayTicks(itemStack, 0);
         setThrownCount(itemStack, 0);
         setExplosionState(itemStack, false);
     }
 
-    private void clearThrownSpears(ItemStack stack) {
+    public void clearThrownSpears(ItemStack stack) {
         CompoundTag tag = stack.getOrCreateTag();
         tag.put("ThrownSpears", new ListTag());
+    }
+
+    public boolean isNBTReset(ItemStack stack) {
+        return !getExplosionState(stack) && getThrownCount(stack) == 0 && getDelayTicks(stack) == 0 && getThrownSpears(stack).isEmpty();
     }
 
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
@@ -134,13 +139,23 @@ public class DraupnirSpear extends Item implements Vanishable {
             if (thrownCount == THROWN_SPEARS_THRESHOLD - 1) { setDelayTicks(itemStack, 15); }
             return InteractionResultHolder.pass(itemStack);
         } else if (delayTicks == 0 || isShiftDown){
-            level.playSound(null, player.getOnPos(), ModSounds.DRAUPNIR_SPEAR_EXPLOSION_HIT.get(), SoundSource.PLAYERS, 2.0F, RANDOM_SOUND_PITCH);
+            BlockPos playerOnPos = player.getOnPos();
+            level.playSound(null, playerOnPos, ModSounds.DRAUPNIR_SPEAR_EXPLOSION_HIT.get(), SoundSource.PLAYERS, 2.0F, RANDOM_SOUND_PITCH);
             setDelayTicks(itemStack, 10);
             setExplosionState(itemStack, true);
-            player.getCooldowns().addCooldown(this, 40 * thrownCount);
+            if (!level.isClientSide) {
+                Vec2 normVec = HeimdallGauntlet.findNormVec(player.getLookAngle());
+                sendExplosionPacket(level, player.getX() + normVec.x * 0.7, player.getY() - 1, player.getZ() + normVec.y * 0.7, 2D, 0D,25);
+            }
+//            player.getCooldowns().addCooldown(this, 40 * (thrownCount + 1));
             return InteractionResultHolder.consume(itemStack);
         }
         return InteractionResultHolder.fail(itemStack);
+    }
+
+    public static void sendExplosionPacket(Level level, double x, double y, double z, double factor, double yRandom, int quantity) {
+        SpearExplosionParticleS2CPacket packet = new SpearExplosionParticleS2CPacket(x, y, z, factor, yRandom, quantity);
+        ModMessages.sendToChunk(packet, level.getChunkAt(new BlockPos(x, y, z)));
     }
 
     @Override
@@ -152,15 +167,28 @@ public class DraupnirSpear extends Item implements Vanishable {
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
         int delayTicks = getDelayTicks(itemStack);
         List<UUID> thrownSpears = getThrownSpears(itemStack);
-        if (thrownSpears.isEmpty()) {
-             resetItemStackState(itemStack);
+        if (thrownSpears.isEmpty() && !isNBTReset(itemStack)) {
+             resetNBT(itemStack);
         }
         if (delayTicks > DELAY_TICKS_THRESHOLD) {
             setDelayTicks(itemStack, --delayTicks);
         } else if (delayTicks == DELAY_TICKS_THRESHOLD && getExplosionState(itemStack)) {
             UUID uuid = thrownSpears.get(0);
             if (!level.isClientSide) {
-                destroySpear(level, itemStack, uuid, entity);
+                ServerLevel serverLevel = ((ServerLevel) level);
+                Entity entityUUID = serverLevel.getEntity(uuid);
+
+                if (isValidSpear(entityUUID) && entity instanceof Player player) {
+                    destroySpear(level, entityUUID, entityUUID, player);
+                }
+                thrownSpears.remove(0);
+                setThrownSpears(itemStack, thrownSpears);
+                if (entityUUID != null) {
+                    if (entityUUID instanceof ThrownDraupnirSpear) {
+                        entityUUID.discard();
+                    }
+                    setDelayTicks(itemStack, RAND.nextInt(2, 6));
+                }
             }
         } else if (delayTicks == 1 && !getExplosionState(itemStack)){
             setDelayTicks(itemStack, --delayTicks);
@@ -168,46 +196,37 @@ public class DraupnirSpear extends Item implements Vanishable {
         super.inventoryTick(itemStack, level, entity, p_41407_, p_41408_);
     }
 
-    private void destroySpear(Level level, ItemStack itemStack, UUID uuid, Entity entity) {
-        List<UUID> thrownSpears = getThrownSpears(itemStack);
-        ServerLevel serverLevel = ((ServerLevel) level);
-        Entity entityUUID = serverLevel.getEntity(uuid);
-
-        if (entityUUID instanceof ThrownDraupnirSpear spear && entity instanceof Player player) {
-            double spearX = spear.getX();
-            double spearY = spear.getY();
-            double spearZ = spear.getZ();
-
-            List<LivingEntity> entitiesInArea =
-                    Motosignir.getEntitiesInArea(level, spearX, spearY, spearZ, EXPLOSION_RADIUS);
-
-            Motosignir.hurtAndKnockbackEntites(level, entitiesInArea, player, spear, EXPLOSION_DAMAGE, 0.2f);
-
-            level.playSound(null, spear.getOnPos(), ModSounds.DRAUPNIR_SPEAR_EXPLOSION.get(), SoundSource.PLAYERS, 2.0F, RANDOM_SOUND_PITCH);
-
-            SpearExplosionParticleS2CPacket packet = new SpearExplosionParticleS2CPacket(spearX, spearY, spearZ);
-            ModMessages.sendToChunk(packet, serverLevel.getChunkAt(spear.getOnPos()));
-
-            thrownSpears.remove(0);
-            setThrownSpears(itemStack, thrownSpears);
-            setDelayTicks(itemStack, RAND.nextInt(2, 6));
-
-            spear.discard();
-        }
+    private boolean isValidSpear(Entity entity) {
+        return entity instanceof ThrownDraupnirSpear || entity instanceof LivingEntity;
     }
 
-    public static void spawnSpearExplosionParticles(Level level, double x, double y, double z) {
+    private void destroySpear(Level level, Entity spear, Entity entityUUID, Player player) {
+        double spearX = spear.getX();
+        double spearY = spear.getY();
+        double spearZ = spear.getZ();
+
+        List<LivingEntity> entitiesInArea =
+                Motosignir.getEntitiesInArea(level, spearX, spearY, spearZ, EXPLOSION_RADIUS);
+
+        Motosignir.hurtAndKnockbackEntites(level, entitiesInArea, player, spear, EXPLOSION_DAMAGE, 0.2f);
+
+        level.playSound(null, spear.getOnPos(), ModSounds.DRAUPNIR_SPEAR_EXPLOSION.get(), SoundSource.PLAYERS, 2.0F, RANDOM_SOUND_PITCH);
+
+        sendExplosionPacket(level, spearX, spearY, spearZ, 1.5F, 0, 20);
+    }
+
+    public static void spawnSpearExplosionParticles(Level level, double x, double y, double z, double factor, double yRandom, int quantity) {
         BlockParticleOption particleOption = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.HONEY_BLOCK.defaultBlockState());
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < quantity; i++) {
             level.addParticle(particleOption,
-                    x + (Math.random() - 0.5) * 1.5,
-                    y + Math.random() * 1.5,
-                    z + (Math.random() - 0.5) * 1.5,
+                    x + (Math.random() - 0.5) * factor,
+                    y + (Math.random() - yRandom) * factor,
+                    z + (Math.random() - 0.5) * factor,
                     0, 0, 0);
             level.addParticle(ParticleTypes.CRIT,
-                    x + (Math.random() - 0.5) * 1.5,
-                    y + Math.random() * 1.5,
-                    z + (Math.random() - 0.5) * 1.5,
+                    x + (Math.random() - 0.5) * factor,
+                    y + (Math.random() - yRandom) * factor,
+                    z + (Math.random() - 0.5) * factor,
                     0, 0, 0);
         }
     }
