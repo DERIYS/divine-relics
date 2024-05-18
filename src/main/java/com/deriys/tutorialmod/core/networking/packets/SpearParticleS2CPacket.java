@@ -12,16 +12,20 @@ public class SpearParticleS2CPacket {
     private final double spearX;
     private final double spearY;
     private final double spearZ;
+    private final double throwerX;
+    private final double throwerY;
+    private final double throwerZ;
     private final float pitch;
-    private final float yaw;
     private final float height;
 
-    public SpearParticleS2CPacket(double spearX, double spearY, double playerZ, float pitch, float yaw, float height) {
+    public SpearParticleS2CPacket(double spearX, double spearY, double playerZ, double throwerX, double throwerY, double throwerZ, float pitch, float height) {
         this.spearX = spearX;
         this.spearY = spearY;
         this.spearZ = playerZ;
+        this.throwerX = throwerX;
+        this.throwerY = throwerY;
+        this.throwerZ = throwerZ;
         this.pitch = pitch;
-        this.yaw = pitch;
         this.height = height;
     }
 
@@ -29,8 +33,10 @@ public class SpearParticleS2CPacket {
         spearX = buf.readDouble();
         spearY = buf.readDouble();
         spearZ = buf.readDouble();
+        throwerX = buf.readDouble();
+        throwerY = buf.readDouble();
+        throwerZ = buf.readDouble();
         pitch = buf.readFloat();
-        yaw = buf.readFloat();
         height = buf.readFloat();
     }
 
@@ -38,8 +44,10 @@ public class SpearParticleS2CPacket {
         buf.writeDouble(spearX);
         buf.writeDouble(spearY);
         buf.writeDouble(spearZ);
+        buf.writeDouble(throwerX);
+        buf.writeDouble(throwerY);
+        buf.writeDouble(throwerZ);
         buf.writeFloat(pitch);
-        buf.writeFloat(yaw);
         buf.writeFloat(height);
     }
 
@@ -49,7 +57,7 @@ public class SpearParticleS2CPacket {
             Minecraft mc = Minecraft.getInstance();
             ClientLevel level = mc.level;
             if (level != null) {
-                ThrownDraupnirSpear.spawnSpearParticles(level, spearX, spearY, spearZ, pitch, yaw, height);
+                ThrownDraupnirSpear.spawnSpearParticles(level, spearX, spearY, spearZ, throwerX, throwerY, throwerZ, pitch, height);
             }
         });
         return true;

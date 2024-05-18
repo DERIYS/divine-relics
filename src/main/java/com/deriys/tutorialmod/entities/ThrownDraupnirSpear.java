@@ -33,6 +33,9 @@ import javax.annotation.Nullable;
 
 public class ThrownDraupnirSpear extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
+    private double throwerX;
+    private double throwerY;
+    private double throwerZ;
     private ItemStack spearItem;
     private boolean dealtDamage;
 
@@ -54,14 +57,22 @@ public class ThrownDraupnirSpear extends AbstractArrow {
         this.entityData.set(ID_FOIL, itemStack.hasFoil());
     }
 
-    public static void spawnSpearParticles(ClientLevel level, double x, double y, double z, float pitch, float yaw, float height) {
+    public void setThrowerPos(Vec3 throwerPos) {
+        this.throwerX = throwerPos.x;
+        this.throwerY = throwerPos.y;
+        this.throwerZ = throwerPos.z;
+    }
+
+    public static void spawnSpearParticles(ClientLevel level, double x, double y, double z, double throwerX, double throwerY, double throwerZ, float pitch, float height) {
         BlockParticleOption particleOption = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.WHITE_CONCRETE.defaultBlockState());
 
-        double pitchRadians = Math.toRadians(Math.abs(pitch) - 90);
+        double pitchRadians = Math.toRadians(pitch);
 
-        double offsetX = 0;
-        double offsetY = height * Math.cos(pitchRadians);
-        double offsetZ = 0;
+        Vec3 throwVec = new Vec3(throwerX - x, throwerY - y, throwerZ - z).normalize().scale(height * Math.cos(pitchRadians));
+
+        double offsetX = throwVec.x;
+        double offsetY = -height * Math.sin(pitchRadians);
+        double offsetZ = throwVec.z;
 
         level.addParticle(particleOption,
                 x + offsetX + (Math.random() * 0.2 - 0.1),
@@ -81,7 +92,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
         }
         if (!level.isClientSide && this.tickCount % 4 == 0) {
             ServerLevel serverLevel = ((ServerLevel) this.getLevel());
-            SpearParticleS2CPacket packet = new SpearParticleS2CPacket(this.getX(), this.getY(), this.getZ(), this.getXRot(), this.getYRot(), 0.8F);
+            SpearParticleS2CPacket packet = new SpearParticleS2CPacket(this.getX(), this.getY(), this.getZ(), this.throwerX, this.throwerY, this.throwerZ, this.getXRot(), 1F);
             ModMessages.sendToChunk(packet, serverLevel.getChunkAt(this.getOnPos()));
         }
         super.tick();
@@ -120,16 +131,14 @@ public class ThrownDraupnirSpear extends AbstractArrow {
 
                 if (this.spearItem.getItem() instanceof DraupnirSpear draupnirSpear) {
                     draupnirSpear.addThrownSpear(this.spearItem, hurtEntity.getUUID());
-
                     DraupnirSpear.sendExplosionPacket(this.level, this.getX(), this.getY(), this.getZ(), 1D, 0.5D, 10);
-
-                    this.discard();
                 }
 
                 this.doPostHurtEffects(livingEntityHurt);
+                this.discard();
             }
         }
-
+        this.setDeltaMovement(this.getDeltaMovement().multiply(-0.001, -0.01, -0.001));
         this.playSound(soundEvent, 2.0F, 1.0F);
     }
 

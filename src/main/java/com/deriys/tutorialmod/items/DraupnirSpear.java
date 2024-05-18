@@ -38,7 +38,7 @@ import java.util.UUID;
 
 public class DraupnirSpear extends Item implements Vanishable {
     public static final int THROW_THRESHOLD_TIME = 8;
-    public static final float BASE_DAMAGE = 8.0F;
+    public static final float BASE_DAMAGE = 10.0F;
     public static final float SHOOT_POWER = 3.5F;
     public static final Random RAND = new Random();
     private static final int DELAY_TICKS_THRESHOLD = 1;
@@ -147,7 +147,7 @@ public class DraupnirSpear extends Item implements Vanishable {
                 Vec2 normVec = HeimdallGauntlet.findNormVec(player.getLookAngle());
                 sendExplosionPacket(level, player.getX() + normVec.x * 0.7, player.getY() - 1, player.getZ() + normVec.y * 0.7, 2D, 0D,25);
             }
-//            player.getCooldowns().addCooldown(this, 40 * (thrownCount + 1));
+            player.getCooldowns().addCooldown(this, 40 * (thrownCount + 1));
             return InteractionResultHolder.consume(itemStack);
         }
         return InteractionResultHolder.fail(itemStack);
@@ -179,14 +179,14 @@ public class DraupnirSpear extends Item implements Vanishable {
                 Entity entityUUID = serverLevel.getEntity(uuid);
 
                 if (isValidSpear(entityUUID) && entity instanceof Player player) {
-                    destroySpear(level, entityUUID, entityUUID, player);
+                    destroySpear(level, entityUUID, player);
                 }
                 thrownSpears.remove(0);
                 setThrownSpears(itemStack, thrownSpears);
                 if (entityUUID != null) {
                     if (entityUUID instanceof ThrownDraupnirSpear) {
                         entityUUID.discard();
-                    }
+                    } else { entityUUID.invulnerableTime = 1; }
                     setDelayTicks(itemStack, RAND.nextInt(2, 6));
                 }
             }
@@ -200,7 +200,7 @@ public class DraupnirSpear extends Item implements Vanishable {
         return entity instanceof ThrownDraupnirSpear || entity instanceof LivingEntity;
     }
 
-    private void destroySpear(Level level, Entity spear, Entity entityUUID, Player player) {
+    private void destroySpear(Level level, Entity spear, Player player) {
         double spearX = spear.getX();
         double spearY = spear.getY();
         double spearZ = spear.getZ();
@@ -208,7 +208,7 @@ public class DraupnirSpear extends Item implements Vanishable {
         List<LivingEntity> entitiesInArea =
                 Motosignir.getEntitiesInArea(level, spearX, spearY, spearZ, EXPLOSION_RADIUS);
 
-        Motosignir.hurtAndKnockbackEntites(level, entitiesInArea, player, spear, EXPLOSION_DAMAGE, 0.2f);
+        Motosignir.hurtAndKnockbackEntites(entitiesInArea, player, spear, EXPLOSION_DAMAGE, 0.2f);
 
         level.playSound(null, spear.getOnPos(), ModSounds.DRAUPNIR_SPEAR_EXPLOSION.get(), SoundSource.PLAYERS, 2.0F, RANDOM_SOUND_PITCH);
 
@@ -241,6 +241,8 @@ public class DraupnirSpear extends Item implements Vanishable {
                     ThrownDraupnirSpear thrownSpear = new ThrownDraupnirSpear(level, player, itemStack);
                     thrownSpear.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, SHOOT_POWER, 1.0F);
                     thrownSpear.pickup = AbstractArrow.Pickup.DISALLOWED;
+
+                    thrownSpear.setThrowerPos(player.position());
 
                     addThrownSpear(itemStack, thrownSpear.getUUID());
                     setThrownCount(itemStack, ++thrownCount);
