@@ -18,7 +18,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ThrownDraupnirSpearRenderer extends EntityRenderer<ThrownDraupnirSpear> {
-    public static final ResourceLocation SPEAR_LOCATION = new ResourceLocation("tutorialmod:textures/entity/draupnir_spear.png");
+    public static final ResourceLocation SPEAR_LOCATION = new ResourceLocation("tutorialmod:textures/entity/thrown_draupnir.png");
     private final ThrownDraupnirSpearModel model;
 
     public ThrownDraupnirSpearRenderer(EntityRendererProvider.Context context) {
