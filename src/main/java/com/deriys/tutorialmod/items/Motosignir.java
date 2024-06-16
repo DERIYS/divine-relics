@@ -154,7 +154,7 @@ public class Motosignir extends SwordItem {
 
     public static void hurtAndKnockbackEntites (List<LivingEntity> entities, Player player, MobEffect[] mobEffects, float baseDamage, double force, int amplifier, int duration) {
         for(LivingEntity livingEntity: entities) {
-            if (livingEntity != player) {
+            if (livingEntity != player && (!(livingEntity instanceof Player && ((Player) livingEntity).isCreative()))) {
                 double entityX = livingEntity.getX();
                 double entityZ = livingEntity.getZ();
 
@@ -176,9 +176,8 @@ public class Motosignir extends SwordItem {
 
                 if (!livingEntity.hasEffect(ModEffects.BIFROST_PROTECTION.get())) {
                     livingEntity.knockback(force, ratioX, ratioZ);
+                    gainMobEffects(livingEntity, mobEffects, duration, amplifier);
                 }
-
-                gainMobEffects(livingEntity, mobEffects, duration, amplifier);
             }
         }
     }

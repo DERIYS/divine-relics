@@ -20,6 +20,8 @@ public class ModItems {
 
     public static final RegistryObject<Item> DRAUPNIR_SPEAR = ITEMS.register("draupnir_spear",
             () -> new DraupnirSpear(new Item.Properties().stacksTo(1).fireResistant().tab(ModCreativeTab.TUTORIAL_TAB)));
+    public static final RegistryObject<Item> ORACLE_COMPASS = ITEMS.register("oracle_compass",
+            () -> new OracleCompass(new Item.Properties().stacksTo(1).fireResistant().tab(ModCreativeTab.TUTORIAL_TAB)));
 
 
     public static void register(IEventBus eventBus) {

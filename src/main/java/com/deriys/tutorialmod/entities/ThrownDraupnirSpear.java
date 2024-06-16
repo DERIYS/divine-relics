@@ -13,7 +13,6 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -91,9 +90,8 @@ public class ThrownDraupnirSpear extends AbstractArrow {
             this.dealtDamage = true;
         }
         if (!level.isClientSide && this.tickCount % 4 == 0) {
-            ServerLevel serverLevel = ((ServerLevel) this.getLevel());
             SpearParticleS2CPacket packet = new SpearParticleS2CPacket(this.getX(), this.getY(), this.getZ(), this.throwerX, this.throwerY, this.throwerZ, this.getXRot(), 1F);
-            ModMessages.sendToChunk(packet, serverLevel.getChunkAt(this.getOnPos()));
+            ModMessages.sendToChunk(packet, level.getChunkAt(this.getOnPos()));
         }
         super.tick();
     }
@@ -123,7 +121,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
                 return;
             }
 
-            if (hurtEntity instanceof LivingEntity livingEntityHurt) {
+            if (hurtEntity instanceof LivingEntity livingEntityHurt && !(hurtEntity instanceof Player && ((Player) hurtEntity).isCreative())) {
                 if (owner instanceof LivingEntity) {
                     EnchantmentHelper.doPostHurtEffects(livingEntityHurt, owner);
                     EnchantmentHelper.doPostDamageEffects((LivingEntity)owner, livingEntityHurt);
@@ -131,7 +129,9 @@ public class ThrownDraupnirSpear extends AbstractArrow {
 
                 if (this.spearItem.getItem() instanceof DraupnirSpear draupnirSpear) {
                     draupnirSpear.addThrownSpear(this.spearItem, hurtEntity.getUUID());
-                    DraupnirSpear.sendExplosionPacket(this.level, this.getX(), this.getY(), this.getZ(), 1D, 0.5D, 10);
+                    if (!level.isClientSide) {
+                        DraupnirSpear.sendExplosionPacket(this.level, hurtEntity.getX(), this.getY(), hurtEntity.getZ(), 1D, 0.5D, 10);
+                    }
                 }
 
                 this.doPostHurtEffects(livingEntityHurt);
