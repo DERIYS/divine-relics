@@ -1,0 +1,16 @@
+{
+  "item.divinerelics.motosignir": "§6§lMotosignir",
+  "item.divinerelics.heimdall_gauntlet": "§3§lHeimdall's Gauntlet",
+  "item.divinerelics.draupnir_spear": "§6§lDraupnir Spear",
+
+  "effect.divinerelics.bifrost_protection": "Bifrost Protection",
+
+  "sounds.divinerelics.motosignir_sound_wave": "Motosignir released its sound wave",
+  "sounds.divinerelics.draupnir_spear_throwing": "Draupnir Spear is thrown",
+  "sounds.divinerelics.draupnir_spear_landing": "Draupnir Spear has landed",
+  "sounds.divinerelics.draupnir_spear_hit": "Hit with Draupnir Spear",
+  "sounds.divinerelics.draupnir_spear_explosion_hit": "Summoned Draupnir Explosion",
+  "sounds.divinerelics.draupnir_spear_explosion": "Draupnir Spear exploded",
+
+  "itemGroup.drmaintab": "Divine Relics"
+}

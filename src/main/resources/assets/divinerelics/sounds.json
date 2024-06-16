@@ -1,0 +1,38 @@
+  {
+    "motosignir_sound_wave": {
+      "subtitle": "sounds.divinerelics.motosignir_sound_wave",
+      "sounds": [
+        "divinerelics:motosignir_sound_wave"
+      ]
+    },
+    "draupnir_spear_throwing": {
+      "subtitle": "sounds.divinerelics.draupnir_spear_throwing",
+      "sounds": [
+        "divinerelics:draupnir_spear_throwing"
+      ]
+    },
+    "draupnir_spear_landing": {
+      "subtitle": "sounds.divinerelics.draupnir_spear_landing",
+      "sounds": [
+        "divinerelics:draupnir_spear_landing"
+      ]
+    },
+    "draupnir_spear_hit": {
+      "subtitle": "sounds.divinerelics.draupnir_spear_hit",
+      "sounds": [
+        "divinerelics:draupnir_spear_hit"
+      ]
+    },
+    "draupnir_spear_explosion_hit": {
+      "subtitle": "sounds.divinerelics.draupnir_spear_explosion_hit",
+      "sounds": [
+        "divinerelics:draupnir_spear_explosion_hit"
+      ]
+    },
+    "draupnir_spear_explosion": {
+      "subtitle": "sounds.divinerelics.draupnir_spear_explosion",
+      "sounds": [
+        "divinerelics:draupnir_spear_explosion"
+      ]
+    }
+  }
