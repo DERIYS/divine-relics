@@ -105,6 +105,11 @@ public class ThrownDraupnirSpear extends AbstractArrow {
         return this.dealtDamage ? null : super.findHitEntity(p_37575_, p_37576_);
     }
 
+    @Override
+    public boolean isOnFire() {
+        return false;
+    }
+
     protected void onHitEntity(EntityHitResult hitResult) {
         Entity hurtEntity = hitResult.getEntity();
         float damage = 7.0F;

@@ -1,21 +1,27 @@
 package com.deriys.divinerelics.event;
 
 import com.deriys.divinerelics.DivineRelics;
+import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBinding;
+import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.GauntletParticleS2CPacket;
 import com.deriys.divinerelics.effects.DREffects;
 import com.deriys.divinerelics.items.DRItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -47,6 +53,31 @@ public class DREvents {
                     }
                 }
             }
+        }
+
+        @SubscribeEvent
+        public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
+            if(event.getObject() instanceof Player) {
+                event.addCapability(new ResourceLocation(DivineRelics.MODID, "properties"), new MjolnirBindingProvider());
+            }
+        }
+
+//        @SubscribeEvent
+//        public static void onPlayerCloned(PlayerEvent.Clone event) {
+//            System.out.println("asdfasdf");
+//            if(event.isWasDeath()) {
+//                System.out.println("1111");
+//                event.getOriginal().getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(oldStore -> {
+//                    event.getEntity().getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(newStore -> {
+//                        newStore.copyFrom(oldStore);
+//                    });
+//                });
+//            }
+//        }
+
+        @SubscribeEvent
+        public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
+            event.register(MjolnirBinding.class);
         }
 
         private static boolean isValidAttacker(Entity attacker) {

@@ -204,6 +204,8 @@ public class DraupnirSpear extends Item implements Vanishable {
         return entity instanceof ThrownDraupnirSpear || entity instanceof LivingEntity;
     }
 
+
+
     private void destroySpear(Level level, Entity spear, Player player) {
         double spearX = spear.getX();
         double spearY = spear.getY();

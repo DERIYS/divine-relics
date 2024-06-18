@@ -29,6 +29,12 @@ public class DRMessages {
 
         INSTANCE = net;
 
+        net.messageBuilder(MjolnirBindingC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(MjolnirBindingC2SPacket::new)
+                .encoder(MjolnirBindingC2SPacket::toBytes)
+                .consumerMainThread(MjolnirBindingC2SPacket::handle)
+                .add();
+
         net.messageBuilder(MotosignirParticleS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(MotosignirParticleS2CPacket::new)
                 .encoder(MotosignirParticleS2CPacket::toBytes)
