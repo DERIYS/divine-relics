@@ -4,7 +4,8 @@ import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.effects.DREffects;
 import com.deriys.divinerelics.entities.DREntitiyTypes;
 import com.deriys.divinerelics.entities.client.render.ThrownDraupnirSpearRenderer;
-import com.deriys.divinerelics.items.ModItems;
+import com.deriys.divinerelics.entities.client.render.ThrownMjolnirRenderer;
+import com.deriys.divinerelics.items.DRItems;
 import com.deriys.divinerelics.sound.DRSounds;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
@@ -26,7 +27,7 @@ public class DivineRelics
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         modEventBus.addListener(this::commonSetup);
-        ModItems.register(modEventBus);
+        DRItems.register(modEventBus);
         DRSounds.register(modEventBus);
         DREffects.register(modEventBus);
         DREntitiyTypes.register(modEventBus);
@@ -44,6 +45,7 @@ public class DivineRelics
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             EntityRenderers.register(DREntitiyTypes.THROWN_DRAUPNIR_SPEAR.get(), ThrownDraupnirSpearRenderer::new);
+            EntityRenderers.register(DREntitiyTypes.THROWN_MJOLNIR.get(), ThrownMjolnirRenderer::new);
         }
     }
 }

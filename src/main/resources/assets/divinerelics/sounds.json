@@ -34,5 +34,41 @@
       "sounds": [
         "divinerelics:draupnir_spear_explosion"
       ]
+    },
+    "mjolnir_ground_impact": {
+      "subtitle": "sounds.divinerelics.mjolnir_ground_impact",
+      "sounds": [
+        "divinerelics:mjolnir_ground_impact"
+      ]
+    },
+    "mjolnir_pierce": {
+      "subtitle": "sounds.divinerelics.mjolnir_pierce",
+      "sounds": [
+        "divinerelics:mjolnir_pierce"
+      ]
+    },
+    "mjolnir_return": {
+      "subtitle": "sounds.divinerelics.mjolnir_return",
+      "sounds": [
+        "divinerelics:mjolnir_return"
+      ]
+    },
+    "mjolnir_riptide": {
+      "subtitle": "sounds.divinerelics.mjolnir_riptide",
+      "sounds": [
+        "divinerelics:mjolnir_riptide"
+      ]
+    },
+    "mjolnir_throw": {
+      "subtitle": "sounds.divinerelics.mjolnir_throw",
+      "sounds": [
+        "divinerelics:mjolnir_throw"
+      ]
+    },
+    "mjolnir_thunder": {
+      "subtitle": "sounds.divinerelics.mjolnir_thunder",
+      "sounds": [
+        "divinerelics:mjolnir_thunder"
+      ]
     }
   }

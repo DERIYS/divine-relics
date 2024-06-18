@@ -14,10 +14,15 @@ public class DREntitiyTypes {
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, DivineRelics.MODID);
 
     public static final RegistryObject<EntityType<ThrownDraupnirSpear>> THROWN_DRAUPNIR_SPEAR =
-        ENTITY_TYPES.register("thrown_draupnir_spear",
-                () -> EntityType.Builder.of(ThrownDraupnirSpear::create, MobCategory.MISC)
-                        .sized(0.5F, 0.5F)
-                        .build(new ResourceLocation(DivineRelics.MODID, "thrown_draupnir_spear").toString()));
+            ENTITY_TYPES.register("thrown_draupnir_spear",
+                    () -> EntityType.Builder.of(ThrownDraupnirSpear::create, MobCategory.MISC)
+                            .sized(0.5F, 0.5F)
+                            .build(new ResourceLocation(DivineRelics.MODID, "thrown_draupnir_spear").toString()));
+    public static final RegistryObject<EntityType<ThrownMjolnir>> THROWN_MJOLNIR =
+            ENTITY_TYPES.register("thrown_mjolnir",
+                    () -> EntityType.Builder.of(ThrownMjolnir::create, MobCategory.MISC)
+                            .sized(0.5F, 0.5F)
+                            .build(new ResourceLocation(DivineRelics.MODID, "thrown_mjolnir").toString()));
 
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);

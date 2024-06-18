@@ -7,7 +7,7 @@ public class DRCreativeTab {
     public static final CreativeModeTab MAINTAB = new CreativeModeTab("drmaintab") {
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(ModItems.MOTOSIGNIR.get());
+            return new ItemStack(DRItems.MOTOSIGNIR.get());
         }
     };
 }

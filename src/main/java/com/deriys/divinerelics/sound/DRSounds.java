@@ -27,6 +27,19 @@ public class DRSounds {
     public static final RegistryObject<SoundEvent> DRAUPNIR_SPEAR_EXPLOSION =
             registerSoundEvent("draupnir_spear_explosion");
 
+    public static final RegistryObject<SoundEvent> MJOLNIR_THROWING =
+            registerSoundEvent("mjolnir_throw");
+    public static final RegistryObject<SoundEvent> MJOLNIR_IMPACT =
+            registerSoundEvent("mjolnir_ground_impact");
+    public static final RegistryObject<SoundEvent> MJOLNIR_RETURN =
+            registerSoundEvent("mjolnir_return");
+    public static final RegistryObject<SoundEvent> MJOLNIR_RIPTIDE =
+            registerSoundEvent("mjolnir_riptide");
+    public static final RegistryObject<SoundEvent> MJOLNIR_PIERCE =
+            registerSoundEvent("mjolnir_pierce");
+    public static final RegistryObject<SoundEvent> MJOLNIR_THUNDER =
+            registerSoundEvent("mjolnir_thunder");
+
     public static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> new SoundEvent(new ResourceLocation(DivineRelics.MODID, name)));
     }

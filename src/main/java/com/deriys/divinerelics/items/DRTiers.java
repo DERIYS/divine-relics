@@ -12,7 +12,7 @@ import net.minecraftforge.common.TierSortingRegistry;
 
 import java.util.List;
 
-public class ModTiers {
+public class DRTiers {
     public static final Tier MOTOSIGNIR = TierSortingRegistry.registerTier(
             new ForgeTier(5, 0, 9f, 4f, 15,
                     Tags.Blocks.NEEDS_NETHERITE_TOOL, () -> Ingredient.of(Items.NETHERITE_INGOT)),

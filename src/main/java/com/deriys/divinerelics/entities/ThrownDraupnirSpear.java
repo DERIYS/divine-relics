@@ -3,7 +3,7 @@ package com.deriys.divinerelics.entities;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.SpearParticleS2CPacket;
 import com.deriys.divinerelics.items.DraupnirSpear;
-import com.deriys.divinerelics.items.ModItems;
+import com.deriys.divinerelics.items.DRItems;
 import com.deriys.divinerelics.sound.DRSounds;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.BlockParticleOption;
@@ -47,7 +47,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
     }
     public ThrownDraupnirSpear(EntityType<? extends ThrownDraupnirSpear> type, Level level) {
         super(type, level);
-        this.spearItem = new ItemStack(ModItems.DRAUPNIR_SPEAR.get());
+        this.spearItem = new ItemStack(DRItems.DRAUPNIR_SPEAR.get());
     }
 
     public ThrownDraupnirSpear(Level level, LivingEntity livingEntity, ItemStack itemStack) {

@@ -32,7 +32,7 @@ public class OracleCompass extends Item {
             for (ServerPlayer Splayer: players) {
                 if (Splayer != player) {
                     sendMessage(player, Splayer.getDisplayName().getString() + ": ");
-                    sendMessage(player, "DIM: " + getDimentionName(Splayer) + "; X: " + Splayer.getBlockX() + "; Y: " + Splayer.getBlockY() + "; Z: " + Splayer.getBlockZ() + "; DIST: " + Splayer.position().subtract(player.position()).length());
+                    sendMessage(player, "DIM: " + getDimentionName(Splayer) + "; X: " + Splayer.getBlockX() + "; Y: " + Splayer.getBlockY() + "; Z: " + Splayer.getBlockZ() + "; DIST: " + Math.round(Splayer.position().subtract(player.position()).length()));
                 }
             }
             return InteractionResultHolder.consume(player.getItemInHand(interactionHand));

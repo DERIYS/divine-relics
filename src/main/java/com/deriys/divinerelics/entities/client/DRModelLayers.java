@@ -7,4 +7,6 @@ import net.minecraft.resources.ResourceLocation;
 public class DRModelLayers {
     public static final ModelLayerLocation DRAUPNIR_SPEAR_LAYER = new ModelLayerLocation(
             new ResourceLocation(DivineRelics.MODID, "draupnir_spear_layer"), "main");
+    public static final ModelLayerLocation MJOLNIR_LAYER = new ModelLayerLocation(
+            new ResourceLocation(DivineRelics.MODID, "mjolnir_layer"), "main");
 }

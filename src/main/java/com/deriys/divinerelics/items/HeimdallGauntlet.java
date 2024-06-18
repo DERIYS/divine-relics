@@ -27,7 +27,7 @@ import static com.deriys.divinerelics.items.Motosignir.gainMobEffects;
 
 public class HeimdallGauntlet extends SwordItem {
 
-    private static final Random RAND = new Random();
+    public static final Random RAND = new Random();
     public static final double VECTOR_ANGLE_CONSTANT = 3 * Math.PI / 2 - Math.PI / 4;
     private final MobEffect[] EFFECTS = {
             DREffects.BIFROST_PROTECTION.get(),
@@ -144,8 +144,8 @@ public class HeimdallGauntlet extends SwordItem {
 
     public static void addTeleportParticles(Level level, double pX, double pY, double pZ, double tpX, double tpZ) {
         for (int i = 0; i < 70; i++) {
-           double rX = RAND.nextFloat() - 0.5;
-           double rZ = RAND.nextFloat() - 0.5;
+            double rX = RAND.nextFloat() - 0.5;
+            double rZ = RAND.nextFloat() - 0.5;
 
             level.addParticle(ParticleTypes.PORTAL,
                     pX + rX,

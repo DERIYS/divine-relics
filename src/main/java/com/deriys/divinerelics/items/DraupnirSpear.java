@@ -172,7 +172,7 @@ public class DraupnirSpear extends Item implements Vanishable {
         int delayTicks = getDelayTicks(itemStack);
         List<UUID> thrownSpears = getThrownSpears(itemStack);
         if (thrownSpears.isEmpty() && !isNBTReset(itemStack)) {
-             resetNBT(itemStack);
+            resetNBT(itemStack);
         }
         if (delayTicks > DELAY_TICKS_THRESHOLD) {
             setDelayTicks(itemStack, --delayTicks);

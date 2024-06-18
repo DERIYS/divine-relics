@@ -4,7 +4,7 @@ import com.deriys.divinerelics.DivineRelics;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.GauntletParticleS2CPacket;
 import com.deriys.divinerelics.effects.DREffects;
-import com.deriys.divinerelics.items.ModItems;
+import com.deriys.divinerelics.items.DRItems;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
@@ -42,9 +42,7 @@ public class DREvents {
 
                         Vec2 attackVector = new Vec2((float) (entityPos.x - attackerPos.x), (float) (entityPos.z - attackerPos.z));
                         dodgeAttack(level, livingEntity, attackVector);
-                        if (!(attacker instanceof AbstractArrow)) {
-                            hurtEntity.lookAt(EntityAnchorArgument.Anchor.EYES, attackerPos.add(0, attacker.getBbHeight() * 0.8, 0));
-                        }
+                        hurtEntity.lookAt(EntityAnchorArgument.Anchor.EYES, attackerPos.add(0, attacker.getBbHeight() * 0.8, 0));
                         event.setCanceled(true);
                     }
                 }
@@ -52,7 +50,7 @@ public class DREvents {
         }
 
         private static boolean isValidAttacker(Entity attacker) {
-            return attacker instanceof AbstractArrow || (attacker instanceof LivingEntity livingEntity && livingEntity.getMainHandItem().getItem() != ModItems.DRAUPNIR_SPEAR.get() && !livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get()));
+            return attacker instanceof AbstractArrow || (attacker instanceof LivingEntity livingEntity && livingEntity.getMainHandItem().getItem() != DRItems.DRAUPNIR_SPEAR.get());
         }
 
         public static void dodgeAttack(Level level, LivingEntity hurtEntity,  Vec2 attackVector) {
