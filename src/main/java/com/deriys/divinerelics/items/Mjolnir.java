@@ -56,6 +56,7 @@ public class Mjolnir extends Item implements Vanishable {
             int ticks = this.getUseDuration(itemStack) - use_ticks;
             if (ticks >= 10) {
                 if (!player.isShiftKeyDown() && !level.isClientSide) {
+                    // adding throwed mjolnir
                     ThrownMjolnir thrownMjolnir = new ThrownMjolnir(level, player, itemStack);
                     thrownMjolnir.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, SHOOT_POWER, 1.0F);
                     if (player.getAbilities().instabuild) {
@@ -63,16 +64,18 @@ public class Mjolnir extends Item implements Vanishable {
                     }
                     level.addFreshEntity(thrownMjolnir);
 
+                    // bind thrown mjolnir to the player
                     player.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(binding -> {
                         binding.setMjolnir(thrownMjolnir.getUUID());
                     });
-//                  player.getCooldowns().addCooldown(this, 300);
+
                     level.playSound((Player)null, thrownMjolnir, DRSounds.MJOLNIR_THROWING.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
 
                     if (!player.getAbilities().instabuild) {
                         player.getInventory().removeItem(itemStack);
                     }
-                } else if (player.isShiftKeyDown()){
+
+                } else if (player.isShiftKeyDown()){ // riptide
                     float f7 = player.getYRot();
                     float f = player.getXRot();
                     float f1 = -Mth.sin(f7 * ((float) Math.PI / 180F)) * Mth.cos(f * ((float) Math.PI / 180F));

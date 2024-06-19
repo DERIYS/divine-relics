@@ -130,6 +130,9 @@ public class ThrownMjolnir extends AbstractArrow {
         float volume = 1.0F;
         this.dealtDamage = true;
         this.hit = true;
+        if (owner instanceof Player player) {
+            player.getCooldowns().addCooldown(this.mjolnirItem.getItem(), 300);
+        }
         SoundEvent soundEvent = DRSounds.MJOLNIR_IMPACT.get();
         if (entity.hurt(damageSource, damage)) {
             Level level = this.level;
@@ -175,33 +178,40 @@ public class ThrownMjolnir extends AbstractArrow {
 
         List<LivingEntity> entitiesInArea =
                 Motosignir.getEntitiesInArea(level, hammerX, hammerY, hammerZ, STRIKE_RADIUS);
-        int lightningCount = 0;
+
+        int lightningCount = 0; // how many lightning are spawned
+
         for (LivingEntity hitEntity: entitiesInArea) {
             if (hitEntity != owner) {
                 spawnLightning(level, hitEntity.getOnPos(), owner);
                 lightningCount++;
             }
         }
-        if (lightningCount < 4) {
+        if (lightningCount < 4) { // if there were < 4 lightnings, shoot at random position within 5-meter radius
             for (int i = lightningCount; i < 3; i++) {
                 spawnLightning(level, getRandBlockPos(blockPos), owner);
             }
         }
         if (this.getOwner() instanceof Player player) {
-            Motosignir.hurtAndKnockbackEntites(entitiesInArea, player, this, 7F, 0.7f);
+            Motosignir.hurtAndKnockbackEntites(entitiesInArea, player, this, 9F, 1f);
         }
     }
 
     @Override
     protected void onHitBlock(BlockHitResult blockHitResult) {
         super.onHitBlock(blockHitResult);
+
         Level level = this.level;
         BlockPos blockPos = blockHitResult.getBlockPos();
         this.level.playSound(null, this.getX(), this.getY(), this.getZ(), DRSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+
         if (!level.isClientSide && !this.hit) {
             Entity owner = this.getOwner();
             onHitLighnting(level, blockPos, owner);
             this.hit = true;
+            if (owner instanceof Player player) {
+                player.getCooldowns().addCooldown(this.mjolnirItem.getItem(), 300);
+            }
         }
     }
     @Override
@@ -213,11 +223,8 @@ public class ThrownMjolnir extends AbstractArrow {
         return EnchantmentHelper.hasChanneling(this.mjolnirItem);
     }
 
-    protected boolean tryPickup(Player p_150196_) {
-        if (super.tryPickup(p_150196_) || this.isNoPhysics() && this.ownedBy(p_150196_) && p_150196_.getInventory().add(this.getPickupItem())) {
-            this.hit = false;
-            return true;
-        } return false;
+    protected boolean tryPickup(Player player) {
+        return super.tryPickup(player) || this.isNoPhysics() && this.ownedBy(player) && player.getInventory().add(this.getPickupItem());
     }
 
     protected SoundEvent getDefaultHitGroundSoundEvent() {
