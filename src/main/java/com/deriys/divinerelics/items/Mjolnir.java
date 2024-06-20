@@ -5,7 +5,10 @@ import com.deriys.divinerelics.entities.ThrownMjolnir;
 import com.deriys.divinerelics.sound.DRSounds;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
@@ -24,6 +27,9 @@ import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class Mjolnir extends Item implements Vanishable {
     public static final int THROW_THRESHOLD_TIME = 10;
@@ -121,5 +127,14 @@ public class Mjolnir extends Item implements Vanishable {
 
     public int getEnchantmentValue() {
         return 1;
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag flag) {
+        if(Screen.hasShiftDown()) {
+            components.add(Component.literal("The legendary hammer of the Aesir god Thor, forged by the Huldra brothers, is now at your possession. Be careful, for the hammer does not make you the God of Thunder."));
+        } else {
+            components.add(Component.literal("Press SHIFT for more info").withStyle(ChatFormatting.YELLOW));
+        }
     }
 }

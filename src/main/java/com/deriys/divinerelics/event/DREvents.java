@@ -7,6 +7,7 @@ import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.GauntletParticleS2CPacket;
 import com.deriys.divinerelics.effects.DREffects;
 import com.deriys.divinerelics.items.DRItems;
+import com.deriys.divinerelics.items.Motosignir;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.resources.ResourceLocation;
@@ -26,6 +27,7 @@ import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.List;
 import java.util.Random;
 
 import static com.deriys.divinerelics.items.HeimdallGauntlet.*;
@@ -53,6 +55,18 @@ public class DREvents {
                     }
                 }
             }
+
+            if (hurtEntity instanceof Player player && attacker instanceof LivingEntity livingAttacker) {
+                if (player.isBlocking() && player.getOffhandItem().getItem() == DRItems.GUARDIAN_SHIELD.get()) {
+                    int ticksInUse = player.getTicksUsingItem();
+                    if (ticksInUse <= 20) {
+                        System.out.println(event.getAmount());
+                        Motosignir.hurtAndKnockbackEntites(List.of(livingAttacker), player, Motosignir.NEGATIVE_EFFECTS, event.getAmount(), 0.4f, 1, 100);
+                    } else {
+                        System.out.println(">20");
+                    }
+                }
+            }
         }
 
         @SubscribeEvent
@@ -62,23 +76,12 @@ public class DREvents {
             }
         }
 
-//        @SubscribeEvent
-//        public static void onPlayerCloned(PlayerEvent.Clone event) {
-//            System.out.println("asdfasdf");
-//            if(event.isWasDeath()) {
-//                System.out.println("1111");
-//                event.getOriginal().getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(oldStore -> {
-//                    event.getEntity().getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(newStore -> {
-//                        newStore.copyFrom(oldStore);
-//                    });
-//                });
-//            }
-//        }
-
         @SubscribeEvent
         public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
             event.register(MjolnirBinding.class);
         }
+
+
 
         private static boolean isValidAttacker(Entity attacker) {
             return attacker instanceof AbstractArrow || (attacker instanceof LivingEntity livingEntity && livingEntity.getMainHandItem().getItem() != DRItems.DRAUPNIR_SPEAR.get());

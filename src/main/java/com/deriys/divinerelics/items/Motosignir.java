@@ -31,14 +31,14 @@ import java.util.List;
 
 
 public class Motosignir extends SwordItem {
-    private final MobEffect[] NEGATIVE_EFFECTS = {
+    public static final MobEffect[] NEGATIVE_EFFECTS = {
             MobEffects.CONFUSION,
             MobEffects.MOVEMENT_SLOWDOWN,
             MobEffects.WEAKNESS
     };
 
-    private final int EFFECTS_DURATION = 200;
-    private final int AMPLIFIER = 1;
+    public static final int EFFECTS_DURATION = 200;
+    public static final int AMPLIFIER = 1;
 
     public Motosignir(Tier p_43269_, int p_43270_, float p_43271_, Properties p_43272_) {
         super(p_43269_, p_43270_, p_43271_, p_43272_);
@@ -115,7 +115,7 @@ public class Motosignir extends SwordItem {
     public static List<LivingEntity> getEntitiesInArea(Level level, double x, double y, double z, double radius) {
         AABB aabb = new AABB(x - radius, y - radius, z - radius,
                 x + radius, y + radius, z + radius);
-        return  level.getEntitiesOfClass(LivingEntity.class, aabb);
+        return level.getEntitiesOfClass(LivingEntity.class, aabb);
     }
 
     public static void hurtAndKnockbackEntites (List<LivingEntity> entities, Player player, Entity attacker, float baseDamage, double force) {

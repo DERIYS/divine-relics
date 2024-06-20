@@ -70,10 +70,11 @@ public class ThrownMjolnir extends AbstractArrow {
             if (player != null) {
                 if (!this.isAcceptibleReturnOwner()) {
                     if (!this.level.isClientSide && this.pickup == Pickup.ALLOWED) {
-                        this.spawnAtLocation(this.getPickupItem(), 0.1F);
+                        this.setNoPhysics(false);
+                        this.setDeltaMovement(this.getDeltaMovement().multiply(0.001, 0.01, 0.001));
+                        this.shouldReturn = false;
+                        this.hit = true;
                     }
-
-                    this.discard();
                 } else {
                     this.setNoPhysics(true);
                     Vec3 vectorPM = player.getEyePosition().subtract(this.position());
