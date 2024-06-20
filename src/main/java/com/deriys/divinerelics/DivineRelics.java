@@ -7,6 +7,7 @@ import com.deriys.divinerelics.entities.client.render.ThrownDraupnirSpearRendere
 import com.deriys.divinerelics.entities.client.render.ThrownMjolnirRenderer;
 import com.deriys.divinerelics.items.DRItems;
 import com.deriys.divinerelics.sound.DRSounds;
+import com.deriys.divinerelics.util.DRItemProperties;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -46,6 +47,7 @@ public class DivineRelics
         public static void onClientSetup(FMLClientSetupEvent event) {
             EntityRenderers.register(DREntitiyTypes.THROWN_DRAUPNIR_SPEAR.get(), ThrownDraupnirSpearRenderer::new);
             EntityRenderers.register(DREntitiyTypes.THROWN_MJOLNIR.get(), ThrownMjolnirRenderer::new);
+            DRItemProperties.addCustomItemProperties();
         }
     }
 }

@@ -2,6 +2,7 @@ package com.deriys.divinerelics.items;
 
 import com.deriys.divinerelics.DivineRelics;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -25,7 +26,7 @@ public class DRItems {
     public static final RegistryObject<Item> MJOLNIR = ITEMS.register("mjolnir",
             () -> new Mjolnir(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> GUARDIAN_SHIELD = ITEMS.register("guardian_shield",
-            () -> new GuardianShield(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
+            () -> new GuardianShield(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant().tab(DRCreativeTab.MAINTAB)));
 
 
     public static void register(IEventBus eventBus) {

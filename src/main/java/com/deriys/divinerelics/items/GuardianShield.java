@@ -1,5 +1,7 @@
 package com.deriys.divinerelics.items;
 
+import com.deriys.divinerelics.sound.DRSounds;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -9,6 +11,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
+
+import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 
 public class GuardianShield extends ShieldItem {
 
@@ -40,6 +44,9 @@ public class GuardianShield extends ShieldItem {
     public InteractionResultHolder<ItemStack> use(Level p_43099_, Player player, InteractionHand p_43101_) {
         ItemStack itemstack = player.getItemInHand(p_43101_);
         player.startUsingItem(p_43101_);
+        if (player.isUsingItem() && player.getUseItem() == itemstack) {
+            player.getLevel().playSound(null, player.getOnPos(), DRSounds.GUARDIAN_SHIELD_OPEN.get(), SoundSource.PLAYERS, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
+        }
         return InteractionResultHolder.consume(itemstack);
     }
 

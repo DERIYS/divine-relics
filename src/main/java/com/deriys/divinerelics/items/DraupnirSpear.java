@@ -49,7 +49,7 @@ public class DraupnirSpear extends Item implements Vanishable {
     private static final double EXPLOSION_RADIUS = 4.0F;
     private static final float EXPLOSION_DAMAGE = 9.0F;
     private static final int THROWN_SPEARS_THRESHOLD = 5;
-    private static final float RANDOM_SOUND_PITCH = RAND.nextFloat() * 0.1F + 0.95F;
+    public static final float RANDOM_SOUND_PITCH = RAND.nextFloat() * 0.1F + 0.95F;
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     public DraupnirSpear(Item.Properties p_43381_) {
@@ -144,7 +144,7 @@ public class DraupnirSpear extends Item implements Vanishable {
             return InteractionResultHolder.pass(itemStack);
         } else if (delayTicks == 0 || isShiftDown){
             BlockPos playerOnPos = player.getOnPos();
-            level.playSound(null, playerOnPos, DRSounds.DRAUPNIR_SPEAR_EXPLOSION_HIT.get(), SoundSource.PLAYERS, 2.0F, RANDOM_SOUND_PITCH);
+            level.playSound(null, playerOnPos, DRSounds.DRAUPNIR_SPEAR_EXPLOSION_HIT.get(), SoundSource.PLAYERS, 2.0F, RAND.nextFloat() * 0.1F + 0.95F);
             setDelayTicks(itemStack, 10);
             setExplosionState(itemStack, true);
             if (!level.isClientSide) {
@@ -216,7 +216,7 @@ public class DraupnirSpear extends Item implements Vanishable {
 
         Motosignir.hurtAndKnockbackEntites(entitiesInArea, player, spear, EXPLOSION_DAMAGE, 0.2f);
 
-        level.playSound(null, spear.getOnPos(), DRSounds.DRAUPNIR_SPEAR_EXPLOSION.get(), SoundSource.PLAYERS, 2.0F, RANDOM_SOUND_PITCH);
+        level.playSound(null, spear.getOnPos(), DRSounds.DRAUPNIR_SPEAR_EXPLOSION.get(), SoundSource.PLAYERS, 2.0F, RAND.nextFloat() * 0.1F + 0.95F);
 
         sendExplosionPacket(level, spearX, spearY, spearZ, 1.5F, 0, 20);
     }
@@ -254,7 +254,7 @@ public class DraupnirSpear extends Item implements Vanishable {
                     setThrownCount(itemStack, ++thrownCount);
 
                     level.addFreshEntity(thrownSpear);
-                    level.playSound(null, thrownSpear, DRSounds.DRAUPNIR_SPEAR_THROWING.get(), SoundSource.PLAYERS, 1.0F, RANDOM_SOUND_PITCH);
+                    level.playSound(null, thrownSpear, DRSounds.DRAUPNIR_SPEAR_THROWING.get(), SoundSource.PLAYERS, 1.0F, RAND.nextFloat() * 0.1F + 0.95F);
                 }
             }
         }
@@ -275,7 +275,7 @@ public class DraupnirSpear extends Item implements Vanishable {
         double length = (entity.position().subtract(player.position())).length();
         double distanceModification = (length > 3F) ? 1.0F: length / 3.5F;
         double speed = 0.7F * distanceModification;
-        player.getLevel().playSound(null, player.getOnPos(), DRSounds.DRAUPNIR_SPEAR_HIT.get(), SoundSource.PLAYERS, 1.0f, RANDOM_SOUND_PITCH);
+        player.getLevel().playSound(null, player.getOnPos(), DRSounds.DRAUPNIR_SPEAR_HIT.get(), SoundSource.PLAYERS, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
         player.setDeltaMovement(new Vec3(lookVec.x * speed, 0, lookVec.z * speed));
         return false;
     }

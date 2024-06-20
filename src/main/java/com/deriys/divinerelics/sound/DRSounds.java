@@ -40,6 +40,11 @@ public class DRSounds {
     public static final RegistryObject<SoundEvent> MJOLNIR_THUNDER =
             registerSoundEvent("mjolnir_thunder");
 
+    public static final RegistryObject<SoundEvent> GUARDIAN_SHIELD_OPEN =
+            registerSoundEvent("guardian_shield_open");
+    public static final RegistryObject<SoundEvent> GUARDIAN_SHIELD_PARRY =
+            registerSoundEvent("guardian_shield_parry");
+
     public static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> new SoundEvent(new ResourceLocation(DivineRelics.MODID, name)));
     }

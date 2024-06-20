@@ -947,8 +947,8 @@
 	"gui_light": "front",
 	"display": {
 		"thirdperson_righthand": {
-			"rotation": [0, 90, 0],
-			"translation": [0, 0, 1]
+			"rotation": [-180, 90, 0],
+			"translation": [0, -8.5, 1.75]
 		},
 		"thirdperson_lefthand": {
 			"rotation": [0, -90, 0],
@@ -982,13 +982,5 @@
 			"translation": [0, 0, -0.25],
 			"scale": [0.5, 0.5, 0.5]
 		}
-	},
-	"overrides": [
-		{
-			"predicate": {
-				"using": 1
-			},
-			"model": "divinerelics:item/draupnir_spear_throwing"
-		}
-	]
+	}
 }

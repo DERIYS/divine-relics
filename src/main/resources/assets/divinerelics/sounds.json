@@ -70,5 +70,17 @@
       "sounds": [
         "divinerelics:mjolnir_thunder"
       ]
+    },
+    "guardian_shield_open": {
+      "subtitle": "sounds.divinerelics.guardian_shield_open",
+      "sounds": [
+        "divinerelics:guardian_shield_open"
+      ]
+    },
+    "guardian_shield_parry": {
+      "subtitle": "sounds.divinerelics.guardian_shield_parry",
+      "sounds": [
+        "divinerelics:guardian_shield_parry"
+      ]
     }
   }

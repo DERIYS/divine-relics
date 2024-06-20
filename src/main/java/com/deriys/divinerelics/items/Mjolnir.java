@@ -33,9 +33,10 @@ import java.util.List;
 
 public class Mjolnir extends Item implements Vanishable {
     public static final int THROW_THRESHOLD_TIME = 10;
-    public static final float BASE_DAMAGE = 20.0F;
-    public static final float SHOOT_POWER = 3F;
+    public static final float BASE_DAMAGE = 25.0F;
+    public static final float SHOOT_POWER = 4.5F;
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
+    public boolean isFlying = false;
 
     public Mjolnir(Item.Properties properties) {
         super(properties);
@@ -68,6 +69,7 @@ public class Mjolnir extends Item implements Vanishable {
                     if (player.getAbilities().instabuild) {
                         thrownMjolnir.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                     }
+                    thrownMjolnir.setNoGravity(true);
                     level.addFreshEntity(thrownMjolnir);
 
                     // bind thrown mjolnir to the player
@@ -75,13 +77,14 @@ public class Mjolnir extends Item implements Vanishable {
                         binding.setMjolnir(thrownMjolnir.getUUID());
                     });
 
-                    level.playSound((Player)null, thrownMjolnir, DRSounds.MJOLNIR_THROWING.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                    level.playSound((Player)null, player.getOnPos(), DRSounds.MJOLNIR_THROWING.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
 
                     if (!player.getAbilities().instabuild) {
                         player.getInventory().removeItem(itemStack);
                     }
 
                 } else if (player.isShiftKeyDown()){ // riptide
+                    if (!this.isFlying) { this.isFlying = true; }
                     float f7 = player.getYRot();
                     float f = player.getXRot();
                     float f1 = -Mth.sin(f7 * ((float) Math.PI / 180F)) * Mth.cos(f * ((float) Math.PI / 180F));
@@ -93,7 +96,7 @@ public class Mjolnir extends Item implements Vanishable {
                     f2 *= f5 / f4;
                     f3 *= f5 / f4;
                     player.push((double) f1, (double) f2, (double) f3);
-                    player.startAutoSpinAttack(20);
+                    player.startAutoSpinAttack(40);
                     if (player.isOnGround()) {
                         float f6 = 1.1999999F;
                         player.move(MoverType.SELF, new Vec3(0.0D, f6, 0.0D));
