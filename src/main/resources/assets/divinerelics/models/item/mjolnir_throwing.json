@@ -672,8 +672,8 @@
 			"scale": [0.8, 0.8, 0.8]
 		},
 		"firstperson_righthand": {
-			"rotation": [-12.5, 90, 0],
-			"translation": [6, -6, -8.5],
+			"rotation": [-162, 82, -97],
+			"translation": [16.75, 13, -25],
 			"scale": [1.3, 1.3, 1.3]
 		},
 		"firstperson_lefthand": {
@@ -785,14 +785,6 @@
 					]
 				}
 			]
-		}
-	],
-	"overrides": [
-		{
-			"predicate": {
-				"using": 1
-			},
-			"model": "divinerelics:item/mjolnir_throwing"
 		}
 	]
 }

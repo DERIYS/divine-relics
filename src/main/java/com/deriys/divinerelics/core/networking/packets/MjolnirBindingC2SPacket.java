@@ -27,7 +27,6 @@ public class MjolnirBindingC2SPacket {
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
-            // HERE WE ARE ON THE SERVER!
             ServerPlayer player = context.getSender();
             ServerLevel serverLevel = player.getLevel();
 
@@ -37,6 +36,10 @@ public class MjolnirBindingC2SPacket {
                     Entity thrownMjolnirEntity = serverLevel.getEntity(thrownMjolnirUUID);
                     if (thrownMjolnirEntity instanceof ThrownMjolnir thrownMjolnir) {
                         thrownMjolnir.shouldReturn = true;
+                        thrownMjolnir.relaxed = false;
+                    } else {
+                        System.out.print("NOT MJOLNIR | IF null -> ");
+                        System.out.println(thrownMjolnirEntity == null);
                     }
                 }
 

@@ -52,11 +52,14 @@ public class DREvents {
         public static void LivingAttackEvent(LivingAttackEvent event) {
             Entity hurtEntity = event.getEntity();
             Entity attacker = event.getSource().getEntity();
+            Entity directAttacker = event.getSource().getDirectEntity();
 
             if (hurtEntity instanceof LivingEntity livingEntity) {
                 Level level = livingEntity.getLevel();
                 if (livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
-                    if (isValidAttacker(attacker)) {
+                    System.out.println(attacker instanceof Player);
+                    System.out.println(directAttacker instanceof ThrownDraupnirSpear);
+                    if (isValidAttacker(attacker, directAttacker)) {
                         Vec3 entityPos = livingEntity.position();
                         Vec3 attackerPos = attacker.position();
 
@@ -71,11 +74,12 @@ public class DREvents {
             if (hurtEntity instanceof Player player && attacker instanceof LivingEntity livingAttacker) {
                 if (player.isBlocking() && player.getOffhandItem().getItem() == DRItems.GUARDIAN_SHIELD.get()) {
                     int ticksInUse = player.getTicksUsingItem();
-                    if (ticksInUse <= 15) {
+                    if (ticksInUse <= 12) {
                         float amount = event.getAmount();
                         float damage = (amount < 3)? 2: amount / 1.2f;
                         player.getLevel().playSound(null, player.getOnPos(), DRSounds.GUARDIAN_SHIELD_PARRY.get(), SoundSource.PLAYERS, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
                         Motosignir.hurtAndKnockbackEntites(List.of(livingAttacker), player, Motosignir.NEGATIVE_EFFECTS, damage, Math.min(Math.log10(damage) / 2.5, 1.0f), 1, 100);
+                        player.stopUsingItem();
                     }
                 }
             }
@@ -124,7 +128,7 @@ public class DREvents {
 
         @SubscribeEvent
         public static void onLightningStrike(EntityStruckByLightningEvent event) {
-            if (event.getEntity() instanceof Player player && (player.getMainHandItem().getItem() == DRItems.MJOLNIR.get() || player.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).isPresent())) {
+            if (event.getEntity() instanceof Player player && (player.getMainHandItem().getItem() == DRItems.MJOLNIR.get() || player.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).isPresent() || player.hasEffect(DREffects.BIFROST_PROTECTION.get()))) {
                 event.setCanceled(true);
             }
         }
@@ -161,8 +165,8 @@ public class DREvents {
             return Math.sqrt(deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ);
         }
 
-        private static boolean isValidAttacker(Entity attacker) {
-            return attacker instanceof AbstractArrow || (attacker instanceof LivingEntity livingEntity && livingEntity.getMainHandItem().getItem() != DRItems.DRAUPNIR_SPEAR.get());
+        private static boolean isValidAttacker(Entity attacker, Entity directAttacker) {
+            return !(directAttacker instanceof ThrownDraupnirSpear) && (attacker instanceof LivingEntity livingEntity && livingEntity.getMainHandItem().getItem() != DRItems.DRAUPNIR_SPEAR.get());
         }
 
         public static void dodgeAttack(Level level, LivingEntity hurtEntity, Vec2 attackVector) {

@@ -6,6 +6,7 @@ import com.deriys.divinerelics.items.Motosignir;
 import com.deriys.divinerelics.sound.DRSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -40,6 +41,7 @@ public class ThrownMjolnir extends AbstractArrow {
     public static float STRIKE_FORCE = 1.0f;
     public int clientSideReturnTridentTickCount;
     public boolean shouldReturn = false;
+    public boolean relaxed = false;
 
     public ThrownMjolnir(EntityType<? extends ThrownMjolnir> entityType, Level level) {
         super(entityType, level);
@@ -63,27 +65,29 @@ public class ThrownMjolnir extends AbstractArrow {
             this.dealtDamage = true;
         }
 
-        if (!this.shouldReturn && this.tickCount % 10 == 0 && this.isAcceptibleReturnOwner() && !this.level.isClientSide) {
-            if (this.position().distanceToSqr(this.getOwner().position()) > 10000) {
-                this.shouldReturn = true;
+
+        if (!this.level.isClientSide) {
+            boolean properReturnOwner = this.isAcceptibleReturnOwner();
+            if (properReturnOwner && !this.shouldReturn) {
+                if (this.position().distanceToSqr(this.getOwner().position()) > 10000) {
+                    System.out.println("returning 100");
+                    this.shouldReturn = true;
+                    this.relaxed = false;
+                }
             }
-        } else if (!this.isAcceptibleReturnOwner() && !this.level.isClientSide) {
-            this.relax();
         }
 
-//        if (this.getOwner() instanceof Player player1 && this.tickCount % 20 == 0 && !this.level.isClientSide) {
-//            player1.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(oldStore -> {
-//                player1.sendSystemMessage(Component.literal(String.valueOf(oldStore.getMjolnir() != null)));
-//            });
-//        }
-
-        if (this.getOwner() instanceof Player player && this.shouldReturn) {
+        if (this.getOwner() instanceof Player player) {
             if (player != null) {
-                if (!this.isAcceptibleReturnOwner()) {
-                    if (!this.level.isClientSide && this.pickup == Pickup.ALLOWED) {
-                        this.relax();
-                    }
-                } else {
+                System.out.printf("relaxed: %b\nshouldReturn: %b\nisAcceptibleReturnOwner: %b\npickupAllowed: %b\nplayerAlive: %b\n", this.relaxed, this.shouldReturn, this.isAcceptibleReturnOwner(), this.pickup == Pickup.ALLOWED, player.isAlive());
+                if (!this.isAcceptibleReturnOwner() && !this.level.isClientSide && !this.relaxed && this.pickup == Pickup.ALLOWED) {
+                    this.pickup = Pickup.DISALLOWED;
+                    this.relax();
+                } else if (!this.level.isClientSide && player.isAlive() && this.pickup == Pickup.DISALLOWED) {
+                    System.out.println("sadgfasdf");
+                    this.pickup = Pickup.ALLOWED;
+                } else if (this.shouldReturn) {
+                    this.relaxed = false;
                     this.setNoPhysics(true);
                     Vec3 vectorPM = player.getEyePosition().subtract(this.position());
                     this.setPosRaw(this.getX(), this.getY() + vectorPM.y * 0.015 * 4, this.getZ());
@@ -119,7 +123,9 @@ public class ThrownMjolnir extends AbstractArrow {
         this.setDeltaMovement(this.getDeltaMovement().multiply(0.001, 0.01, 0.001));
         this.shouldReturn = false;
         this.hit = true; // so that it won't spawn lightnings
+        this.relaxed = true;
         this.clientSideReturnTridentTickCount = 0;
+        this.pickup = Pickup.DISALLOWED;
     }
 
     protected ItemStack getPickupItem() {
@@ -227,12 +233,13 @@ public class ThrownMjolnir extends AbstractArrow {
             this.hit = true;
         }
         super.onHitBlock(blockHitResult);
+        this.setSoundEvent(DRSounds.MJOLNIR_IMPACT.get());
     }
 
     private void mjolnirHit(Player player, Level level, BlockPos blockPos, Entity owner) {
         ThrownMjolnir.spawnLightning(level, blockPos, owner);
         onHitLighnting(level, this, blockPos, player, STRIKE_DAMAGE, STRIKE_FORCE, 5);
-        player.getCooldowns().addCooldown(this.mjolnirItem.getItem(), this.COOLDOWN);
+//        player.getCooldowns().addCooldown(this.mjolnirItem.getItem(), this.COOLDOWN);
     }
 
     @Override

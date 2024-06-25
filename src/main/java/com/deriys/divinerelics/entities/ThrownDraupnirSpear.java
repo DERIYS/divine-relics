@@ -24,6 +24,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
@@ -145,6 +146,12 @@ public class ThrownDraupnirSpear extends AbstractArrow {
         }
         this.setDeltaMovement(this.getDeltaMovement().multiply(-0.001, -0.01, -0.001));
         this.playSound(soundEvent, 2.0F, 1.0F);
+    }
+
+    @Override
+    protected void onHitBlock(BlockHitResult p_36755_) {
+        super.onHitBlock(p_36755_);
+        this.setSoundEvent(DRSounds.DRAUPNIR_SPEAR_LANDING.get());
     }
 
     public boolean isFoil() {

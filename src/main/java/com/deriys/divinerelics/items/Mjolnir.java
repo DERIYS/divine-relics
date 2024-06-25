@@ -2,6 +2,7 @@ package com.deriys.divinerelics.items;
 
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
 import com.deriys.divinerelics.entities.ThrownMjolnir;
+import com.deriys.divinerelics.event.DREvents;
 import com.deriys.divinerelics.sound.DRSounds;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -15,6 +16,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -31,15 +33,18 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public class Mjolnir extends Item implements Vanishable {
+import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getVelocity;
+
+public class Mjolnir extends AxeItem {
     public static final int THROW_THRESHOLD_TIME = 10;
     public static final float BASE_DAMAGE = 25.0F;
     public static final float SHOOT_POWER = 4.5F;
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
     public boolean isFlying = false;
+    public boolean isFlying_prev = false;
 
-    public Mjolnir(Item.Properties properties) {
-        super(properties);
+    public Mjolnir(Tier p_40521_, float p_40522_, float p_40523_, Properties p_40524_) {
+        super(p_40521_, p_40522_, p_40523_, p_40524_);
         ImmutableMultimap.Builder<Attribute, AttributeModifier> $$1 = ImmutableMultimap.builder();
         $$1.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", BASE_DAMAGE, AttributeModifier.Operation.ADDITION));
         $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -3.2500000953674316, AttributeModifier.Operation.ADDITION));
@@ -83,7 +88,7 @@ public class Mjolnir extends Item implements Vanishable {
                         player.getInventory().removeItem(itemStack);
                     }
 
-                } else if (player.isShiftKeyDown()){ // riptide
+                } else if (player.isShiftKeyDown() && getVelocity(player) < 1){ // riptide
                     if (!this.isFlying) { this.isFlying = true; }
                     float f7 = player.getYRot();
                     float f = player.getXRot();
@@ -96,16 +101,27 @@ public class Mjolnir extends Item implements Vanishable {
                     f2 *= f5 / f4;
                     f3 *= f5 / f4;
                     player.push((double) f1, (double) f2, (double) f3);
-                    player.startAutoSpinAttack(40);
+                    player.startAutoSpinAttack(20);
                     if (player.isOnGround()) {
                         float f6 = 1.1999999F;
                         player.move(MoverType.SELF, new Vec3(0.0D, f6, 0.0D));
                     }
 
-                    SoundEvent soundevent = DRSounds.MJOLNIR_RIPTIDE.get();
-                    level.playSound((Player) null, player, soundevent, SoundSource.PLAYERS, 1.0F, 1.0F);
+                    level.playSound((Player) null, player, DRSounds.MJOLNIR_RIPTIDE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
                 }
                 player.awardStat(Stats.ITEM_USED.get(this));
+            }
+        }
+    }
+
+    @Override
+    public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
+        super.inventoryTick(itemStack, level, entity, p_41407_, p_41408_);
+
+        if (this.isFlying_prev != this.isFlying) {
+            this.isFlying_prev = this.isFlying;
+            if (entity instanceof Player) {
+                entity.sendSystemMessage(Component.literal("isFlying: " + this.isFlying));
             }
         }
     }

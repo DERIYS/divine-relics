@@ -151,6 +151,38 @@ public class Motosignir extends SwordItem {
         }
     }
 
+    public static void hurtAndKnockbackEntites (List<LivingEntity> entities, Player player, Entity attacker, DamageSource damageSource, float baseDamage, double force) {
+        for(LivingEntity livingEntity: entities) {
+            if (livingEntity != player) {
+                double entityX = livingEntity.getX();
+                double entityZ = livingEntity.getZ();
+
+                double angle = Math.atan2(entityZ - attacker.getZ(), entityX - attacker.getX());
+                double ratioX = -Math.cos(angle);
+                double ratioZ = -Math.sin(angle);
+
+                float armorModifier = (float) (livingEntity.getAttributeValue(Attributes.ARMOR)) / 12;
+                float adjustedDamage = baseDamage + armorModifier;
+
+                ItemStack weapon = player.getMainHandItem();
+                adjustedDamage += EnchantmentHelper.getDamageBonus(weapon, livingEntity.getMobType());
+
+                livingEntity.hurt(damageSource, (float) Math.min(adjustedDamage, adjustedDamage / livingEntity.position().subtract(attacker.position()).length() * 2.5));
+
+                EnchantmentHelper.doPostHurtEffects(livingEntity, player);
+                EnchantmentHelper.doPostDamageEffects(player, livingEntity);
+
+                if (!livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
+                    livingEntity.knockback(force, ratioX, ratioZ);
+                }
+
+                if (attacker instanceof ThrownDraupnirSpear) {
+                    livingEntity.invulnerableTime = 1;
+                }
+            }
+        }
+    }
+
 
     public static void hurtAndKnockbackEntites (List<LivingEntity> entities, Player player, MobEffect[] mobEffects, float baseDamage, double force, int amplifier, int duration) {
         for(LivingEntity livingEntity: entities) {

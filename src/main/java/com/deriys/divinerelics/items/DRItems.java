@@ -24,7 +24,7 @@ public class DRItems {
     public static final RegistryObject<Item> ORACLE_COMPASS = ITEMS.register("oracle_compass",
             () -> new OracleCompass(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> MJOLNIR = ITEMS.register("mjolnir",
-            () -> new Mjolnir(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
+            () -> new Mjolnir(DRTiers.MJOLNIR, 0, 0, new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> GUARDIAN_SHIELD = ITEMS.register("guardian_shield",
             () -> new GuardianShield(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant().tab(DRCreativeTab.MAINTAB)));
 

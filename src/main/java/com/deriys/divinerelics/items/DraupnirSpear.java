@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -40,7 +41,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
-public class DraupnirSpear extends Item implements Vanishable {
+public class DraupnirSpear extends Item {
     public static final int THROW_THRESHOLD_TIME = 8;
     public static final float BASE_DAMAGE = 10.0F;
     public static final float SHOOT_POWER = 3.5F;
@@ -183,7 +184,7 @@ public class DraupnirSpear extends Item implements Vanishable {
                 Entity entityUUID = serverLevel.getEntity(uuid);
 
                 if (isValidSpear(entityUUID) && entity instanceof Player player) {
-                    destroySpear(level, entityUUID, player);
+                    destroySpear(level, entityUUID, player, DamageSource.trident(new ThrownDraupnirSpear(level, player, itemStack), player));
                 }
                 thrownSpears.remove(0);
                 setThrownSpears(itemStack, thrownSpears);
@@ -206,7 +207,7 @@ public class DraupnirSpear extends Item implements Vanishable {
 
 
 
-    private void destroySpear(Level level, Entity spear, Player player) {
+    private void destroySpear(Level level, Entity spear, Player player, DamageSource damageSource) {
         double spearX = spear.getX();
         double spearY = spear.getY();
         double spearZ = spear.getZ();
@@ -214,7 +215,7 @@ public class DraupnirSpear extends Item implements Vanishable {
         List<LivingEntity> entitiesInArea =
                 Motosignir.getEntitiesInArea(level, spearX, spearY, spearZ, EXPLOSION_RADIUS);
 
-        Motosignir.hurtAndKnockbackEntites(entitiesInArea, player, spear, EXPLOSION_DAMAGE, 0.2f);
+        Motosignir.hurtAndKnockbackEntites(entitiesInArea, player, spear, damageSource, EXPLOSION_DAMAGE, 0.2f);
 
         level.playSound(null, spear.getOnPos(), DRSounds.DRAUPNIR_SPEAR_EXPLOSION.get(), SoundSource.PLAYERS, 2.0F, RAND.nextFloat() * 0.1F + 0.95F);
 
