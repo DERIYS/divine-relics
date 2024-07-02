@@ -34,7 +34,7 @@ import java.util.List;
 public class ThrownMjolnir extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
     public final float STRIKE_DAMAGE = 10f;
-    private final int COOLDOWN = 140;
+    private final int COOLDOWN = 141;
     private ItemStack mjolnirItem;
     private boolean dealtDamage;
     private boolean hit;

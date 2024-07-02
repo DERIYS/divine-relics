@@ -76,7 +76,7 @@ public class Mjolnir extends AxeItem {
                         binding.setMjolnir(thrownMjolnir.getUUID());
                     });
 
-                    level.playSound((Player)null, player.getOnPos(), DRSounds.MJOLNIR_THROWING.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                    level.playSound(null, player.getOnPos(), DRSounds.MJOLNIR_THROWING.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
 
                     if (!player.getAbilities().instabuild) {
                         player.getInventory().removeItem(itemStack);
