@@ -2,21 +2,19 @@ package com.deriys.divinerelics.items;
 
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
 import com.deriys.divinerelics.entities.ThrownMjolnir;
-import com.deriys.divinerelics.event.DREvents;
 import com.deriys.divinerelics.sound.DRSounds;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -33,15 +31,11 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getVelocity;
-
 public class Mjolnir extends AxeItem {
     public static final int THROW_THRESHOLD_TIME = 10;
     public static final float BASE_DAMAGE = 25.0F;
     public static final float SHOOT_POWER = 4.5F;
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
-    public boolean isFlying = false;
-    public boolean isFlying_prev = false;
 
     public Mjolnir(Tier p_40521_, float p_40522_, float p_40523_, Properties p_40524_) {
         super(p_40521_, p_40522_, p_40523_, p_40524_);
@@ -88,8 +82,9 @@ public class Mjolnir extends AxeItem {
                         player.getInventory().removeItem(itemStack);
                     }
 
-                } else if (player.isShiftKeyDown() && getVelocity(player) < 1){ // riptide
-                    if (!this.isFlying) { this.isFlying = true; }
+                } else if (player.isShiftKeyDown()){ // riptide
+                    player.getCooldowns().addCooldown(itemStack.getItem(), 30);
+                    if (!isRiptideFlying(itemStack)) { setRiptideFlying(itemStack, true); }
                     float f7 = player.getYRot();
                     float f = player.getXRot();
                     float f1 = -Mth.sin(f7 * ((float) Math.PI / 180F)) * Mth.cos(f * ((float) Math.PI / 180F));
@@ -101,7 +96,7 @@ public class Mjolnir extends AxeItem {
                     f2 *= f5 / f4;
                     f3 *= f5 / f4;
                     player.push((double) f1, (double) f2, (double) f3);
-                    player.startAutoSpinAttack(20);
+                    player.startAutoSpinAttack(30);
                     if (player.isOnGround()) {
                         float f6 = 1.1999999F;
                         player.move(MoverType.SELF, new Vec3(0.0D, f6, 0.0D));
@@ -114,16 +109,19 @@ public class Mjolnir extends AxeItem {
         }
     }
 
-    @Override
-    public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
-        super.inventoryTick(itemStack, level, entity, p_41407_, p_41408_);
-
-        if (this.isFlying_prev != this.isFlying) {
-            this.isFlying_prev = this.isFlying;
-            if (entity instanceof Player) {
-                entity.sendSystemMessage(Component.literal("isFlying: " + this.isFlying));
-            }
+    public void setRiptideFlying(ItemStack mjolnir, boolean isFlying) {
+        if (mjolnir != null) {
+            CompoundTag nbt = mjolnir.getOrCreateTag();
+            nbt.putBoolean("RiptideFlying", isFlying);
         }
+    }
+
+    public boolean isRiptideFlying(ItemStack mjolnir) {
+        if (mjolnir != null) {
+            CompoundTag nbt = mjolnir.getOrCreateTag();
+            return nbt.getBoolean("RiptideFlying");
+        }
+        return false;
     }
 
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {

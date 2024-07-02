@@ -6,7 +6,6 @@ import com.deriys.divinerelics.items.Motosignir;
 import com.deriys.divinerelics.sound.DRSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.ServerGamePacketListener;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -22,7 +21,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec3;
@@ -42,6 +43,7 @@ public class ThrownMjolnir extends AbstractArrow {
     public int clientSideReturnTridentTickCount;
     public boolean shouldReturn = false;
     public boolean relaxed = false;
+    public DamageSource damageSource = DamageSource.trident(this, (Entity)(this.getOwner() == null ? this : this.getOwner()));
 
     public ThrownMjolnir(EntityType<? extends ThrownMjolnir> entityType, Level level) {
         super(entityType, level);
@@ -65,7 +67,6 @@ public class ThrownMjolnir extends AbstractArrow {
             this.dealtDamage = true;
         }
 
-
         if (!this.level.isClientSide) {
             boolean properReturnOwner = this.isAcceptibleReturnOwner();
             if (properReturnOwner && !this.shouldReturn) {
@@ -79,12 +80,11 @@ public class ThrownMjolnir extends AbstractArrow {
 
         if (this.getOwner() instanceof Player player) {
             if (player != null) {
-                System.out.printf("relaxed: %b\nshouldReturn: %b\nisAcceptibleReturnOwner: %b\npickupAllowed: %b\nplayerAlive: %b\n", this.relaxed, this.shouldReturn, this.isAcceptibleReturnOwner(), this.pickup == Pickup.ALLOWED, player.isAlive());
+//                System.out.printf("relaxed: %b\nshouldReturn: %b\nisAcceptibleReturnOwner: %b\npickupAllowed: %b\nplayerAlive: %b\n", this.relaxed, this.shouldReturn, this.isAcceptibleReturnOwner(), this.pickup == Pickup.ALLOWED, player.isAlive());
                 if (!this.isAcceptibleReturnOwner() && !this.level.isClientSide && !this.relaxed && this.pickup == Pickup.ALLOWED) {
                     this.pickup = Pickup.DISALLOWED;
                     this.relax();
                 } else if (!this.level.isClientSide && player.isAlive() && this.pickup == Pickup.DISALLOWED) {
-                    System.out.println("sadgfasdf");
                     this.pickup = Pickup.ALLOWED;
                 } else if (this.shouldReturn) {
                     this.relaxed = false;
@@ -95,7 +95,7 @@ public class ThrownMjolnir extends AbstractArrow {
                         this.yOld = this.getY();
                     }
 
-                    double fact = 0.05 * 4;
+                    double fact = 0.05 * 3;
                     this.setDeltaMovement(this.getDeltaMovement().scale(0.95).add(vectorPM.normalize().scale(fact)));
                     if (this.clientSideReturnTridentTickCount == 0) {
                         this.playSound(DRSounds.MJOLNIR_RETURN.get(), 15.0F, 1.0F);
@@ -149,16 +149,15 @@ public class ThrownMjolnir extends AbstractArrow {
         }
 
         Entity owner = this.getOwner();
-        DamageSource damageSource = DamageSource.trident(this, (Entity)(owner == null ? this : owner));
         float volume = 1.0F;
         this.dealtDamage = true;
         this.hit = true;
         SoundEvent soundEvent = DRSounds.MJOLNIR_IMPACT.get();
-        if (entity.hurt(damageSource, damage)) {
+        if (entity.hurt(this.damageSource, damage)) {
             Level level = this.level;
             BlockPos blockPos = entity.blockPosition();
             if (!level.isClientSide && owner instanceof Player player) {
-                mjolnirHit(player, level, blockPos, owner);
+                mjolnirHit(player, level, blockPos);
             }
             soundEvent = DRSounds.MJOLNIR_THUNDER.get();
             volume = 5.0F;
@@ -189,7 +188,7 @@ public class ThrownMjolnir extends AbstractArrow {
         level.addFreshEntity(lightningBolt);
     }
 
-    public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, Player owner, float damage, float force, int strikeRadius) {
+    public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, Player owner, DamageSource damageSource, float damage, float force, int strikeRadius) {
 
         double hammerX = hammer.getX();
         double hammerY = hammer.getY();
@@ -207,38 +206,49 @@ public class ThrownMjolnir extends AbstractArrow {
             }
         }
         if (lightningCount < 4) { // if there were < 4 lightnings, shoot at random position within 5-meter radius
-            for (int i = lightningCount; i < 3; i++) {
+            for (int i = lightningCount; i < 4; i++) {
                 spawnLightning(level, getRandBlockPos(blockPos), owner);
             }
         }
 
-        Motosignir.hurtAndKnockbackEntites(entitiesInArea, owner, hammer, damage, force);
+        Motosignir.hurtAndKnockbackEntites(entitiesInArea, owner, hammer, damageSource, damage, force);
     }
 
     @Override
     protected void onHitBlock(BlockHitResult blockHitResult) {
-        Level level = this.level;
         BlockPos blockPos = blockHitResult.getBlockPos();
+        Vec3 prevMovement = this.getDeltaMovement();
+        Vec3 position = new Vec3(blockPos.getX(), blockPos.getY(), blockPos.getZ());
+        Level level = this.level;
+
         this.level.playSound(null, this.getX(), this.getY(), this.getZ(), DRSounds.MJOLNIR_IMPACT.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
 
         if (!level.isClientSide) {
-            if (!this.hit) {
-                this.setNoGravity(false);
-                this.setDeltaMovement(this.getDeltaMovement().multiply(0.00001, 0.00001, 0.00001));
-                Entity owner = this.getOwner();
-                if (owner instanceof Player player) {
-                    mjolnirHit(player, level, blockPos, owner);
+            boolean isBedrock = level.getBlockState(blockPos).getBlock() == Blocks.BEDROCK;
+            Entity owner = this.getOwner();
+
+            if (owner instanceof Player player) {
+                if (!this.hit && !isBedrock) {
+                    mjolnirHit(player, level, blockPos);
+                    level.explode(null, this.damageSource, null, position.x, position.y, position.z, 2.5f, false, Explosion.BlockInteraction.DESTROY);
+                    this.setDeltaMovement(prevMovement);
+                } else {
+                    this.setNoGravity(false);
+                    super.onHitBlock(blockHitResult);
+                    if (!this.hit) {
+                        mjolnirHit(player, level, blockPos);
+                    }
                 }
             }
             this.hit = true;
         }
-        super.onHitBlock(blockHitResult);
         this.setSoundEvent(DRSounds.MJOLNIR_IMPACT.get());
     }
 
-    private void mjolnirHit(Player player, Level level, BlockPos blockPos, Entity owner) {
-        ThrownMjolnir.spawnLightning(level, blockPos, owner);
-        onHitLighnting(level, this, blockPos, player, STRIKE_DAMAGE, STRIKE_FORCE, 5);
+    private void mjolnirHit(Player player, Level level, BlockPos blockPos) {
+        ThrownMjolnir.spawnLightning(level, blockPos, player);
+        onHitLighnting(level, this, blockPos, player, this.damageSource, STRIKE_DAMAGE, STRIKE_FORCE, 5);
+
 //        player.getCooldowns().addCooldown(this.mjolnirItem.getItem(), this.COOLDOWN);
     }
 

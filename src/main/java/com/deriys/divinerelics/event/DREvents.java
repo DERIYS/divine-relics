@@ -18,12 +18,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
@@ -79,7 +79,6 @@ public class DREvents {
                         float damage = (amount < 3)? 2: amount / 1.2f;
                         player.getLevel().playSound(null, player.getOnPos(), DRSounds.GUARDIAN_SHIELD_PARRY.get(), SoundSource.PLAYERS, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
                         Motosignir.hurtAndKnockbackEntites(List.of(livingAttacker), player, Motosignir.NEGATIVE_EFFECTS, damage, Math.min(Math.log10(damage) / 2.5, 1.0f), 1, 100);
-                        player.stopUsingItem();
                     }
                 }
             }
@@ -87,8 +86,8 @@ public class DREvents {
             if (hurtEntity instanceof LivingEntity livingHurt && attacker instanceof Player player) {
                 ItemStack itemStack = player.getMainHandItem();
                 if (itemStack.getItem() instanceof Mjolnir mjolnir && !player.getLevel().isClientSide) {
-                    if (mjolnir.isFlying) {
-                        player.getCooldowns().addCooldown(mjolnir, 20);
+                    if (mjolnir.isRiptideFlying(itemStack)) {
+                        player.getCooldowns().addCooldown(mjolnir, 40);
                     }
                 }
             }
@@ -109,16 +108,22 @@ public class DREvents {
         public static void onPlayerFall(LivingFallEvent event) {
             if (event.getEntity() instanceof Player player) {
                 ItemStack itemStack = player.getMainHandItem();
-                if (itemStack.getItem() instanceof Mjolnir mjolnir && !player.getLevel().isClientSide) {
-                    if (mjolnir.isFlying) {
+                Level level = player.getLevel();
+                if (itemStack.getItem() instanceof Mjolnir mjolnir && !level.isClientSide) {
+                    if (mjolnir.isRiptideFlying(itemStack)) {
                         if (event.getDistance() > 20) {
-                            System.out.println(getVelocity(player));
+                            double velocity = getVelocity(player);
+                            float damage = ((float) Math.min(Math.max(10f, 5f * velocity), 40f));
+                            float force = (float) (1 + velocity / (velocity + 0.5));
+                            DamageSource damageSource = DamageSource.trident(new ThrownMjolnir(level, player, itemStack), player);
+
                             player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 80, 2));
-                            ThrownMjolnir.onHitLighnting(event.getEntity().getLevel(), player, player.getOnPos(), player, ((float) Math.min(Math.max(10f, 5f * getVelocity(player)), 40f)), Math.max(1.0f, (float) (getVelocity(player) / 2)), 5);
+                            ThrownMjolnir.onHitLighnting(event.getEntity().getLevel(), player, player.getOnPos(), player, damageSource, damage, force, 5);
+
                             player.getCooldowns().addCooldown(mjolnir, 70);
                         }
                         player.startAutoSpinAttack(1);
-                        mjolnir.isFlying = false;
+                        mjolnir.setRiptideFlying(itemStack, false);
                         event.setCanceled(true);
                     }
 
