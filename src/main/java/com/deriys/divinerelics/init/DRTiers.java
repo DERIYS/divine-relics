@@ -1,4 +1,4 @@
-package com.deriys.divinerelics.items;
+package com.deriys.divinerelics.init;
 
 import com.deriys.divinerelics.DivineRelics;
 import net.minecraft.resources.ResourceLocation;

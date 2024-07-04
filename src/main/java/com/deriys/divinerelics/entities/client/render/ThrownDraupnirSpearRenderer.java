@@ -1,6 +1,6 @@
 package com.deriys.divinerelics.entities.client.render;
 
-import com.deriys.divinerelics.entities.ThrownDraupnirSpear;
+import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
 import com.deriys.divinerelics.entities.client.DRModelLayers;
 import com.deriys.divinerelics.entities.client.model.ThrownDraupnirSpearModel;
 import com.mojang.blaze3d.vertex.PoseStack;

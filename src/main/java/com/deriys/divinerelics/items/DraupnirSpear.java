@@ -2,8 +2,8 @@ package com.deriys.divinerelics.items;
 
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.SpearExplosionParticleS2CPacket;
-import com.deriys.divinerelics.entities.ThrownDraupnirSpear;
-import com.deriys.divinerelics.sound.DRSounds;
+import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
+import com.deriys.divinerelics.init.DRSounds;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
@@ -40,6 +40,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+
+import static com.deriys.divinerelics.event.DREvents.ForgeEvents.bindItemToEntity;
+import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
 
 public class DraupnirSpear extends Item {
     public static final int THROW_THRESHOLD_TIME = 8;
@@ -170,6 +173,10 @@ public class DraupnirSpear extends Item {
 
     @Override
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
+        if (getOwner(itemStack).isEmpty()) {
+            bindItemToEntity(entity, itemStack);
+        }
+
         int delayTicks = getDelayTicks(itemStack);
         List<UUID> thrownSpears = getThrownSpears(itemStack);
         if (thrownSpears.isEmpty() && !isNBTReset(itemStack)) {
@@ -309,6 +316,11 @@ public class DraupnirSpear extends Item {
             components.add(Component.literal("May this weapon strike true; may it be wielded with wisdom; may it be put down when its job is done."));
         } else {
             components.add(Component.literal("Press SHIFT for more info").withStyle(ChatFormatting.YELLOW));
+            String ownerName = stack.getOrCreateTag().getString("OwnerNickname");
+            if (!ownerName.isEmpty()) {
+                components.add(Component.literal(""));
+                components.add(Component.literal("Loyal to: " + ownerName));
+            }
         }
     }
 }

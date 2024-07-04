@@ -1,13 +1,14 @@
 package com.deriys.divinerelics.core.networking.packets;
 
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
-import com.deriys.divinerelics.entities.ThrownMjolnir;
+import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
 
@@ -31,15 +32,16 @@ public class MjolnirBindingC2SPacket {
             ServerLevel serverLevel = player.getLevel();
 
             player.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(binding -> {
-                UUID thrownMjolnirUUID = binding.getMjolnir();
-                if (thrownMjolnirUUID != null) {
-                    Entity thrownMjolnirEntity = serverLevel.getEntity(thrownMjolnirUUID);
-                    if (thrownMjolnirEntity instanceof ThrownMjolnir thrownMjolnir) {
-                        thrownMjolnir.shouldReturn = true;
-                        thrownMjolnir.relaxed = false;
-                    } else {
-                        System.out.print("NOT MJOLNIR | IF null -> ");
-                        System.out.println(thrownMjolnirEntity == null);
+                List<String> thrownMjolnirList = binding.getMjolnirList();
+                List<String> copyList = List.copyOf(thrownMjolnirList);
+                if (!thrownMjolnirList.isEmpty()) {
+                    for (String mjolnir: copyList) {
+                        Entity thrownMjolnirEntity = serverLevel.getEntity(UUID.fromString(mjolnir));
+                        if (thrownMjolnirEntity instanceof ThrownMjolnir thrownMjolnir) {
+                            thrownMjolnir.shouldReturn = true;
+                            thrownMjolnir.relaxed = false;
+                            binding.removeMjolnir(mjolnir);
+                        }
                     }
                 }
 

@@ -1,32 +1,48 @@
 package com.deriys.divinerelics.capabilities.mjolnir;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 
-import java.util.UUID;
+import java.util.ArrayList;
+import java.util.List;
 
 public class MjolnirBinding {
-    private UUID mjolnir = null;
+    private List<String> mjolnirList = new ArrayList<>();
 
-    public UUID getMjolnir() {
-        return mjolnir;
+    public List<String> getMjolnirList() {
+        return mjolnirList;
     }
 
-    public void setMjolnir(UUID mjolnir) {
-        this.mjolnir = mjolnir;
+    public void addMjolnir(String mjolnir) {
+        this.mjolnirList.add(mjolnir);
+    }
+
+    public void removeMjolnir(String mjolnir) {
+        this.mjolnirList.remove(mjolnir);
     }
 
     public void copyFrom(MjolnirBinding source) {
-        this.mjolnir = source.mjolnir;
+        this.mjolnirList = source.mjolnirList;
     }
 
     public void saveNBTData(CompoundTag nbt) {
-        if (mjolnir != null) {
-            nbt.putUUID("mjolnir_bind", mjolnir);
+        if (!mjolnirList.isEmpty()) {
+            ListTag listTag = nbt.getList("mjolnir_bind", 8);
+            for (String mjolnir: this.mjolnirList) {
+                listTag.add(StringTag.valueOf(mjolnir));
+            }
+            nbt.put("mjolnir_bind", listTag);
         }
     }
+
     public void loadNBTData(CompoundTag nbt) {
-        if (nbt.hasUUID("mjolnir_bind")) {
-            mjolnir = nbt.getUUID("mjolnir_bind");
+        if (nbt.contains("mjolnir_bind")) {
+            ListTag listTag = nbt.getList("mjolnir_bind", 8);
+            for (int i = 0; i < listTag.size(); i++) {
+                String mjolnir = listTag.getString(i);
+                this.mjolnirList.add(mjolnir);
+            }
         }
     }
 }

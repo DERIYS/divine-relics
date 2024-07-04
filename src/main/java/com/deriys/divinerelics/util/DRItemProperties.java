@@ -1,6 +1,6 @@
 package com.deriys.divinerelics.util;
 
-import com.deriys.divinerelics.items.DRItems;
+import com.deriys.divinerelics.init.DRItems;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;

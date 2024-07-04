@@ -1,6 +1,7 @@
-package com.deriys.divinerelics.effects;
+package com.deriys.divinerelics.init;
 
 import com.deriys.divinerelics.DivineRelics;
+import com.deriys.divinerelics.effects.BifrostProtection;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraftforge.eventbus.api.IEventBus;

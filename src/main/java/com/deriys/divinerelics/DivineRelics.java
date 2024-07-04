@@ -1,12 +1,12 @@
 package com.deriys.divinerelics;
 
 import com.deriys.divinerelics.core.networking.DRMessages;
-import com.deriys.divinerelics.effects.DREffects;
-import com.deriys.divinerelics.entities.DREntitiyTypes;
+import com.deriys.divinerelics.init.DREffects;
+import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.entities.client.render.ThrownDraupnirSpearRenderer;
 import com.deriys.divinerelics.entities.client.render.ThrownMjolnirRenderer;
-import com.deriys.divinerelics.items.DRItems;
-import com.deriys.divinerelics.sound.DRSounds;
+import com.deriys.divinerelics.init.DRItems;
+import com.deriys.divinerelics.init.DRSounds;
 import com.deriys.divinerelics.util.DRItemProperties;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
@@ -18,7 +18,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-// The value here should match an entry in the META-INF/mods.toml file
 @Mod(DivineRelics.MODID)
 public class DivineRelics
 {

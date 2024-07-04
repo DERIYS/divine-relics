@@ -11,14 +11,13 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = DivineRelics.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class DREventBusEvents {
     @SubscribeEvent
-    public static void onPlayerInteract(PlayerInteractEvent.RightClickEmpty event) {
-        Player player = event.getEntity();
+    public static void onRightClickEmpty(PlayerInteractEvent.RightClickEmpty event) {
         MjolnirBindingC2SPacket packet = new MjolnirBindingC2SPacket();
         DRMessages.sendToServer(packet);
     }
 
     @SubscribeEvent
-    public static void onPlayerInteract(PlayerInteractEvent.RightClickBlock event) {
+    public static void onRightClickBlock(PlayerInteractEvent.RightClickBlock event) {
         Player player = event.getEntity();
         if (player.getMainHandItem().isEmpty()) {
             MjolnirBindingC2SPacket packet = new MjolnirBindingC2SPacket();

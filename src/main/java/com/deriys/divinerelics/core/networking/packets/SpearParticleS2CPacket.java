@@ -1,6 +1,6 @@
 package com.deriys.divinerelics.core.networking.packets;
 
-import com.deriys.divinerelics.entities.ThrownDraupnirSpear;
+import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.network.FriendlyByteBuf;

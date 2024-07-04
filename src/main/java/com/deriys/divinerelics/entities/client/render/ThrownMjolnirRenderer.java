@@ -1,6 +1,6 @@
 package com.deriys.divinerelics.entities.client.render;
 
-import com.deriys.divinerelics.entities.ThrownMjolnir;
+import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
 import com.deriys.divinerelics.entities.client.DRModelLayers;
 import com.deriys.divinerelics.entities.client.model.ThrownMjolnirModel;
 import com.mojang.blaze3d.vertex.PoseStack;

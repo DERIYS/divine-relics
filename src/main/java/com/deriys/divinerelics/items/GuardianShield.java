@@ -1,6 +1,9 @@
 package com.deriys.divinerelics.items;
 
-import com.deriys.divinerelics.sound.DRSounds;
+import com.deriys.divinerelics.init.DRSounds;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
@@ -11,6 +14,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.DispenserBlock;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 
@@ -53,5 +59,14 @@ public class GuardianShield extends ShieldItem {
     @Override
     public boolean isValidRepairItem(ItemStack p_43091_, ItemStack p_43092_) {
         return p_43092_.is(ItemTags.PLANKS) || super.isValidRepairItem(p_43091_, p_43092_);
+    }
+
+    @Override
+    public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag flag) {
+        if (Screen.hasShiftDown()) {
+            components.add(Component.literal("The legendary Kratos's shield, provides unyielding protection against the fiercest of foes. With precise timing, it can parry incoming attacks, turning the enemy’s strength against them."));
+        } else {
+            components.add(Component.literal("Press SHIFT for more info").withStyle(ChatFormatting.YELLOW));
+        }
     }
 }

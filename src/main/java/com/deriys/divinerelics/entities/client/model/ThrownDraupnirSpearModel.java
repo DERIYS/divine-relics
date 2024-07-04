@@ -1,7 +1,7 @@
 package com.deriys.divinerelics.entities.client.model;
 
 
-import com.deriys.divinerelics.entities.ThrownDraupnirSpear;
+import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;

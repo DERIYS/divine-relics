@@ -1,6 +1,6 @@
 package com.deriys.divinerelics.items;
 
-import com.deriys.divinerelics.effects.DREffects;
+import com.deriys.divinerelics.init.DREffects;
 import com.deriys.divinerelics.items.custom.TPData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;

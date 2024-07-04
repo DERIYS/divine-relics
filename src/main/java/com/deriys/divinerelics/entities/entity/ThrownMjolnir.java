@@ -1,9 +1,10 @@
-package com.deriys.divinerelics.entities;
+package com.deriys.divinerelics.entities.entity;
 
-import com.deriys.divinerelics.items.DRItems;
+import com.deriys.divinerelics.init.DREntitiyTypes;
+import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.items.HeimdallGauntlet;
 import com.deriys.divinerelics.items.Motosignir;
-import com.deriys.divinerelics.sound.DRSounds;
+import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -30,6 +31,8 @@ import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.List;
+
+import static com.deriys.divinerelics.capabilities.teammates.TeammatesProvider.hasTeammate;
 
 public class ThrownMjolnir extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
@@ -138,7 +141,7 @@ public class ThrownMjolnir extends AbstractArrow {
 
     @Nullable
     protected EntityHitResult findHitEntity(Vec3 p_37575_, Vec3 p_37576_) {
-        return this.dealtDamage ? null : super.findHitEntity(p_37575_, p_37576_);
+        return super.findHitEntity(p_37575_, p_37576_);
     }
 
     protected void onHitEntity(EntityHitResult hitResult) {
@@ -188,7 +191,7 @@ public class ThrownMjolnir extends AbstractArrow {
         level.addFreshEntity(lightningBolt);
     }
 
-    public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, Player owner, DamageSource damageSource, float damage, float force, int strikeRadius) {
+    public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, LivingEntity owner, DamageSource damageSource, float damage, float force, int strikeRadius) {
 
         double hammerX = hammer.getX();
         double hammerY = hammer.getY();
@@ -197,15 +200,15 @@ public class ThrownMjolnir extends AbstractArrow {
         List<LivingEntity> entitiesInArea =
                 Motosignir.getEntitiesInArea(level, hammerX, hammerY, hammerZ, strikeRadius);
 
-        int lightningCount = 0; // how many lightning are spawned
+        int lightningCount = 0; // how many lightnings are spawned
 
         for (LivingEntity hitEntity: entitiesInArea) {
-            if (hitEntity != owner) {
+            if (hitEntity != owner && !hasTeammate(owner, hitEntity)) {
                 spawnLightning(level, hitEntity.getOnPos(), owner);
                 lightningCount++;
             }
         }
-        if (lightningCount < 4) { // if there were < 4 lightnings, shoot at random position within 5-meter radius
+        if (lightningCount < 4) { // if there were < 4 lightnings, shoot at random position within 5 meter radius
             for (int i = lightningCount; i < 4; i++) {
                 spawnLightning(level, getRandBlockPos(blockPos), owner);
             }
@@ -230,8 +233,8 @@ public class ThrownMjolnir extends AbstractArrow {
             if (owner instanceof Player player) {
                 if (!this.hit && !isBedrock) {
                     mjolnirHit(player, level, blockPos);
-                    level.explode(null, this.damageSource, null, position.x, position.y, position.z, 2.5f, false, Explosion.BlockInteraction.DESTROY);
-                    this.setDeltaMovement(prevMovement);
+                    level.explode(null, this.damageSource, null, position.x, position.y, position.z, 2f, false, Explosion.BlockInteraction.DESTROY);
+                    this.setDeltaMovement(prevMovement.scale(0.8f));
                 } else {
                     this.setNoGravity(false);
                     super.onHitBlock(blockHitResult);
@@ -245,9 +248,9 @@ public class ThrownMjolnir extends AbstractArrow {
         this.setSoundEvent(DRSounds.MJOLNIR_IMPACT.get());
     }
 
-    private void mjolnirHit(Player player, Level level, BlockPos blockPos) {
-        ThrownMjolnir.spawnLightning(level, blockPos, player);
-        onHitLighnting(level, this, blockPos, player, this.damageSource, STRIKE_DAMAGE, STRIKE_FORCE, 5);
+    private void mjolnirHit(LivingEntity owner, Level level, BlockPos blockPos) {
+        ThrownMjolnir.spawnLightning(level, blockPos, owner);
+        onHitLighnting(level, this, blockPos, owner, this.damageSource, STRIKE_DAMAGE, STRIKE_FORCE, 5);
 
 //        player.getCooldowns().addCooldown(this.mjolnirItem.getItem(), this.COOLDOWN);
     }

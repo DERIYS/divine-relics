@@ -1,6 +1,7 @@
-package com.deriys.divinerelics.items;
+package com.deriys.divinerelics.init;
 
 import com.deriys.divinerelics.DivineRelics;
+import com.deriys.divinerelics.items.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -27,6 +28,9 @@ public class DRItems {
             () -> new Mjolnir(DRTiers.MJOLNIR, 0, 0, new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> GUARDIAN_SHIELD = ITEMS.register("guardian_shield",
             () -> new GuardianShield(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant().tab(DRCreativeTab.MAINTAB)));
+
+    public static final RegistryObject<Item> YGGDRASILS_TWIG = ITEMS.register("yggdrasils_twig",
+            () -> new YggdrasilsTwig(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).tab(DRCreativeTab.MAINTAB)));
 
 
     public static void register(IEventBus eventBus) {

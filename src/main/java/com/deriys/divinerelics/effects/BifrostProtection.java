@@ -5,7 +5,7 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 
 public class BifrostProtection extends MobEffect {
-    protected BifrostProtection(MobEffectCategory mobEffectCategory, int color) {
+    public BifrostProtection(MobEffectCategory mobEffectCategory, int color) {
         super(mobEffectCategory, color);
     }
 

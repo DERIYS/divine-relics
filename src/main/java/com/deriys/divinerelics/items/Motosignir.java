@@ -2,9 +2,9 @@ package com.deriys.divinerelics.items;
 
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.MotosignirParticleS2CPacket;
-import com.deriys.divinerelics.effects.DREffects;
-import com.deriys.divinerelics.entities.ThrownDraupnirSpear;
-import com.deriys.divinerelics.sound.DRSounds;
+import com.deriys.divinerelics.init.DREffects;
+import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
+import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.particles.ParticleTypes;
@@ -28,6 +28,8 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+
+import static com.deriys.divinerelics.capabilities.teammates.TeammatesProvider.hasTeammate;
 
 
 public class Motosignir extends SwordItem {
@@ -62,7 +64,7 @@ public class Motosignir extends SwordItem {
 
         Vec3 viewVector = player.getLookAngle().normalize();
 
-        if (!level.isClientSide()) {
+        if (!level.isClientSide() && !player.isShiftKeyDown()) {
 
             releaseSoundWave(level, player, playerX, playerY, playerZ);
             if (hand == InteractionHand.MAIN_HAND) {
@@ -118,9 +120,9 @@ public class Motosignir extends SwordItem {
         return level.getEntitiesOfClass(LivingEntity.class, aabb);
     }
 
-    public static void hurtAndKnockbackEntites (List<LivingEntity> entities, Player player, Entity attacker, float baseDamage, double force) {
+    public static void hurtAndKnockbackEntites (List<LivingEntity> entities, LivingEntity owner, Entity attacker, DamageSource damageSource, float baseDamage, double force) {
         for(LivingEntity livingEntity: entities) {
-            if (livingEntity != player) {
+            if (livingEntity != owner && !hasTeammate(owner, livingEntity)) {
                 double entityX = livingEntity.getX();
                 double entityZ = livingEntity.getZ();
 
@@ -131,46 +133,20 @@ public class Motosignir extends SwordItem {
                 float armorModifier = (float) (livingEntity.getAttributeValue(Attributes.ARMOR)) / 12;
                 float adjustedDamage = baseDamage + armorModifier;
 
-                ItemStack weapon = player.getMainHandItem();
+                ItemStack weapon = owner.getMainHandItem();
                 adjustedDamage += EnchantmentHelper.getDamageBonus(weapon, livingEntity.getMobType());
 
-                DamageSource damageSource = DamageSource.playerAttack(player);
-                livingEntity.hurt(damageSource, (float) Math.min(adjustedDamage, adjustedDamage / livingEntity.position().subtract(attacker.position()).length() * 2.5));
+                float distanceToEnemy = (float) livingEntity.getEyePosition().subtract(attacker.position()).length();
 
-                EnchantmentHelper.doPostHurtEffects(livingEntity, player);
-                EnchantmentHelper.doPostDamageEffects(player, livingEntity);
+                float distanceFactor = (1f - (distanceToEnemy -1.5f) / (distanceToEnemy + 6.5f));
 
-                if (!livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
-                    livingEntity.knockback(force, ratioX, ratioZ);
-                }
+                owner.sendSystemMessage(Component.literal("Dealt " + Math.floor(Math.min(adjustedDamage, adjustedDamage * distanceFactor)*100)/100 + " damage to " + livingEntity.getDisplayName().getString() + " at " + Math.floor(distanceToEnemy*100)/100 + " distance"));
 
-                if (attacker instanceof ThrownDraupnirSpear) {
-                    livingEntity.invulnerableTime = 1;
-                }
-            }
-        }
-    }
+                livingEntity.hurt(damageSource, Math.min(adjustedDamage, adjustedDamage * distanceFactor));
+//                livingEntity.hurt(damageSource, (float) Math.min(adjustedDamage, adjustedDamage / livingEntity.position().subtract(attacker.position()).length() * 2.5));
 
-    public static void hurtAndKnockbackEntites (List<LivingEntity> entities, Player player, Entity attacker, DamageSource damageSource, float baseDamage, double force) {
-        for(LivingEntity livingEntity: entities) {
-            if (livingEntity != player) {
-                double entityX = livingEntity.getX();
-                double entityZ = livingEntity.getZ();
-
-                double angle = Math.atan2(entityZ - attacker.getZ(), entityX - attacker.getX());
-                double ratioX = -Math.cos(angle);
-                double ratioZ = -Math.sin(angle);
-
-                float armorModifier = (float) (livingEntity.getAttributeValue(Attributes.ARMOR)) / 12;
-                float adjustedDamage = baseDamage + armorModifier;
-
-                ItemStack weapon = player.getMainHandItem();
-                adjustedDamage += EnchantmentHelper.getDamageBonus(weapon, livingEntity.getMobType());
-
-                livingEntity.hurt(damageSource, (float) Math.min(adjustedDamage, adjustedDamage / livingEntity.position().subtract(attacker.position()).length() * 2.5));
-
-                EnchantmentHelper.doPostHurtEffects(livingEntity, player);
-                EnchantmentHelper.doPostDamageEffects(player, livingEntity);
+                EnchantmentHelper.doPostHurtEffects(livingEntity, owner);
+                EnchantmentHelper.doPostDamageEffects(owner, livingEntity);
 
                 if (!livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
                     livingEntity.knockback(force, ratioX, ratioZ);
@@ -186,7 +162,7 @@ public class Motosignir extends SwordItem {
 
     public static void hurtAndKnockbackEntites (List<LivingEntity> entities, Player player, MobEffect[] mobEffects, float baseDamage, double force, int amplifier, int duration) {
         for(LivingEntity livingEntity: entities) {
-            if (livingEntity != player && (!(livingEntity instanceof Player && ((Player) livingEntity).isCreative()))) {
+            if (livingEntity != player && (!(livingEntity instanceof Player && ((Player) livingEntity).isCreative())) && !hasTeammate(player, livingEntity)) {
                 double entityX = livingEntity.getX();
                 double entityZ = livingEntity.getZ();
 
@@ -201,7 +177,14 @@ public class Motosignir extends SwordItem {
                 adjustedDamage += EnchantmentHelper.getDamageBonus(weapon, livingEntity.getMobType());
 
                 DamageSource damageSource = DamageSource.playerAttack(player);
-                livingEntity.hurt(damageSource, (float) Math.min(adjustedDamage, adjustedDamage / livingEntity.position().subtract(player.position()).length() * 2.5));
+                float distanceToEnemy = (float) livingEntity.position().subtract(player.position()).length();
+
+                float distanceFactor = (1f - (distanceToEnemy -1.5f) / (distanceToEnemy + 6.5f));
+
+                player.sendSystemMessage(Component.literal("Dealt " + Math.floor(Math.min(adjustedDamage, adjustedDamage * distanceFactor)*100)/100 + " damage to " + livingEntity.getDisplayName().getString() + " at " + Math.floor(distanceToEnemy*100)/100 + " distance"));
+
+                livingEntity.hurt(damageSource, Math.min(adjustedDamage, adjustedDamage * distanceFactor));
+//                livingEntity.hurt(damageSource, (float) Math.min(adjustedDamage, adjustedDamage / livingEntity.position().subtract(player.position()).length() * 2.5));
 
                 EnchantmentHelper.doPostHurtEffects(livingEntity, player);
                 EnchantmentHelper.doPostDamageEffects(player, livingEntity);

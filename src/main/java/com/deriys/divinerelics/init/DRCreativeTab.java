@@ -1,4 +1,4 @@
-package com.deriys.divinerelics.items;
+package com.deriys.divinerelics.init;
 
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;

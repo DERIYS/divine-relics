@@ -1,6 +1,8 @@
-package com.deriys.divinerelics.entities;
+package com.deriys.divinerelics.init;
 
 import com.deriys.divinerelics.DivineRelics;
+import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
+import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;

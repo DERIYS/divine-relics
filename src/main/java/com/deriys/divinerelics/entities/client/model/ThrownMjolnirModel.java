@@ -3,7 +3,7 @@ package com.deriys.divinerelics.entities.client.model;// Made with Blockbench 4.
 // Paste this class into your mod and generate all required imports
 
 
-import com.deriys.divinerelics.entities.ThrownMjolnir;
+import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.EntityModel;

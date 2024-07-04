@@ -1,8 +1,8 @@
 package com.deriys.divinerelics.items;
 
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
-import com.deriys.divinerelics.entities.ThrownMjolnir;
-import com.deriys.divinerelics.sound.DRSounds;
+import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
+import com.deriys.divinerelics.init.DRSounds;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
@@ -15,6 +15,7 @@ import net.minecraft.stats.Stats;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
@@ -31,10 +32,13 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
+import static com.deriys.divinerelics.event.DREvents.ForgeEvents.bindItemToEntity;
+import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
+
 public class Mjolnir extends AxeItem {
-    public static final int THROW_THRESHOLD_TIME = 10;
+    public static final int THROW_THRESHOLD_TIME = 13;
     public static final float BASE_DAMAGE = 25.0F;
-    public static final float SHOOT_POWER = 4.5F;
+    public static final float SHOOT_POWER = 3.8F;
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     public Mjolnir(Tier p_40521_, float p_40522_, float p_40523_, Properties p_40524_) {
@@ -60,7 +64,7 @@ public class Mjolnir extends AxeItem {
     public void releaseUsing(ItemStack itemStack, Level level, LivingEntity livingEntity, int use_ticks) {
         if (livingEntity instanceof Player player) {
             int ticks = this.getUseDuration(itemStack) - use_ticks;
-            if (ticks >= 10) {
+            if (ticks >= THROW_THRESHOLD_TIME) {
                 if (!player.isShiftKeyDown() && !level.isClientSide) {
                     // adding throwed mjolnir
                     ThrownMjolnir thrownMjolnir = new ThrownMjolnir(level, player, itemStack);
@@ -73,7 +77,7 @@ public class Mjolnir extends AxeItem {
 
                     // bind thrown mjolnir to the player
                     player.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(binding -> {
-                        binding.setMjolnir(thrownMjolnir.getUUID());
+                        binding.addMjolnir(thrownMjolnir.getUUID().toString());
                     });
 
                     level.playSound(null, player.getOnPos(), DRSounds.MJOLNIR_THROWING.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -82,9 +86,11 @@ public class Mjolnir extends AxeItem {
                         player.getInventory().removeItem(itemStack);
                     }
 
-                } else if (player.isShiftKeyDown()){ // riptide
+                } else if (player.isShiftKeyDown() && !player.isFallFlying()) { // riptide
                     player.getCooldowns().addCooldown(itemStack.getItem(), 30);
-                    if (!isRiptideFlying(itemStack)) { setRiptideFlying(itemStack, true); }
+                    if (!isRiptideFlying(itemStack)) {
+                        setRiptideFlying(itemStack, true);
+                    }
                     float f7 = player.getYRot();
                     float f = player.getXRot();
                     float f1 = -Mth.sin(f7 * ((float) Math.PI / 180F)) * Mth.cos(f * ((float) Math.PI / 180F));
@@ -95,7 +101,7 @@ public class Mjolnir extends AxeItem {
                     f1 *= f5 / f4;
                     f2 *= f5 / f4;
                     f3 *= f5 / f4;
-                    player.push((double) f1, (double) f2, (double) f3);
+                    player.push(f1, f2, f3);
                     player.startAutoSpinAttack(30);
                     if (player.isOnGround()) {
                         float f6 = 1.1999999F;
@@ -107,6 +113,14 @@ public class Mjolnir extends AxeItem {
                 player.awardStat(Stats.ITEM_USED.get(this));
             }
         }
+    }
+
+    @Override
+    public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
+        if (getOwner(itemStack).isEmpty()) {
+            bindItemToEntity(entity, itemStack);
+        }
+        super.inventoryTick(itemStack, level, entity, p_41407_, p_41408_);
     }
 
     public void setRiptideFlying(ItemStack mjolnir, boolean isFlying) {
@@ -148,10 +162,15 @@ public class Mjolnir extends AxeItem {
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag flag) {
-        if(Screen.hasShiftDown()) {
+        if (Screen.hasShiftDown()) {
             components.add(Component.literal("The legendary hammer of the Aesir god Thor, forged by the Huldra brothers, is now at your possession. Be careful, for the hammer does not make you the God of Thunder."));
         } else {
             components.add(Component.literal("Press SHIFT for more info").withStyle(ChatFormatting.YELLOW));
+            String ownerName = stack.getOrCreateTag().getString("OwnerNickname");
+            if (!ownerName.isEmpty()) {
+                components.add(Component.literal(""));
+                components.add(Component.literal("Loyal to: " + ownerName));
+            }
         }
     }
 }

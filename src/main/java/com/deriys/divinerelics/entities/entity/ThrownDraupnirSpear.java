@@ -1,10 +1,11 @@
-package com.deriys.divinerelics.entities;
+package com.deriys.divinerelics.entities.entity;
 
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.SpearParticleS2CPacket;
+import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.items.DraupnirSpear;
-import com.deriys.divinerelics.items.DRItems;
-import com.deriys.divinerelics.sound.DRSounds;
+import com.deriys.divinerelics.init.DRItems;
+import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
