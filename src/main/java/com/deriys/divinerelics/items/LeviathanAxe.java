@@ -1,24 +1,20 @@
 package com.deriys.divinerelics.items;
 
-import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
-import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
+import com.deriys.divinerelics.capabilities.leviathan.LeviathanBindingProvider;
+import com.deriys.divinerelics.entities.entity.ThrownLeviathanAxe;
 import com.deriys.divinerelics.init.DRSounds;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.stats.Stats;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -27,7 +23,6 @@ import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -35,17 +30,17 @@ import java.util.List;
 import static com.deriys.divinerelics.event.DREvents.ForgeEvents.bindItemToEntity;
 import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
 
-public class Mjolnir extends AxeItem {
-    public static final int THROW_THRESHOLD_TIME = 13;
-    public static final float BASE_DAMAGE = 25.0F;
-    public static final float SHOOT_POWER = 3.8F;
+public class LeviathanAxe extends AxeItem {
+    public static final int THROW_THRESHOLD_TIME = 10;
+    public static final float BASE_DAMAGE = 19.0F;
+    public static final float SHOOT_POWER = 3F;
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
-    public Mjolnir(Tier p_40521_, float p_40522_, float p_40523_, Properties p_40524_) {
+    public LeviathanAxe(Tier p_40521_, float p_40522_, float p_40523_, Properties p_40524_) {
         super(p_40521_, p_40522_, p_40523_, p_40524_);
         ImmutableMultimap.Builder<Attribute, AttributeModifier> $$1 = ImmutableMultimap.builder();
         $$1.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", BASE_DAMAGE, AttributeModifier.Operation.ADDITION));
-        $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -3.2500000953674316, AttributeModifier.Operation.ADDITION));
+        $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -2.1500000953674316, AttributeModifier.Operation.ADDITION));
         this.defaultModifiers = $$1.build();
     }
 
@@ -65,52 +60,27 @@ public class Mjolnir extends AxeItem {
         if (livingEntity instanceof Player player) {
             int ticks = this.getUseDuration(itemStack) - use_ticks;
             if (ticks >= THROW_THRESHOLD_TIME) {
-                if (!player.isShiftKeyDown() && !level.isClientSide) {
-                    // adding throwed mjolnir
-                    ThrownMjolnir thrownMjolnir = new ThrownMjolnir(level, player, itemStack);
-                    thrownMjolnir.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, SHOOT_POWER, 1.0F);
-                    if (player.getAbilities().instabuild) {
-                        thrownMjolnir.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
-                    }
-                    thrownMjolnir.setNoGravity(true);
-                    level.addFreshEntity(thrownMjolnir);
+                if (!level.isClientSide) {
+                    ThrownLeviathanAxe thrownLeviathanAxe = new ThrownLeviathanAxe(level, player, itemStack);
+                    thrownLeviathanAxe.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, SHOOT_POWER, 1.0F);
 
-                    // bind thrown mjolnir to the player
-                    player.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(binding -> {
-                        binding.addMjolnir(thrownMjolnir.getUUID().toString());
+                    if (player.getAbilities().instabuild) {
+                        thrownLeviathanAxe.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
+                    }
+
+                    level.addFreshEntity(thrownLeviathanAxe);
+
+                    player.getCapability(LeviathanBindingProvider.LEVIATHAN_BINDING).ifPresent(binding -> {
+                        binding.addLeviathan(thrownLeviathanAxe.getUUID().toString());
                     });
 
-                    level.playSound(null, player.getOnPos(), DRSounds.MJOLNIR_THROWING.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
+                    level.playSound(null, player.getOnPos(), DRSounds.LEVIATHAN_AXE_THROW.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
 
                     if (!player.getAbilities().instabuild) {
                         player.getInventory().removeItem(itemStack);
                     }
 
-                } else if (player.isShiftKeyDown() && !player.isFallFlying()) { // riptide
-                    player.getCooldowns().addCooldown(itemStack.getItem(), 30);
-                    if (!isRiptideFlying(itemStack)) {
-                        setRiptideFlying(itemStack, true);
-                    }
-                    float f7 = player.getYRot();
-                    float f = player.getXRot();
-                    float f1 = -Mth.sin(f7 * ((float) Math.PI / 180F)) * Mth.cos(f * ((float) Math.PI / 180F));
-                    float f2 = -Mth.sin(f * ((float) Math.PI / 180F));
-                    float f3 = Mth.cos(f7 * ((float) Math.PI / 180F)) * Mth.cos(f * ((float) Math.PI / 180F));
-                    float f4 = Mth.sqrt(f1 * f1 + f2 * f2 + f3 * f3);
-                    float f5 = 6.0F;
-                    f1 *= f5 / f4;
-                    f2 *= f5 / f4;
-                    f3 *= f5 / f4;
-                    player.push(f1, f2, f3);
-                    player.startAutoSpinAttack(30);
-                    if (player.isOnGround()) {
-                        float f6 = 1.1999999F;
-                        player.move(MoverType.SELF, new Vec3(0.0D, f6, 0.0D));
-                    }
-
-                    level.playSound((Player) null, player, DRSounds.MJOLNIR_RIPTIDE.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
                 }
-                player.awardStat(Stats.ITEM_USED.get(this));
             }
         }
     }
@@ -121,21 +91,6 @@ public class Mjolnir extends AxeItem {
             bindItemToEntity(entity, itemStack);
         }
         super.inventoryTick(itemStack, level, entity, p_41407_, p_41408_);
-    }
-
-    public void setRiptideFlying(ItemStack mjolnir, boolean isFlying) {
-        if (mjolnir != null) {
-            CompoundTag nbt = mjolnir.getOrCreateTag();
-            nbt.putBoolean("RiptideFlying", isFlying);
-        }
-    }
-
-    public boolean isRiptideFlying(ItemStack mjolnir) {
-        if (mjolnir != null) {
-            CompoundTag nbt = mjolnir.getOrCreateTag();
-            return nbt.getBoolean("RiptideFlying");
-        }
-        return false;
     }
 
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
@@ -163,7 +118,7 @@ public class Mjolnir extends AxeItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
-            components.add(Component.literal("The legendary hammer of the God of T, forged by the Huldra brothers, is now at your possession. Be careful, for the hammer does not make you the God of Thunder."));
+            components.add(Component.literal("Once wielded by Kratos’ wife, this axe embodies icy vengeance. Its enchanted blade cleaves through foes, always returning to its wielder’s grasp."));
         } else {
             components.add(Component.literal("Press SHIFT for more info").withStyle(ChatFormatting.YELLOW));
             String ownerName = stack.getOrCreateTag().getString("OwnerNickname");

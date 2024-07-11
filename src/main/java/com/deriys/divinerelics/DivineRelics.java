@@ -1,6 +1,7 @@
 package com.deriys.divinerelics;
 
 import com.deriys.divinerelics.core.networking.DRMessages;
+import com.deriys.divinerelics.entities.client.render.ThrownLeviathanRenderer;
 import com.deriys.divinerelics.init.DREffects;
 import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.entities.client.render.ThrownDraupnirSpearRenderer;
@@ -46,6 +47,7 @@ public class DivineRelics
         public static void onClientSetup(FMLClientSetupEvent event) {
             EntityRenderers.register(DREntitiyTypes.THROWN_DRAUPNIR_SPEAR.get(), ThrownDraupnirSpearRenderer::new);
             EntityRenderers.register(DREntitiyTypes.THROWN_MJOLNIR.get(), ThrownMjolnirRenderer::new);
+            EntityRenderers.register(DREntitiyTypes.THROWN_LEVIATHAN.get(), ThrownLeviathanRenderer::new);
             DRItemProperties.addCustomItemProperties();
         }
     }

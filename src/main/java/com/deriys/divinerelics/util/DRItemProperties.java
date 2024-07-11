@@ -10,6 +10,7 @@ public class DRItemProperties {
         makeShield(DRItems.GUARDIAN_SHIELD.get());
         makeUsing(DRItems.DRAUPNIR_SPEAR.get());
         makeUsing(DRItems.MJOLNIR.get());
+        makeUsing(DRItems.LEVIATHAN_AXE.get());
     }
 
     private static void makeShield(Item item) {

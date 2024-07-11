@@ -1,12 +1,15 @@
 package com.deriys.divinerelics.event;
 
 import com.deriys.divinerelics.DivineRelics;
+import com.deriys.divinerelics.capabilities.leviathan.LeviathanBinding;
+import com.deriys.divinerelics.capabilities.leviathan.LeviathanBindingProvider;
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBinding;
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
 import com.deriys.divinerelics.capabilities.teammates.Teammates;
 import com.deriys.divinerelics.capabilities.teammates.TeammatesProvider;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.GauntletParticleS2CPacket;
+import com.deriys.divinerelics.entities.entity.ThrownLeviathanAxe;
 import com.deriys.divinerelics.init.DREffects;
 import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
 import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
@@ -17,6 +20,7 @@ import com.deriys.divinerelics.items.Motosignir;
 import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -48,8 +52,9 @@ import java.util.List;
 import java.util.Random;
 
 import static com.deriys.divinerelics.capabilities.teammates.TeammatesProvider.hasTeammate;
+import static com.deriys.divinerelics.effects.BifrostProtection.findNormVec;
+import static com.deriys.divinerelics.effects.BifrostProtection.getTPVector;
 import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
-import static com.deriys.divinerelics.items.HeimdallGauntlet.*;
 
 
 public class DREvents {
@@ -58,13 +63,15 @@ public class DREvents {
         @SubscribeEvent
         public static void LivingAttackEvent(LivingAttackEvent event) {
             Entity hurtEntity = event.getEntity();
-            Entity attacker = event.getSource().getEntity();
-            Entity directAttacker = event.getSource().getDirectEntity();
+            DamageSource damageSource = event.getSource();
+            Entity attacker = damageSource.getEntity();
+            Entity directAttacker = damageSource.getDirectEntity();
 
             if (hurtEntity instanceof LivingEntity livingEntity) {
                 Level level = livingEntity.getLevel();
                 if (livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
-                    if (isValidAttacker(attacker, directAttacker)) {
+                    attacker.sendSystemMessage(Component.literal(String.valueOf(directAttacker.getDisplayName().getString())));
+                    if (isValidAttacker(attacker, directAttacker) && !level.isClientSide) {
                         Vec3 entityPos = livingEntity.position();
                         Vec3 attackerPos = attacker.position();
 
@@ -88,11 +95,15 @@ public class DREvents {
                 }
             }
 
-            if (hurtEntity instanceof LivingEntity && attacker instanceof Player player) {
+            if (hurtEntity != null && attacker instanceof Player player) {
                 ItemStack itemStack = player.getMainHandItem();
                 if (itemStack.getItem() instanceof Mjolnir mjolnir && !player.getLevel().isClientSide) {
                     if (mjolnir.isRiptideFlying(itemStack)) {
-                        player.getCooldowns().addCooldown(mjolnir, 40);
+                        if (!hasTeammate(player, ((LivingEntity) hurtEntity))) {
+                            player.getCooldowns().addCooldown(mjolnir, 40);
+                        } else {
+                            event.setCanceled(true);
+                        }
                     }
                 }
             }
@@ -162,7 +173,9 @@ public class DREvents {
                 if (!event.getObject().getCapability(TeammatesProvider.TEAMMATES).isPresent()) {
                     event.addCapability(new ResourceLocation(DivineRelics.MODID, "drteammates"), new TeammatesProvider());
                 }
-
+                if (!event.getObject().getCapability(LeviathanBindingProvider.LEVIATHAN_BINDING).isPresent()) {
+                    event.addCapability(new ResourceLocation(DivineRelics.MODID, "leviathanbinding"), new LeviathanBindingProvider());
+                }
             }
         }
 
@@ -170,6 +183,7 @@ public class DREvents {
         public static void onRegisterCapabilities(RegisterCapabilitiesEvent event) {
             event.register(MjolnirBinding.class);
             event.register(Teammates.class);
+            event.register(LeviathanBinding.class);
         }
 
         @SubscribeEvent
@@ -186,6 +200,12 @@ public class DREvents {
 
                 original.getCapability(TeammatesProvider.TEAMMATES).ifPresent(oldStore -> {
                     event.getEntity().getCapability(TeammatesProvider.TEAMMATES).ifPresent(newStore -> {
+                        newStore.copyFrom(oldStore);
+                    });
+                });
+
+                original.getCapability(LeviathanBindingProvider.LEVIATHAN_BINDING).ifPresent(oldStore -> {
+                    event.getEntity().getCapability(LeviathanBindingProvider.LEVIATHAN_BINDING).ifPresent(newStore -> {
                         newStore.copyFrom(oldStore);
                     });
                 });
@@ -234,11 +254,11 @@ public class DREvents {
         }
 
         private static boolean isValidAttacker(Entity attacker, Entity directAttacker) {
-            return !(directAttacker instanceof ThrownDraupnirSpear) && (attacker instanceof LivingEntity livingEntity && livingEntity.getMainHandItem().getItem() != DRItems.DRAUPNIR_SPEAR.get());
+            return !(directAttacker instanceof ThrownDraupnirSpear) && (attacker instanceof LivingEntity livingEntity && !(livingEntity.getMainHandItem().getItem() == DRItems.DRAUPNIR_SPEAR.get() && directAttacker == attacker));
         }
 
         public static boolean isDRWeapon(Entity directAttacker) {
-            return directAttacker instanceof ThrownMjolnir || directAttacker instanceof ThrownDraupnirSpear;
+            return directAttacker instanceof ThrownMjolnir || directAttacker instanceof ThrownDraupnirSpear || directAttacker instanceof ThrownLeviathanAxe;
         }
 
         public static void dodgeAttack(Level level, LivingEntity hurtEntity, Vec2 attackVector) {

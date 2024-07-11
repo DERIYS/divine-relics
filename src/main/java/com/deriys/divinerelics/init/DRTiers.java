@@ -22,8 +22,14 @@ public class DRTiers {
             new ForgeTier(5, 0, 9f, 4f, 15,
                     Tags.Blocks.NEEDS_NETHERITE_TOOL, () -> Ingredient.of(Items.NETHERITE_INGOT)),
             new ResourceLocation(DivineRelics.MODID, "heimdall_gauntlet"), List.of(Tiers.NETHERITE), List.of());
+
     public static final Tier MJOLNIR = TierSortingRegistry.registerTier(
             new ForgeTier(5, 0, 9f, 4f, 15,
                     Tags.Blocks.NEEDS_NETHERITE_TOOL, () -> Ingredient.of(Items.NETHERITE_INGOT)),
-            new ResourceLocation(DivineRelics.MODID, "mjolnir"), List.of(Tiers.NETHERITE), List.of());;
+            new ResourceLocation(DivineRelics.MODID, "mjolnir"), List.of(Tiers.NETHERITE), List.of());
+
+    public static final Tier LEVIATHAN = TierSortingRegistry.registerTier(
+            new ForgeTier(5, 0, 9f, 4f, 15,
+                    Tags.Blocks.NEEDS_NETHERITE_TOOL, () -> Ingredient.of(Items.NETHERITE_INGOT)),
+            new ResourceLocation(DivineRelics.MODID, "leviathan"), List.of(Tiers.NETHERITE), List.of());
 }

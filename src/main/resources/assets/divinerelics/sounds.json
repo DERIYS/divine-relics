@@ -82,5 +82,35 @@
       "sounds": [
         "divinerelics:guardian_shield_parry"
       ]
+    },
+    "leviathan_ground_impact": {
+      "subtitle": "sounds.divinerelics.leviathan_ground_impact",
+      "sounds": [
+        "divinerelics:leviathan_ground_impact"
+      ]
+    },
+    "leviathan_pierce": {
+      "subtitle": "sounds.divinerelics.leviathan_pierce",
+      "sounds": [
+        "divinerelics:leviathan_pierce"
+      ]
+    },
+    "leviathan_return": {
+      "subtitle": "sounds.divinerelics.leviathan_return",
+      "sounds": [
+        "divinerelics:leviathan_return"
+      ]
+    },
+    "leviathan_riptide": {
+      "subtitle": "sounds.divinerelics.leviathan_riptide",
+      "sounds": [
+        "divinerelics:leviathan_riptide"
+      ]
+    },
+    "leviathan_throw": {
+      "subtitle": "sounds.divinerelics.leviathan_throw",
+      "sounds": [
+        "divinerelics:leviathan_throw"
+      ]
     }
   }

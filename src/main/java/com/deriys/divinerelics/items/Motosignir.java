@@ -140,10 +140,9 @@ public class Motosignir extends SwordItem {
 
                 float distanceFactor = (1f - (distanceToEnemy -1.5f) / (distanceToEnemy + 6.5f));
 
-                owner.sendSystemMessage(Component.literal("Dealt " + Math.floor(Math.min(adjustedDamage, adjustedDamage * distanceFactor)*100)/100 + " damage to " + livingEntity.getDisplayName().getString() + " at " + Math.floor(distanceToEnemy*100)/100 + " distance"));
+//                owner.sendSystemMessage(Component.literal("Dealt " + Math.floor(Math.min(adjustedDamage, adjustedDamage * distanceFactor)*100)/100 + " damage to " + livingEntity.getDisplayName().getString() + " at " + Math.floor(distanceToEnemy*100)/100 + " distance"));
 
                 livingEntity.hurt(damageSource, Math.min(adjustedDamage, adjustedDamage * distanceFactor));
-//                livingEntity.hurt(damageSource, (float) Math.min(adjustedDamage, adjustedDamage / livingEntity.position().subtract(attacker.position()).length() * 2.5));
 
                 EnchantmentHelper.doPostHurtEffects(livingEntity, owner);
                 EnchantmentHelper.doPostDamageEffects(owner, livingEntity);
@@ -181,10 +180,9 @@ public class Motosignir extends SwordItem {
 
                 float distanceFactor = (1f - (distanceToEnemy -1.5f) / (distanceToEnemy + 6.5f));
 
-                player.sendSystemMessage(Component.literal("Dealt " + Math.floor(Math.min(adjustedDamage, adjustedDamage * distanceFactor)*100)/100 + " damage to " + livingEntity.getDisplayName().getString() + " at " + Math.floor(distanceToEnemy*100)/100 + " distance"));
+//                player.sendSystemMessage(Component.literal("Dealt " + Math.floor(Math.min(adjustedDamage, adjustedDamage * distanceFactor)*100)/100 + " damage to " + livingEntity.getDisplayName().getString() + " at " + Math.floor(distanceToEnemy*100)/100 + " distance"));
 
                 livingEntity.hurt(damageSource, Math.min(adjustedDamage, adjustedDamage * distanceFactor));
-//                livingEntity.hurt(damageSource, (float) Math.min(adjustedDamage, adjustedDamage / livingEntity.position().subtract(player.position()).length() * 2.5));
 
                 EnchantmentHelper.doPostHurtEffects(livingEntity, player);
                 EnchantmentHelper.doPostDamageEffects(player, livingEntity);

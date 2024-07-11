@@ -41,6 +41,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
+import static com.deriys.divinerelics.effects.BifrostProtection.findNormVec;
 import static com.deriys.divinerelics.event.DREvents.ForgeEvents.bindItemToEntity;
 import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
 
@@ -152,7 +153,7 @@ public class DraupnirSpear extends Item {
             setDelayTicks(itemStack, 10);
             setExplosionState(itemStack, true);
             if (!level.isClientSide) {
-                Vec2 normVec = HeimdallGauntlet.findNormVec(player.getLookAngle());
+                Vec2 normVec = findNormVec(player.getLookAngle());
                 sendExplosionPacket(level, player.getX() + normVec.x * 0.7, player.getY() - 1, player.getZ() + normVec.y * 0.7, 2D, 0D,25);
             }
             player.getCooldowns().addCooldown(this, 40 * (thrownCount + 1));

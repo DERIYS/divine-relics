@@ -45,6 +45,15 @@ public class DRSounds {
     public static final RegistryObject<SoundEvent> GUARDIAN_SHIELD_PARRY =
             registerSoundEvent("guardian_shield_parry");
 
+    public static final RegistryObject<SoundEvent> LEVIATHAN_AXE_IMPACT =
+            registerSoundEvent("leviathan_ground_impact");
+    public static final RegistryObject<SoundEvent> LEVIATHAN_AXE_PIERCE =
+            registerSoundEvent("leviathan_pierce");
+    public static final RegistryObject<SoundEvent> LEVIATHAN_AXE_RETURN =
+            registerSoundEvent("leviathan_return");
+    public static final RegistryObject<SoundEvent> LEVIATHAN_AXE_THROW =
+            registerSoundEvent("leviathan_throw");
+
     public static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> new SoundEvent(new ResourceLocation(DivineRelics.MODID, name)));
     }

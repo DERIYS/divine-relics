@@ -32,6 +32,8 @@ public class DRItems {
     public static final RegistryObject<Item> YGGDRASILS_TWIG = ITEMS.register("yggdrasils_twig",
             () -> new YggdrasilsTwig(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).tab(DRCreativeTab.MAINTAB)));
 
+    public static final RegistryObject<Item> LEVIATHAN_AXE = ITEMS.register("leviathan_axe",
+            () -> new LeviathanAxe(DRTiers.LEVIATHAN, 0, 0, new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

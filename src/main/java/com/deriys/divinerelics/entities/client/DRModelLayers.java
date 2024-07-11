@@ -9,4 +9,6 @@ public class DRModelLayers {
             new ResourceLocation(DivineRelics.MODID, "draupnir_spear_layer"), "main");
     public static final ModelLayerLocation MJOLNIR_LAYER = new ModelLayerLocation(
             new ResourceLocation(DivineRelics.MODID, "mjolnir_layer"), "main");
+    public static final ModelLayerLocation LEVIATHAN_AXE_LAYER = new ModelLayerLocation(
+            new ResourceLocation(DivineRelics.MODID, "drleviathan_axe_layer"), "main");
 }

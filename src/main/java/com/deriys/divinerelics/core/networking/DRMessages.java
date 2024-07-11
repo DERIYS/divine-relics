@@ -35,6 +35,12 @@ public class DRMessages {
                 .consumerMainThread(MjolnirBindingC2SPacket::handle)
                 .add();
 
+        net.messageBuilder(LeviathanBindingC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(LeviathanBindingC2SPacket::new)
+                .encoder(LeviathanBindingC2SPacket::toBytes)
+                .consumerMainThread(LeviathanBindingC2SPacket::handle)
+                .add();
+
         net.messageBuilder(MotosignirParticleS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(MotosignirParticleS2CPacket::new)
                 .encoder(MotosignirParticleS2CPacket::toBytes)
