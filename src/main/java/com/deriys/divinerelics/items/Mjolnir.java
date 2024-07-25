@@ -81,7 +81,7 @@ public class Mjolnir extends AxeItem {
                     });
 
                     level.playSound(null, player.getOnPos(), DRSounds.MJOLNIR_THROWING.get(), SoundSource.PLAYERS, 1.0F, 1.0F);
-
+                    
                     if (!player.getAbilities().instabuild) {
                         player.getInventory().removeItem(itemStack);
                     }
@@ -158,6 +158,11 @@ public class Mjolnir extends AxeItem {
 
     public int getEnchantmentValue() {
         return 1;
+    }
+
+    @Override
+    public boolean isFoil(ItemStack p_41453_) {
+        return false;
     }
 
     @Override

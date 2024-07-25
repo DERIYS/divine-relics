@@ -76,4 +76,16 @@ public class HeimdallGauntlet extends SwordItem {
                     0, 0, 0);
         }
     }
+//        public static void drawTPArea(Level level, Vec2 normVector, Vec3 entityPos, double length) {
+//            for (int i = -45; i <= 225; i++) {
+//                double vectorAngle = Math.PI * i / 180;
+//
+//                Vec3 vector = rotateVector(normVector, vectorAngle, length);
+//                for (int j = 0; j <= 10; j++) {
+//                    Vec3 end = entityPos.add(vector.scale((double) j / 10));
+//
+//                    level.addParticle(ParticleTypes.FLAME, end.x, entityPos.y + 1, end.z, 0.0D, 0.0D, 0.0D);
+//                }
+//            }
+//        }
 }

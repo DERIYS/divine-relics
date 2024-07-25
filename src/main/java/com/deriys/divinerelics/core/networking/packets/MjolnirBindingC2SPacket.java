@@ -40,11 +40,9 @@ public class MjolnirBindingC2SPacket {
                         if (thrownMjolnirEntity instanceof ThrownMjolnir thrownMjolnir) {
                             thrownMjolnir.shouldReturn = true;
                             thrownMjolnir.relaxed = false;
-                            binding.removeMjolnir(mjolnir);
                         }
                     }
                 }
-
             });
         });
         return true;

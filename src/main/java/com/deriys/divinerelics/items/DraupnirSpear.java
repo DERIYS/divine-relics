@@ -213,8 +213,6 @@ public class DraupnirSpear extends Item {
         return entity instanceof ThrownDraupnirSpear || entity instanceof LivingEntity;
     }
 
-
-
     private void destroySpear(Level level, Entity spear, Player player, DamageSource damageSource) {
         double spearX = spear.getX();
         double spearY = spear.getY();
@@ -274,7 +272,6 @@ public class DraupnirSpear extends Item {
         if (!slotChanged && oldStack.getItem() == newStack.getItem()) {
             return false;
         }
-
         return super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
     }
 
@@ -299,7 +296,6 @@ public class DraupnirSpear extends Item {
                 p_43385_.broadcastBreakEvent(EquipmentSlot.MAINHAND);
             });
         }
-
         return true;
     }
 
@@ -309,6 +305,11 @@ public class DraupnirSpear extends Item {
 
     public int getEnchantmentValue() {
         return 1;
+    }
+
+    @Override
+    public boolean isFoil(ItemStack p_41453_) {
+        return false;
     }
 
     @Override

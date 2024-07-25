@@ -1,9 +1,9 @@
 package com.deriys.divinerelics.entities.entity;
 
+import com.deriys.divinerelics.capabilities.leviathan.LeviathanBindingProvider;
 import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
-import com.deriys.divinerelics.items.Motosignir;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -11,6 +11,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -29,10 +30,13 @@ public class ThrownLeviathanAxe extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
     private ItemStack leviathanItem;
     private boolean dealtDamage;
+    private boolean stopAnimation = false;
     public int clientSideReturnTridentTickCount;
     public boolean shouldReturn = false;
     public boolean relaxed = false;
     public DamageSource damageSource = DamageSource.trident(this, (Entity)(this.getOwner() == null ? this : this.getOwner()));
+    public final AnimationState throwingAnimationState = new AnimationState();
+    public boolean startedAnimation = true;
 
     public ThrownLeviathanAxe(EntityType<? extends ThrownLeviathanAxe> entityType, Level level) {
         super(entityType, level);
@@ -67,33 +71,44 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         }
 
         if (this.getOwner() instanceof Player player) {
-            if (player != null) {
-//                System.out.printf("relaxed: %b\nshouldReturn: %b\nisAcceptibleReturnOwner: %b\npickupAllowed: %b\nplayerAlive: %b\n", this.relaxed, this.shouldReturn, this.isAcceptibleReturnOwner(), this.pickup == Pickup.ALLOWED, player.isAlive());
-                if (!this.isAcceptibleReturnOwner() && !this.level.isClientSide && !this.relaxed && this.pickup == AbstractArrow.Pickup.ALLOWED) {
-                    this.pickup = AbstractArrow.Pickup.DISALLOWED;
-                    this.relax();
-                } else if (!this.level.isClientSide && player.isAlive() && this.pickup == AbstractArrow.Pickup.DISALLOWED) {
-                    this.pickup = AbstractArrow.Pickup.ALLOWED;
-                } else if (this.shouldReturn) {
-                    this.relaxed = false;
-                    this.setNoPhysics(true);
-                    Vec3 vectorPM = player.getEyePosition().subtract(this.position());
-                    this.setPosRaw(this.getX(), this.getY() + vectorPM.y * 0.015 * 4, this.getZ());
-                    if (this.level.isClientSide) {
-                        this.yOld = this.getY();
-                    }
-
-                    double fact = 0.05 * 3;
-                    this.setDeltaMovement(this.getDeltaMovement().scale(0.95).add(vectorPM.normalize().scale(fact)));
-                    if (this.clientSideReturnTridentTickCount == 0) {
-                        this.playSound(DRSounds.LEVIATHAN_AXE_RETURN.get(), 15.0F, 1.0F);
-                    }
-
-                    ++this.clientSideReturnTridentTickCount;
+            if (!this.isAcceptibleReturnOwner() && !this.level.isClientSide && !this.relaxed && this.pickup == Pickup.ALLOWED) {
+                this.pickup = Pickup.DISALLOWED;
+                this.relax();
+            } else if (!this.level.isClientSide && player.isAlive() && this.pickup == Pickup.DISALLOWED) {
+                this.pickup = Pickup.ALLOWED;
+            } else if (this.shouldReturn) {
+                this.relaxed = false;
+                this.setNoPhysics(true);
+                Vec3 vectorPM = player.getEyePosition().subtract(this.position());
+                this.setPosRaw(this.getX(), this.getY() + vectorPM.y * 0.015 * 4, this.getZ());
+                if (this.level.isClientSide) {
+                    this.yOld = this.getY();
                 }
+
+                double fact = 0.05 * 3;
+                this.setDeltaMovement(this.getDeltaMovement().scale(0.95).add(vectorPM.normalize().scale(fact)));
+                if (this.clientSideReturnTridentTickCount == 0) {
+                    this.playSound(DRSounds.LEVIATHAN_AXE_RETURN.get(), 15.0F, 1.0F);
+                }
+
+                ++this.clientSideReturnTridentTickCount;
             }
         }
         super.tick();
+
+        if (this.level.isClientSide) {
+            setupAnimationStates();
+        }
+    }
+
+    private void setupAnimationStates() {
+        if (!this.dealtDamage) {
+            this.throwingAnimationState.startIfStopped(this.tickCount);
+            this.startedAnimation = true;
+        } else if (this.startedAnimation) {
+            this.throwingAnimationState.stop();
+            this.startedAnimation = false;
+        }
     }
 
     private boolean isAcceptibleReturnOwner() {
@@ -120,7 +135,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
     }
 
     public boolean isFoil() {
-        return (Boolean)this.entityData.get(ID_FOIL);
+        return false;
     }
 
     @Nullable
@@ -138,12 +153,13 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         Entity owner = this.getOwner();
         float volume = 1.0F;
         this.dealtDamage = true;
-        SoundEvent soundEvent = DRSounds.LEVIATHAN_AXE_IMPACT.get();
+        this.stopAnimation = true;
+        SoundEvent soundEvent = DRSounds.LEVIATHAN_AXE_PIERCE.get();
         if (entity.hurt(this.damageSource, damage)) {
             if (entity instanceof LivingEntity livingEntity) {
-                Motosignir.gainMobEffects(livingEntity, Motosignir.NEGATIVE_EFFECTS, 200, 1);
+//                Motosignir.gainMobEffects(livingEntity, Motosignir.NEGATIVE_EFFECTS, 200, 1);
+                livingEntity.setTicksFrozen(400);
             }
-            soundEvent = DRSounds.LEVIATHAN_AXE_PIERCE.get();
             volume = 5.0F;
             if (entity.getType() == EntityType.ENDERMAN) {
                 return;
@@ -158,11 +174,13 @@ public class ThrownLeviathanAxe extends AbstractArrow {
             }
         }
         this.setDeltaMovement(this.getDeltaMovement().multiply(-0.01, -0.1, -0.01));
+//        Minecraft.getInstance().getSoundManager().stop(DRSounds.LEVIATHAN_AXE_THROW.getId(), SoundSource.PLAYERS);
         this.playSound(soundEvent, volume, 1.0F);
     }
 
     @Override
     protected void onHitBlock(BlockHitResult blockHitResult) {
+//        Minecraft.getInstance().getSoundManager().stop(DRSounds.LEVIATHAN_AXE_THROW.getId(), SoundSource.PLAYERS);
         super.onHitBlock(blockHitResult);
         this.setSoundEvent(DRSounds.LEVIATHAN_AXE_IMPACT.get());
     }
@@ -173,7 +191,14 @@ public class ThrownLeviathanAxe extends AbstractArrow {
     }
 
     protected boolean tryPickup(Player player) {
-        return super.tryPickup(player) || this.isNoPhysics() && this.ownedBy(player) && player.getInventory().add(this.getPickupItem());
+        if (super.tryPickup(player) || this.isNoPhysics() && this.ownedBy(player) && player.getInventory().add(this.getPickupItem())) {
+            player.getCapability(LeviathanBindingProvider.LEVIATHAN_BINDING).ifPresent(binding -> {
+                binding.removeLeviathan(this.getUUID().toString());
+            });
+            return true;
+        }
+        return false;
+//        return super.tryPickup(player) || this.isNoPhysics() && this.ownedBy(player) && player.getInventory().add(this.getPickupItem());
     }
 
     protected SoundEvent getDefaultHitGroundSoundEvent() {

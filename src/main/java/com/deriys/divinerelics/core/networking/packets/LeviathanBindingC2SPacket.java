@@ -40,7 +40,6 @@ public class LeviathanBindingC2SPacket {
                         if (thrownLeviathanEntity instanceof ThrownLeviathanAxe thrownLeviathanAxe) {
                             thrownLeviathanAxe.shouldReturn = true;
                             thrownLeviathanAxe.relaxed = false;
-                            binding.removeLeviathan(leviathan);
                         }
                     }
                 }

@@ -1,5 +1,6 @@
 package com.deriys.divinerelics.entities.entity;
 
+import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
 import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.items.HeimdallGauntlet;
@@ -135,7 +136,7 @@ public class ThrownMjolnir extends AbstractArrow {
     }
 
     public boolean isFoil() {
-        return (Boolean)this.entityData.get(ID_FOIL);
+        return false;
     }
 
     @Nullable
@@ -250,8 +251,9 @@ public class ThrownMjolnir extends AbstractArrow {
     private void mjolnirHit(LivingEntity owner, Level level, BlockPos blockPos) {
         ThrownMjolnir.spawnLightning(level, blockPos, owner);
         onHitLighnting(level, this, blockPos, owner, this.damageSource, STRIKE_DAMAGE, STRIKE_FORCE, 5);
-
-//        player.getCooldowns().addCooldown(this.mjolnirItem.getItem(), this.COOLDOWN);
+        if (owner instanceof Player player) {
+            player.getCooldowns().addCooldown(this.mjolnirItem.getItem(), this.COOLDOWN);
+        }
     }
 
     @Override
@@ -264,7 +266,14 @@ public class ThrownMjolnir extends AbstractArrow {
     }
 
     protected boolean tryPickup(Player player) {
-        return super.tryPickup(player) || this.isNoPhysics() && this.ownedBy(player) && player.getInventory().add(this.getPickupItem());
+        if (super.tryPickup(player) || this.isNoPhysics() && this.ownedBy(player) && player.getInventory().add(this.getPickupItem())) {
+            player.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(binding -> {
+                binding.removeMjolnir(this.getUUID().toString());
+            });
+            return true;
+        }
+        return false;
+//        return super.tryPickup(player) || this.isNoPhysics() && this.ownedBy(player) && player.getInventory().add(this.getPickupItem());
     }
 
     protected SoundEvent getDefaultHitGroundSoundEvent() {

@@ -15,12 +15,12 @@ import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
 import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.items.DraupnirSpear;
+import com.deriys.divinerelics.items.LeviathanAxe;
 import com.deriys.divinerelics.items.Mjolnir;
 import com.deriys.divinerelics.items.Motosignir;
 import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -70,7 +70,6 @@ public class DREvents {
             if (hurtEntity instanceof LivingEntity livingEntity) {
                 Level level = livingEntity.getLevel();
                 if (livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
-                    attacker.sendSystemMessage(Component.literal(String.valueOf(directAttacker.getDisplayName().getString())));
                     if (isValidAttacker(attacker, directAttacker) && !level.isClientSide) {
                         Vec3 entityPos = livingEntity.position();
                         Vec3 attackerPos = attacker.position();
@@ -90,7 +89,7 @@ public class DREvents {
                         float amount = event.getAmount();
                         float damage = (amount < 3)? 2: amount / 1.2f;
                         player.getLevel().playSound(null, player.getOnPos(), DRSounds.GUARDIAN_SHIELD_PARRY.get(), SoundSource.PLAYERS, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
-                        Motosignir.hurtAndKnockbackEntites(List.of(livingAttacker), player, Motosignir.NEGATIVE_EFFECTS, damage, Math.min(Math.log10(damage) / 2.5, 1.0f), 1, 100);
+                        Motosignir.hurtAndKnockbackEntites(List.of(livingAttacker), player, Motosignir.STUN_EFFECTS, damage, Math.min(Math.log10(damage) / 2.5, 1.0f), 1, 100);
                     }
                 }
             }
@@ -134,26 +133,42 @@ public class DREvents {
             if (event.getEntity() instanceof Player player) {
                 ItemStack itemStack = player.getMainHandItem();
                 Level level = player.getLevel();
-                if (itemStack.getItem() instanceof Mjolnir mjolnir && !level.isClientSide) {
-                    if (mjolnir.isRiptideFlying(itemStack)) {
-                        if (event.getDistance() > 20) {
-                            double velocity = getVelocity(player);
-                            float damage = ((float) Math.min(Math.max(10f, 5f * velocity), 40f));
-                            float force = (float) (1 + velocity / (velocity + 0.5));
-                            DamageSource damageSource = DamageSource.trident(new ThrownMjolnir(level, player, itemStack), player);
-
-                            player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 80, 2));
-                            ThrownMjolnir.onHitLighnting(event.getEntity().getLevel(), player, player.getOnPos(), player, damageSource, damage, force, 5);
-
-                            player.getCooldowns().addCooldown(mjolnir, 70);
+                if (!level.isClientSide) {
+                    if (itemStack.getItem() instanceof Mjolnir mjolnir) {
+                        if (mjolnir.isRiptideFlying(itemStack)) {
+                            handleMjolnirAction(player, mjolnir, itemStack, event);
                         }
-                        player.startAutoSpinAttack(1);
                         mjolnir.setRiptideFlying(itemStack, false);
-                        event.setCanceled(true);
+                    } else if (player.getUseItem().is(DRItems.GUARDIAN_SHIELD.get())) {
+                        handleGuardianShieldAction(player, event);
                     }
-
                 }
             }
+        }
+
+        private static void handleGuardianShieldAction(Player player, LivingFallEvent event) {
+            if (player.isAutoSpinAttack()) player.startAutoSpinAttack(1);
+            event.setCanceled(true);
+        }
+
+        private static void handleMjolnirAction(Player player, Mjolnir mjolnir, ItemStack itemStack, LivingFallEvent event) {
+            if (event.getDistance() > 20) {
+                applyMjolnirEffects(player, mjolnir, itemStack, event);
+            }
+            if (player.isAutoSpinAttack()) player.startAutoSpinAttack(1);
+            event.setCanceled(true);
+        }
+
+        private static void applyMjolnirEffects(Player player, Mjolnir mjolnir, ItemStack itemStack, LivingFallEvent event) {
+            double velocity = getVelocity(player);
+            float damage = ((float) Math.min(Math.max(10f, 5f * velocity), 40f));
+            float force = (float) (1 + velocity / (velocity + 0.5));
+            DamageSource damageSource = DamageSource.trident(new ThrownMjolnir(player.getLevel(), player, itemStack), player);
+
+            player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 80, 2));
+            ThrownMjolnir.onHitLighnting(event.getEntity().getLevel(), player, player.getOnPos(), player, damageSource, damage, force, 5);
+
+            player.getCooldowns().addCooldown(mjolnir, 70);
         }
 
         @SubscribeEvent
@@ -229,7 +244,7 @@ public class DREvents {
         }
 
         public static boolean isValidBindingItem(Item item) {
-            return item instanceof Mjolnir || item instanceof DraupnirSpear;
+            return item instanceof Mjolnir || item instanceof DraupnirSpear || item instanceof LeviathanAxe;
         }
 
         public static void bindItemToEntity(Entity entity, ItemStack itemStack) {
@@ -285,18 +300,5 @@ public class DREvents {
 
             level.playSound(null, entityX, entityY, entityZ, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, 1f);
         }
-
-//        public static void drawTPArea(Level level, Vec2 normVector, Vec3 entityPos, double length) {
-//            for (int i = -45; i <= 225; i++) {
-//                double vectorAngle = Math.PI * i / 180;
-//
-//                Vec3 vector = rotateVector(normVector, vectorAngle, length);
-//                for (int j = 0; j <= 10; j++) {
-//                    Vec3 end = entityPos.add(vector.scale((double) j / 10));
-//
-//                    level.addParticle(ParticleTypes.FLAME, end.x, entityPos.y + 1, end.z, 0.0D, 0.0D, 0.0D);
-//                }
-//            }
-//        }
     }
 }

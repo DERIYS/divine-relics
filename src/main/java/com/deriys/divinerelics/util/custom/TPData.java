@@ -1,4 +1,4 @@
-package com.deriys.divinerelics.items.custom;
+package com.deriys.divinerelics.util.custom;
 
 public class TPData {
     private final int offset;

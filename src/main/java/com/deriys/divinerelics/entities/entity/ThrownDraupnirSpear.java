@@ -156,7 +156,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
     }
 
     public boolean isFoil() {
-        return (Boolean)this.entityData.get(ID_FOIL);
+        return false;
     }
 
     protected boolean tryPickup(Player p_150196_) {
@@ -205,5 +205,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
     public boolean shouldRender(double p_37588_, double p_37589_, double p_37590_) {
         return true;
     }
+
+
 }
 

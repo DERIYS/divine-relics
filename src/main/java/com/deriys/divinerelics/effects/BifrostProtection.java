@@ -1,6 +1,6 @@
 package com.deriys.divinerelics.effects;
 
-import com.deriys.divinerelics.items.custom.TPData;
+import com.deriys.divinerelics.util.custom.TPData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;

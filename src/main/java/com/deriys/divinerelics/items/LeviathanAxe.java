@@ -40,7 +40,7 @@ public class LeviathanAxe extends AxeItem {
         super(p_40521_, p_40522_, p_40523_, p_40524_);
         ImmutableMultimap.Builder<Attribute, AttributeModifier> $$1 = ImmutableMultimap.builder();
         $$1.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", BASE_DAMAGE, AttributeModifier.Operation.ADDITION));
-        $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -2.1500000953674316, AttributeModifier.Operation.ADDITION));
+        $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -2.4000000953674316, AttributeModifier.Operation.ADDITION));
         this.defaultModifiers = $$1.build();
     }
 
@@ -79,7 +79,6 @@ public class LeviathanAxe extends AxeItem {
                     if (!player.getAbilities().instabuild) {
                         player.getInventory().removeItem(itemStack);
                     }
-
                 }
             }
         }
@@ -99,6 +98,14 @@ public class LeviathanAxe extends AxeItem {
         return InteractionResultHolder.consume(itemStack);
     }
 
+    @Override
+    public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
+        if (entity instanceof LivingEntity livingEntity && !player.getLevel().isClientSide) {
+            livingEntity.setTicksFrozen(livingEntity.getTicksFrozen() + 30);
+        }
+        return super.onLeftClickEntity(stack, player, entity);
+    }
+
     public boolean hurtEnemy(ItemStack p_43390_, LivingEntity p_43391_, LivingEntity p_43392_) {
         return true;
     }
@@ -113,6 +120,11 @@ public class LeviathanAxe extends AxeItem {
 
     public int getEnchantmentValue() {
         return 1;
+    }
+
+    @Override
+    public boolean isFoil(ItemStack p_41453_) {
+        return false;
     }
 
     @Override

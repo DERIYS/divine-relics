@@ -33,7 +33,7 @@ import static com.deriys.divinerelics.capabilities.teammates.TeammatesProvider.h
 
 
 public class Motosignir extends SwordItem {
-    public static final MobEffect[] NEGATIVE_EFFECTS = {
+    public static final MobEffect[] STUN_EFFECTS = {
             MobEffects.CONFUSION,
             MobEffects.MOVEMENT_SLOWDOWN,
             MobEffects.WEAKNESS
@@ -102,7 +102,7 @@ public class Motosignir extends SwordItem {
 
     private void releaseSoundWave(Level level, Player player, double playerX, double playerY, double playerZ) {
         level.playSound(null, player.getOnPos(), DRSounds.MOTOSIGNIR_SOUND_WAVE.get(), SoundSource.PLAYERS,
-                1.0f, 1);
+                3.0f, 1);
 
         int radius = 10;
 
@@ -111,7 +111,7 @@ public class Motosignir extends SwordItem {
 
         List<LivingEntity> entitiesInRadius = getEntitiesInArea(level, playerX, playerY, playerZ, radius);
 
-        hurtAndKnockbackEntites(entitiesInRadius, player, NEGATIVE_EFFECTS, 20f, 1f, AMPLIFIER, EFFECTS_DURATION);
+        hurtAndKnockbackEntites(entitiesInRadius, player, STUN_EFFECTS, 20f, 1f, AMPLIFIER, EFFECTS_DURATION);
     }
 
     public static List<LivingEntity> getEntitiesInArea(Level level, double x, double y, double z, double radius) {

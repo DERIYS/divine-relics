@@ -958,16 +958,19 @@
 		}
 	],
 	"gui_light": "front",
+	"overrides": [
+		{"predicate": {"using": 1}, "model": "divinerelics:item/leviathan_axe_throwing"}
+	],
 	"display": {
 		"thirdperson_righthand": {
 			"rotation": [0, 90, 0],
-			"translation": [0, 4, 1.75],
-			"scale": [0.75, 0.75, 0.75]
+			"translation": [0, 5.25, 2.25],
+			"scale": [0.9, 0.9, 0.9]
 		},
 		"thirdperson_lefthand": {
 			"rotation": [0, -90, 0],
-			"translation": [0, 4.25, 2.25],
-			"scale": [0.75, 0.75, 0.75]
+			"translation": [0, 5, 2.25],
+			"scale": [0.9, 0.9, 0.9]
 		},
 		"firstperson_righthand": {
 			"rotation": [-12.5, 90, 3],
@@ -1061,14 +1064,6 @@
 					]
 				}
 			]
-		}
-	],
-	"overrides": [
-		{
-			"predicate": {
-				"using": 1
-			},
-			"model": "divinerelics:item/leviathan_axe_throwing"
 		}
 	]
 }
