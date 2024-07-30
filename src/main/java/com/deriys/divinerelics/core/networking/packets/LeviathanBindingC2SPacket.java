@@ -38,7 +38,7 @@ public class LeviathanBindingC2SPacket {
                     for (String leviathan: copyList) {
                         Entity thrownLeviathanEntity = serverLevel.getEntity(UUID.fromString(leviathan));
                         if (thrownLeviathanEntity instanceof ThrownLeviathanAxe thrownLeviathanAxe) {
-                            thrownLeviathanAxe.shouldReturn = true;
+                            thrownLeviathanAxe.setReturning(true);
                             thrownLeviathanAxe.relaxed = false;
                         }
                     }

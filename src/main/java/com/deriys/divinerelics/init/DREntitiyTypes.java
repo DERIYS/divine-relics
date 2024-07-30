@@ -1,6 +1,7 @@
 package com.deriys.divinerelics.init;
 
 import com.deriys.divinerelics.DivineRelics;
+import com.deriys.divinerelics.entities.entity.DraugrEntity;
 import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
 import com.deriys.divinerelics.entities.entity.ThrownLeviathanAxe;
 import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
@@ -15,6 +16,12 @@ import net.minecraftforge.registries.RegistryObject;
 public class DREntitiyTypes {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, DivineRelics.MODID);
+
+    public static final RegistryObject<EntityType<DraugrEntity>> DRAUGR =
+            ENTITY_TYPES.register("draugr",
+                    () -> EntityType.Builder.of(DraugrEntity::new, MobCategory.MONSTER)
+                            .sized(0.8F, 1.5F)
+                            .build(new ResourceLocation(DivineRelics.MODID, "draugr").toString()));
 
     public static final RegistryObject<EntityType<ThrownDraupnirSpear>> THROWN_DRAUPNIR_SPEAR =
             ENTITY_TYPES.register("thrown_draupnir_spear",
@@ -32,7 +39,7 @@ public class DREntitiyTypes {
             ENTITY_TYPES.register("thrown_leviathan",
                     () -> EntityType.Builder.of(ThrownLeviathanAxe::create, MobCategory.MISC)
                             .sized(0.5F, 0.5F)
-                            .build(new ResourceLocation(DivineRelics.MODID, "thrown_mjolnir").toString()));
+                            .build(new ResourceLocation(DivineRelics.MODID, "thrown_leviathan").toString()));
 
     public static void register(IEventBus eventBus) {
         ENTITY_TYPES.register(eventBus);

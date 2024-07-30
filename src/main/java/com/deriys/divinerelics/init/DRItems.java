@@ -2,8 +2,10 @@ package com.deriys.divinerelics.init;
 
 import com.deriys.divinerelics.DivineRelics;
 import com.deriys.divinerelics.items.*;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Rarity;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -34,6 +36,10 @@ public class DRItems {
 
     public static final RegistryObject<Item> LEVIATHAN_AXE = ITEMS.register("leviathan_axe",
             () -> new LeviathanAxe(DRTiers.LEVIATHAN, 0, 0, new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
+
+
+    public static final RegistryObject<Item> DRAUGR_SPAWN_EGG = ITEMS.register("draugr_spawn_egg",
+            () -> new ForgeSpawnEggItem(DREntitiyTypes.DRAUGR, 0x7e9680, 0xc5d1c5, new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

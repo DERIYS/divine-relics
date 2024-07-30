@@ -38,7 +38,7 @@ public class MjolnirBindingC2SPacket {
                     for (String mjolnir: copyList) {
                         Entity thrownMjolnirEntity = serverLevel.getEntity(UUID.fromString(mjolnir));
                         if (thrownMjolnirEntity instanceof ThrownMjolnir thrownMjolnir) {
-                            thrownMjolnir.shouldReturn = true;
+                            thrownMjolnir.setReturning(true);
                             thrownMjolnir.relaxed = false;
                         }
                     }

@@ -101,12 +101,6 @@
         "divinerelics:leviathan_return"
       ]
     },
-    "leviathan_riptide": {
-      "subtitle": "sounds.divinerelics.leviathan_riptide",
-      "sounds": [
-        "divinerelics:leviathan_riptide"
-      ]
-    },
     "leviathan_throw": {
       "subtitle": "sounds.divinerelics.leviathan_throw",
       "sounds": [

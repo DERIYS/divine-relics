@@ -28,15 +28,15 @@ import javax.annotation.Nullable;
 
 public class ThrownLeviathanAxe extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
+    private static final EntityDataAccessor<Boolean> SHOULD_RETURN;
     private ItemStack leviathanItem;
-    private boolean dealtDamage;
-    private boolean stopAnimation = false;
+    public boolean dealtDamage;
+    public boolean isOnGround = false;
     public int clientSideReturnTridentTickCount;
     public boolean shouldReturn = false;
     public boolean relaxed = false;
     public DamageSource damageSource = DamageSource.trident(this, (Entity)(this.getOwner() == null ? this : this.getOwner()));
     public final AnimationState throwingAnimationState = new AnimationState();
-    public boolean startedAnimation = true;
 
     public ThrownLeviathanAxe(EntityType<? extends ThrownLeviathanAxe> entityType, Level level) {
         super(entityType, level);
@@ -48,24 +48,29 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         this.leviathanItem = new ItemStack(DRItems.LEVIATHAN_AXE.get());
         this.leviathanItem = p_37571_.copy();
         this.entityData.set(ID_FOIL, p_37571_.hasFoil());
+        this.entityData.set(SHOULD_RETURN, this.shouldReturn);
     }
 
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(ID_FOIL, false);
+        this.entityData.define(SHOULD_RETURN, false);
     }
 
     public void tick() {
-        if (this.inGroundTime > 4) {
+
+        if (this.inGroundTime > 0) {
+            this.isOnGround = true;
             this.dealtDamage = true;
         }
 
         if (!this.level.isClientSide) {
             boolean properReturnOwner = this.isAcceptibleReturnOwner();
-            if (properReturnOwner && !this.shouldReturn) {
+            if (properReturnOwner && !this.isReturning()) {
                 if (this.position().distanceToSqr(this.getOwner().position()) > 10000) {
-                    this.shouldReturn = true;
+                    this.setReturning(true);
                     this.relaxed = false;
+                    this.isOnGround = false;
                 }
             }
         }
@@ -76,8 +81,9 @@ public class ThrownLeviathanAxe extends AbstractArrow {
                 this.relax();
             } else if (!this.level.isClientSide && player.isAlive() && this.pickup == Pickup.DISALLOWED) {
                 this.pickup = Pickup.ALLOWED;
-            } else if (this.shouldReturn) {
+            } else if (this.isReturning()) {
                 this.relaxed = false;
+                this.isOnGround = false;
                 this.setNoPhysics(true);
                 Vec3 vectorPM = player.getEyePosition().subtract(this.position());
                 this.setPosRaw(this.getX(), this.getY() + vectorPM.y * 0.015 * 4, this.getZ());
@@ -95,20 +101,14 @@ public class ThrownLeviathanAxe extends AbstractArrow {
             }
         }
         super.tick();
-
-        if (this.level.isClientSide) {
-            setupAnimationStates();
-        }
     }
 
-    private void setupAnimationStates() {
-        if (!this.dealtDamage) {
-            this.throwingAnimationState.startIfStopped(this.tickCount);
-            this.startedAnimation = true;
-        } else if (this.startedAnimation) {
-            this.throwingAnimationState.stop();
-            this.startedAnimation = false;
-        }
+    public boolean isReturning() {
+        return this.entityData.get(SHOULD_RETURN);
+    }
+
+    public void setReturning(boolean returning) {
+        this.entityData.set(SHOULD_RETURN, returning);
     }
 
     private boolean isAcceptibleReturnOwner() {
@@ -124,7 +124,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         this.setNoGravity(false);
         this.setNoPhysics(false);
         this.setDeltaMovement(this.getDeltaMovement().multiply(0.001, 0.01, 0.001));
-        this.shouldReturn = false;
+        this.setReturning(false);
         this.relaxed = true;
         this.clientSideReturnTridentTickCount = 0;
         this.pickup = AbstractArrow.Pickup.DISALLOWED;
@@ -153,7 +153,6 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         Entity owner = this.getOwner();
         float volume = 1.0F;
         this.dealtDamage = true;
-        this.stopAnimation = true;
         SoundEvent soundEvent = DRSounds.LEVIATHAN_AXE_PIERCE.get();
         if (entity.hurt(this.damageSource, damage)) {
             if (entity instanceof LivingEntity livingEntity) {
@@ -174,13 +173,11 @@ public class ThrownLeviathanAxe extends AbstractArrow {
             }
         }
         this.setDeltaMovement(this.getDeltaMovement().multiply(-0.01, -0.1, -0.01));
-//        Minecraft.getInstance().getSoundManager().stop(DRSounds.LEVIATHAN_AXE_THROW.getId(), SoundSource.PLAYERS);
-        this.playSound(soundEvent, volume, 1.0F);
+        this.playSound(soundEvent, volume, 2.0F);
     }
 
     @Override
     protected void onHitBlock(BlockHitResult blockHitResult) {
-//        Minecraft.getInstance().getSoundManager().stop(DRSounds.LEVIATHAN_AXE_THROW.getId(), SoundSource.PLAYERS);
         super.onHitBlock(blockHitResult);
         this.setSoundEvent(DRSounds.LEVIATHAN_AXE_IMPACT.get());
     }
@@ -242,6 +239,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
 
     static {
         ID_FOIL = SynchedEntityData.defineId(ThrownLeviathanAxe.class, EntityDataSerializers.BOOLEAN);
+        SHOULD_RETURN = SynchedEntityData.defineId(ThrownLeviathanAxe.class, EntityDataSerializers.BOOLEAN);
     }
 
     public static ThrownLeviathanAxe create(EntityType<? extends ThrownLeviathanAxe> type, Level level) {

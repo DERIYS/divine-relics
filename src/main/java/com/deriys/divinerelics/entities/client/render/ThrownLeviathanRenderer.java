@@ -34,8 +34,17 @@ public class ThrownLeviathanRenderer extends EntityRenderer<ThrownLeviathanAxe> 
     public void render(ThrownLeviathanAxe entityIn, float entityYaw, float partialTicks, PoseStack matrixStackIn, MultiBufferSource bufferIn, int packedLightIn) {
         matrixStackIn.pushPose();
         matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(Mth.lerp(partialTicks, entityIn.yRotO, entityIn.getYRot()) - 90.0F));
-        matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(Mth.lerp(partialTicks, entityIn.xRotO, entityIn.getXRot()) + 90.0F));
+        float rotationAngle = entityIn.tickCount + partialTicks;
+        if (!entityIn.isOnGround) {
+            float rotationFactor = (entityIn.dealtDamage) ? 40.0F: -75.0F;
+            matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rotationAngle * rotationFactor));
+        } else if (entityIn.isReturning()) {
+            matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rotationAngle  * 75.0F));
+        } else {
+            matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(Mth.lerp(partialTicks, entityIn.xRotO, entityIn.getXRot()) + 90.0F));
+        }
         VertexConsumer $$6 = ItemRenderer.getFoilBufferDirect(bufferIn, this.model.renderType(this.getTextureLocation(entityIn)), false, entityIn.isFoil());
+        matrixStackIn.scale(0.95f, 0.95f,0.95f);
         this.model.renderToBuffer(matrixStackIn, $$6, packedLightIn, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         matrixStackIn.popPose();
         super.render(entityIn, entityYaw, partialTicks, matrixStackIn, bufferIn, packedLightIn);

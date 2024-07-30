@@ -37,6 +37,7 @@ import static com.deriys.divinerelics.capabilities.teammates.TeammatesProvider.h
 
 public class ThrownMjolnir extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
+    private static final EntityDataAccessor<Boolean> SHOULD_RETURN;
     public final float STRIKE_DAMAGE = 10f;
     private final int COOLDOWN = 141;
     private ItemStack mjolnirItem;
@@ -59,11 +60,13 @@ public class ThrownMjolnir extends AbstractArrow {
         this.mjolnirItem = new ItemStack(DRItems.MJOLNIR.get());
         this.mjolnirItem = p_37571_.copy();
         this.entityData.set(ID_FOIL, p_37571_.hasFoil());
+        this.entityData.set(SHOULD_RETURN, this.shouldReturn);
     }
 
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(ID_FOIL, false);
+        this.entityData.define(SHOULD_RETURN, false);
     }
 
     public void tick() {
@@ -73,42 +76,47 @@ public class ThrownMjolnir extends AbstractArrow {
 
         if (!this.level.isClientSide) {
             boolean properReturnOwner = this.isAcceptibleReturnOwner();
-            if (properReturnOwner && !this.shouldReturn) {
+            if (properReturnOwner && !this.isReturning()) {
                 if (this.position().distanceToSqr(this.getOwner().position()) > 10000) {
-                    this.shouldReturn = true;
+                    this.setReturning(true);
                     this.relaxed = false;
                 }
             }
         }
 
         if (this.getOwner() instanceof Player player) {
-            if (player != null) {
-//                System.out.printf("relaxed: %b\nshouldReturn: %b\nisAcceptibleReturnOwner: %b\npickupAllowed: %b\nplayerAlive: %b\n", this.relaxed, this.shouldReturn, this.isAcceptibleReturnOwner(), this.pickup == Pickup.ALLOWED, player.isAlive());
-                if (!this.isAcceptibleReturnOwner() && !this.level.isClientSide && !this.relaxed && this.pickup == Pickup.ALLOWED) {
-                    this.pickup = Pickup.DISALLOWED;
-                    this.relax();
-                } else if (!this.level.isClientSide && player.isAlive() && this.pickup == Pickup.DISALLOWED) {
-                    this.pickup = Pickup.ALLOWED;
-                } else if (this.shouldReturn) {
-                    this.relaxed = false;
-                    this.setNoPhysics(true);
-                    Vec3 vectorPM = player.getEyePosition().subtract(this.position());
-                    this.setPosRaw(this.getX(), this.getY() + vectorPM.y * 0.015 * 4, this.getZ());
-                    if (this.level.isClientSide) {
-                        this.yOld = this.getY();
-                    }
-
-                    double fact = 0.05 * 3;
-                    this.setDeltaMovement(this.getDeltaMovement().scale(0.95).add(vectorPM.normalize().scale(fact)));
-                    if (this.clientSideReturnTridentTickCount == 0) {
-                        this.playSound(DRSounds.MJOLNIR_RETURN.get(), 15.0F, 1.0F);
-                    }
-
-                    ++this.clientSideReturnTridentTickCount;
+            if (!this.isAcceptibleReturnOwner() && !this.level.isClientSide && !this.relaxed && this.pickup == Pickup.ALLOWED) {
+                this.pickup = Pickup.DISALLOWED;
+                this.relax();
+            } else if (!this.level.isClientSide && player.isAlive() && this.pickup == Pickup.DISALLOWED) {
+                this.pickup = Pickup.ALLOWED;
+            } else if (this.isReturning()) {
+                this.relaxed = false;
+                this.setNoPhysics(true);
+                Vec3 vectorPM = player.getEyePosition().subtract(this.position());
+                this.setPosRaw(this.getX(), this.getY() + vectorPM.y * 0.015 * 4, this.getZ());
+                if (this.level.isClientSide) {
+                    this.yOld = this.getY();
                 }
+
+                double fact = 0.05 * 3;
+                this.setDeltaMovement(this.getDeltaMovement().scale(0.95).add(vectorPM.normalize().scale(fact)));
+                if (this.clientSideReturnTridentTickCount == 0) {
+                    this.playSound(DRSounds.MJOLNIR_RETURN.get(), 15.0F, 1.0F);
+                }
+
+                ++this.clientSideReturnTridentTickCount;
             }
         }
         super.tick();
+    }
+
+    public boolean isReturning() {
+        return this.entityData.get(SHOULD_RETURN);
+    }
+
+    public void setReturning(boolean returning) {
+        this.entityData.set(SHOULD_RETURN, returning);
     }
 
     private boolean isAcceptibleReturnOwner() {
@@ -124,7 +132,7 @@ public class ThrownMjolnir extends AbstractArrow {
         this.setNoGravity(false);
         this.setNoPhysics(false);
         this.setDeltaMovement(this.getDeltaMovement().multiply(0.001, 0.01, 0.001));
-        this.shouldReturn = false;
+        this.setReturning(false);
         this.hit = true; // so that it won't spawn lightnings
         this.relaxed = true;
         this.clientSideReturnTridentTickCount = 0;
@@ -154,9 +162,9 @@ public class ThrownMjolnir extends AbstractArrow {
         Entity owner = this.getOwner();
         float volume = 1.0F;
         this.dealtDamage = true;
-        this.hit = true;
         SoundEvent soundEvent = DRSounds.MJOLNIR_IMPACT.get();
         if (entity.hurt(this.damageSource, damage)) {
+            this.hit = true;
             Level level = this.level;
             BlockPos blockPos = entity.blockPosition();
             if (!level.isClientSide && owner instanceof Player player) {
@@ -318,6 +326,7 @@ public class ThrownMjolnir extends AbstractArrow {
 
     static {
         ID_FOIL = SynchedEntityData.defineId(ThrownMjolnir.class, EntityDataSerializers.BOOLEAN);
+        SHOULD_RETURN = SynchedEntityData.defineId(ThrownMjolnir.class, EntityDataSerializers.BOOLEAN);
     }
 
     public static ThrownMjolnir create(EntityType<? extends ThrownMjolnir> type, Level level) {
