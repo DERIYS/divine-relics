@@ -30,6 +30,8 @@ public class DraugrRenderer extends GeoEntityRenderer<DraugrEntity> {
                                     @Nullable MultiBufferSource bufferSource,
                                     @Nullable VertexConsumer buffer, int packedLight, ResourceLocation texture) {
 
+        poseStack.scale(1.2f, 1.2f, 1.2f);
+
         return super.getRenderType(animatable, partialTick, poseStack, bufferSource, buffer, packedLight, texture);
     }
 }

@@ -64,6 +64,12 @@ public class DRMessages {
                 .encoder(SpearParticleS2CPacket::toBytes)
                 .consumerMainThread(SpearParticleS2CPacket::handle)
                 .add();
+
+        net.messageBuilder(StuckSpearsS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(StuckSpearsS2CPacket::new)
+                .encoder(StuckSpearsS2CPacket::toBytes)
+                .consumerMainThread(StuckSpearsS2CPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG message) {
@@ -72,6 +78,10 @@ public class DRMessages {
 
     public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
         INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
+    }
+
+    public static <MSG> void sendToAllPlayers(MSG message) {
+        INSTANCE.send(PacketDistributor.ALL.noArg(), message);
     }
 
     public static <MSG> void sendToChunk(MSG message, LevelChunk chunk) {

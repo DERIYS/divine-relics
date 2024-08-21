@@ -24,6 +24,9 @@ public class DRItems {
 
     public static final RegistryObject<Item> DRAUPNIR_SPEAR = ITEMS.register("draupnir_spear",
             () -> new DraupnirSpear(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
+
+    public static final RegistryObject<Item> THROWN_DRAUPNIR_SPEAR = ITEMS.register("thrown_draupnir_spear_item",
+            () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> ORACLE_COMPASS = ITEMS.register("oracle_compass",
             () -> new OracleCompass(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> MJOLNIR = ITEMS.register("mjolnir",

@@ -20,7 +20,7 @@ public class DREntitiyTypes {
     public static final RegistryObject<EntityType<DraugrEntity>> DRAUGR =
             ENTITY_TYPES.register("draugr",
                     () -> EntityType.Builder.of(DraugrEntity::new, MobCategory.MONSTER)
-                            .sized(0.8F, 1.5F)
+                            .sized(0.7F, 1.8F)
                             .build(new ResourceLocation(DivineRelics.MODID, "draugr").toString()));
 
     public static final RegistryObject<EntityType<ThrownDraupnirSpear>> THROWN_DRAUPNIR_SPEAR =

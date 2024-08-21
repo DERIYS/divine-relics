@@ -13,6 +13,15 @@ public class DRSounds {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS =
             DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, DivineRelics.MODID);
 
+    public static final RegistryObject<SoundEvent> DRAUGR_ATTACK =
+            registerSoundEvent("draugr_attack");
+    public static final RegistryObject<SoundEvent> DRAUGR_AMBIENT_1 =
+            registerSoundEvent("draugr_ambient_1");
+    public static final RegistryObject<SoundEvent> DRAUGR_AMBIENT_2 =
+            registerSoundEvent("draugr_ambient_2");
+    public static final RegistryObject<SoundEvent> DRAUGR_AMBIENT_3 =
+            registerSoundEvent("draugr_ambient_3");
+
     public static final RegistryObject<SoundEvent> MOTOSIGNIR_SOUND_WAVE =
             registerSoundEvent("motosignir_sound_wave");
 

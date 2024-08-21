@@ -15,7 +15,6 @@ public class DREventBusClientEvents {
 
     @SubscribeEvent
     public static void registerLayer(EntityRenderersEvent.RegisterLayerDefinitions event) {
-//        event.registerLayerDefinition(DRModelLayers.DRAUGR_LAYER, DraugrModel::createBodyLayer);
         event.registerLayerDefinition(DRModelLayers.DRAUPNIR_SPEAR_LAYER, ThrownDraupnirSpearModel::createBodyLayer);
         event.registerLayerDefinition(DRModelLayers.MJOLNIR_LAYER, ThrownMjolnirModel::createBodyLayer);
         event.registerLayerDefinition(DRModelLayers.LEVIATHAN_AXE_LAYER, ThrownLeviathanModel::createBodyLayer);

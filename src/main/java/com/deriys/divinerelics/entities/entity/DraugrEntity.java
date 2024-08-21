@@ -1,6 +1,7 @@
 package com.deriys.divinerelics.entities.entity;
 
 import com.deriys.divinerelics.entities.ai.draugr.DraugrAttackGoal;
+import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -8,6 +9,9 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -17,6 +21,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
@@ -27,7 +32,11 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
+import static com.deriys.divinerelics.items.HeimdallGauntlet.RAND;
+
 public class DraugrEntity extends Monster implements IAnimatable {
+    private static final AttributeModifier SLOW_SPEED_MODIFIER = new AttributeModifier("SlowSpeed", -0.3, AttributeModifier.Operation.MULTIPLY_BASE);
+    private static final AttributeModifier FAST_SPEED_MODIFIER = new AttributeModifier("FastSpeed", 0.5, AttributeModifier.Operation.MULTIPLY_BASE);
     private static final EntityDataAccessor<Boolean> ATTACKING =
             SynchedEntityData.defineId(DraugrEntity.class, EntityDataSerializers.BOOLEAN);
     public int attackingTicks = 0;
@@ -62,13 +71,12 @@ public class DraugrEntity extends Monster implements IAnimatable {
     public void tick() {
         super.tick();
 
-        if (this.isAttacking()) {
-            this.currentState = AnimationState.ATTACKING;
-        }
-
         if (this.level.isClientSide && this.attackingTicks > 0){
             this.attackingTicks--;
         }
+
+        LivingEntity target = this.getTarget();
+        this.setChasing(target != null && target.isAlive());
     }
 
     @Override
@@ -79,7 +87,7 @@ public class DraugrEntity extends Monster implements IAnimatable {
     }
 
     protected void addBehaviourGoals() {
-        this.goalSelector.addGoal(2, new DraugrAttackGoal(this, 1.0D, true));
+        this.goalSelector.addGoal(1, new DraugrAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this)).setAlertOthers(DraugrEntity.class));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
@@ -87,7 +95,7 @@ public class DraugrEntity extends Monster implements IAnimatable {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Monster.createMonsterAttributes().add(Attributes.FOLLOW_RANGE, 35.0D).add(Attributes.MOVEMENT_SPEED, (double)0.28F).add(Attributes.ATTACK_DAMAGE, 5.0D).add(Attributes.ARMOR, 7.0D).add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
+        return Monster.createMonsterAttributes().add(Attributes.FOLLOW_RANGE, 35.0D).add(Attributes.KNOCKBACK_RESISTANCE, 0.5f).add(Attributes.MOVEMENT_SPEED, 0.22F).add(Attributes.ATTACK_DAMAGE, 6.0D).add(Attributes.ARMOR, 9.0D).add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
     }
 
     public static DraugrEntity create(EntityType<? extends DraugrEntity> entityType, Level level) {
@@ -98,7 +106,7 @@ public class DraugrEntity extends Monster implements IAnimatable {
         if(this.isAttacking() && this.attackingTicks == 0) {
             event.getController().markNeedsReload();
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.draugr.attack", ILoopType.EDefaultLoopTypes.PLAY_ONCE));
-            this.attackingTicks = 20;
+            this.attackingTicks = 30;
             return PlayState.CONTINUE;
         }
 
@@ -112,16 +120,26 @@ public class DraugrEntity extends Monster implements IAnimatable {
         return PlayState.CONTINUE;
     }
 
-//    private <E extends IAnimatable> PlayState attackPredicate(AnimationEvent<E> event) {
-//        if(this.swinging) {
-//            event.getController().markNeedsReload();
-//            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.draugr.attack", ILoopType.EDefaultLoopTypes.PLAY_ONCE));
-//            System.out.println("ATTACK");
-//            this.attackingTicks = 20;
-//            this.swinging = false;
-//        }
-//        return PlayState.CONTINUE;
-//    }
+    public void setChasing(boolean chasing) {
+        AttributeInstance speedAttribute = this.getAttribute(Attributes.MOVEMENT_SPEED);
+        if (speedAttribute != null) {
+            if (chasing) {
+                if (!speedAttribute.hasModifier(FAST_SPEED_MODIFIER)) {
+                    speedAttribute.addTransientModifier(FAST_SPEED_MODIFIER);
+                }
+                if (speedAttribute.hasModifier(SLOW_SPEED_MODIFIER)) {
+                    speedAttribute.removeModifier(SLOW_SPEED_MODIFIER);
+                }
+            } else {
+                if (!speedAttribute.hasModifier(SLOW_SPEED_MODIFIER)) {
+                    speedAttribute.addTransientModifier(SLOW_SPEED_MODIFIER);
+                }
+                if (speedAttribute.hasModifier(FAST_SPEED_MODIFIER)) {
+                    speedAttribute.removeModifier(FAST_SPEED_MODIFIER);
+                }
+            }
+        }
+    }
 
     @Override
     public void registerControllers(AnimationData animationData) {
@@ -134,6 +152,17 @@ public class DraugrEntity extends Monster implements IAnimatable {
     @Override
     protected SoundEvent getHurtSound(DamageSource p_33034_) {
         return SoundEvents.SKELETON_HURT;
+    }
+
+    @Nullable
+    @Override
+    protected SoundEvent getAmbientSound() {
+        int rand = RAND.nextInt(1, 4);
+        return switch (rand) {
+            case 1 -> DRSounds.DRAUGR_AMBIENT_1.get();
+            case 2 -> DRSounds.DRAUGR_AMBIENT_2.get();
+            default -> DRSounds.DRAUGR_AMBIENT_3.get();
+        };
     }
 
     @Override

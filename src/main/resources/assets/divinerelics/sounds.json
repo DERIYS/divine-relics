@@ -106,5 +106,29 @@
       "sounds": [
         "divinerelics:leviathan_throw"
       ]
+    },
+    "draugr_attack": {
+      "subtitle": "sounds.divinerelics.draugr_attack",
+      "sounds": [
+        "divinerelics:draugr_attack"
+      ]
+    },
+    "draugr_ambient_1": {
+      "subtitle": "sounds.divinerelics.draugr_ambient_1",
+      "sounds": [
+        "divinerelics:draugr_ambient_1"
+      ]
+    },
+    "draugr_ambient_2": {
+      "subtitle": "sounds.divinerelics.draugr_ambient_2",
+      "sounds": [
+        "divinerelics:draugr_ambient_2"
+      ]
+    },
+    "draugr_ambient_3": {
+      "subtitle": "sounds.divinerelics.draugr_ambient_3",
+      "sounds": [
+        "divinerelics:draugr_ambient_3"
+      ]
     }
   }

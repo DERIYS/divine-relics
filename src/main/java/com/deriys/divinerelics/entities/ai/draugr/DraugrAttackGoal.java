@@ -8,8 +8,8 @@ import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
 
 public class DraugrAttackGoal extends MeleeAttackGoal {
     private final DraugrEntity entity;
-    private int attackDelay = 10;
-    private int ticksUntilNextAttack = 10;
+    private int attackDelay = 15;
+    private int ticksUntilNextAttack = 15;
     private boolean shouldCountTillNextAttack = false;
 
     public DraugrAttackGoal(PathfinderMob pathfinderMob, double pSpeedModifier, boolean pFollowingTargetEvenIfNotSeen) {
@@ -20,9 +20,8 @@ public class DraugrAttackGoal extends MeleeAttackGoal {
     @Override
     public void start() {
         super.start();
-        attackDelay = 10;
-        ticksUntilNextAttack = 10;
-        System.out.println("Starting attack goal");
+        attackDelay = 15;
+        ticksUntilNextAttack = 15;
     }
 
     @Override
@@ -53,13 +52,10 @@ public class DraugrAttackGoal extends MeleeAttackGoal {
         }
     }
 
-    @Override
-    protected double getAttackReachSqr(LivingEntity p_25556_) {
-        return super.getAttackReachSqr(p_25556_) * 1.2f;
-    }
 
     private boolean isEnemyWithinAttackDistance(LivingEntity pEnemy, double pDistToEnemySqr) {
-        return pDistToEnemySqr <= this.getAttackReachSqr(pEnemy);
+        float attackRange = 2.8f;
+        return pDistToEnemySqr <= getAttackReachSqr(pEnemy) + attackRange * attackRange;
     }
 
     protected void resetAttackCooldown() {
@@ -97,6 +93,5 @@ public class DraugrAttackGoal extends MeleeAttackGoal {
     public void stop() {
         entity.setAttacking(false);
         super.stop();
-        System.out.println("Stopping attack goal");
     }
 }

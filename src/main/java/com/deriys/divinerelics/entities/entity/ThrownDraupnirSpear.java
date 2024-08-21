@@ -1,7 +1,9 @@
 package com.deriys.divinerelics.entities.entity;
 
+import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpearsProvider;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.SpearParticleS2CPacket;
+import com.deriys.divinerelics.core.networking.packets.StuckSpearsS2CPacket;
 import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.items.DraupnirSpear;
 import com.deriys.divinerelics.init.DRItems;
@@ -27,10 +29,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
 
 import javax.annotation.Nullable;
+
+import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 
 public class ThrownDraupnirSpear extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
@@ -136,6 +141,26 @@ public class ThrownDraupnirSpear extends AbstractArrow {
 
                 if (this.spearItem.getItem() instanceof DraupnirSpear draupnirSpear) {
                     draupnirSpear.addThrownSpear(this.spearItem, hurtEntity.getUUID());
+                    hurtEntity.getCapability(StuckSpearsProvider.STUCK_SPEARS).ifPresent(cap -> {
+                        Vec3 positionDifference = this.position().subtract(hurtEntity.position());
+                        Vec2 bodyRotationVector = getBodyRotationVector((LivingEntity) hurtEntity);
+                        Vec2 positionDifference2D = new Vec2((float) positionDifference.x, (float) positionDifference.z);
+
+                        float angleBetweenVectors = (float) angleBetweenVectors(positionDifference2D, bodyRotationVector);
+
+                        double hurtEntityWidth = hurtEntity.getBbWidth();
+                        double hurtEntityHeight = hurtEntity.getEyeHeight();
+
+                        double xOffset = RAND.nextDouble() * hurtEntityWidth * 0.6 - hurtEntityWidth * 0.3;
+                        double yOffset = RAND.nextDouble() * hurtEntityHeight * 0.6 + hurtEntityHeight * 0.3;
+                        double zOffset = RAND.nextDouble() * hurtEntityWidth * 0.3 - hurtEntityWidth * 0.15;
+
+                        cap.addSpear(new Vec3(xOffset, yOffset, zOffset), RAND.nextFloat() * 10 - 5, angleBetweenVectors < 90);
+
+                        // this.getOwner().sendSystemMessage(Component.literal("x: " + xOffset + "; y: " + yOffset + "; z: " + zOffset + "; angle: " + angleBetweenVectors));
+
+                        DRMessages.sendToAllPlayers(new StuckSpearsS2CPacket(hurtEntity.getId(), cap.getSpears()));
+                    });
                     if (!level.isClientSide) {
                         DraupnirSpear.sendExplosionPacket(this.level, hurtEntity.getX(), this.getY(), hurtEntity.getZ(), 1D, 0.5D, 10);
                     }
@@ -147,6 +172,25 @@ public class ThrownDraupnirSpear extends AbstractArrow {
         }
         this.setDeltaMovement(this.getDeltaMovement().multiply(-0.001, -0.01, -0.001));
         this.playSound(soundEvent, 2.0F, 1.0F);
+    }
+
+    public Vec2 getBodyRotationVector(LivingEntity entity) {
+        float yaw = entity.yBodyRot;
+        float pitch = entity.getXRot();
+
+        // Convert angles to radians
+        float yawRad = (float) Math.toRadians(yaw);
+        float pitchRad = (float) Math.toRadians(pitch);
+
+        // Calculate the direction vector
+        double x = -Math.sin(yawRad) * Math.cos(pitchRad);
+        double z = Math.cos(yawRad) * Math.cos(pitchRad);
+
+        return new Vec2((float) x, (float) z);
+    }
+
+    public double angleBetweenVectors(Vec2 vec1, Vec2 vec2) {
+        return Math.toDegrees(Math.acos(vec1.dot(vec2) / (vec1.length() * vec2.length())));
     }
 
     @Override

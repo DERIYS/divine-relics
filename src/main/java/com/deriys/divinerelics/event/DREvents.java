@@ -5,6 +5,8 @@ import com.deriys.divinerelics.capabilities.leviathan.LeviathanBinding;
 import com.deriys.divinerelics.capabilities.leviathan.LeviathanBindingProvider;
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBinding;
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
+import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpears;
+import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpearsProvider;
 import com.deriys.divinerelics.capabilities.teammates.Teammates;
 import com.deriys.divinerelics.capabilities.teammates.TeammatesProvider;
 import com.deriys.divinerelics.core.networking.DRMessages;
@@ -180,15 +182,21 @@ public class DREvents {
         }
 
         @SubscribeEvent
-        public static void onAttachCapabilitiesPlayer(AttachCapabilitiesEvent<Entity> event) {
-            if (event.getObject() instanceof Player) {
-                if (!event.getObject().getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).isPresent()) {
+        public static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
+            if (event.getObject() instanceof LivingEntity livingEntity) {
+                if (!livingEntity.getCapability(StuckSpearsProvider.STUCK_SPEARS).isPresent()) {
+                    event.addCapability(new ResourceLocation(DivineRelics.MODID, "stuck_spears"), new StuckSpearsProvider());
+                }
+            }
+
+            if (event.getObject() instanceof Player player) {
+                if (!player.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).isPresent()) {
                     event.addCapability(new ResourceLocation(DivineRelics.MODID, "mjolnirbinding"), new MjolnirBindingProvider());
                 }
-                if (!event.getObject().getCapability(TeammatesProvider.TEAMMATES).isPresent()) {
+                if (!player.getCapability(TeammatesProvider.TEAMMATES).isPresent()) {
                     event.addCapability(new ResourceLocation(DivineRelics.MODID, "drteammates"), new TeammatesProvider());
                 }
-                if (!event.getObject().getCapability(LeviathanBindingProvider.LEVIATHAN_BINDING).isPresent()) {
+                if (!player.getCapability(LeviathanBindingProvider.LEVIATHAN_BINDING).isPresent()) {
                     event.addCapability(new ResourceLocation(DivineRelics.MODID, "leviathanbinding"), new LeviathanBindingProvider());
                 }
             }
@@ -199,6 +207,7 @@ public class DREvents {
             event.register(MjolnirBinding.class);
             event.register(Teammates.class);
             event.register(LeviathanBinding.class);
+            event.register(StuckSpears.class);
         }
 
         @SubscribeEvent

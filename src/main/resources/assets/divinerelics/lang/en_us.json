@@ -8,6 +8,8 @@
   "item.divinerelics.leviathan_axe": "§9§lLeviathan Axe",
   "item.divinerelics.draugr_spawn_egg": "Draugr Spawn Egg",
 
+  "entity.divinerelics.draugr": "Draugr",
+
   "effect.divinerelics.bifrost_protection": "Bifrost Protection",
 
   "sounds.divinerelics.motosignir_sound_wave": "Motosignir released its sound wave",

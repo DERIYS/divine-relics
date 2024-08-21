@@ -1,7 +1,9 @@
 package com.deriys.divinerelics.items;
 
+import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpearsProvider;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.SpearExplosionParticleS2CPacket;
+import com.deriys.divinerelics.core.networking.packets.StuckSpearsS2CPacket;
 import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
 import com.deriys.divinerelics.init.DRSounds;
 import com.google.common.collect.ImmutableMultimap;
@@ -199,7 +201,13 @@ public class DraupnirSpear extends Item {
                 if (entityUUID != null) {
                     if (entityUUID instanceof ThrownDraupnirSpear) {
                         entityUUID.discard();
-                    } else { entityUUID.invulnerableTime = 1; }
+                    } else {
+                        entityUUID.getCapability(StuckSpearsProvider.STUCK_SPEARS).ifPresent(stuckSpears -> {
+                            stuckSpears.removeSpear();
+                            DRMessages.sendToAllPlayers(new StuckSpearsS2CPacket(entityUUID.getId(), stuckSpears.getSpears()));
+                        });
+                        entityUUID.invulnerableTime = 1;
+                    }
                     setDelayTicks(itemStack, RAND.nextInt(2, 6));
                 }
             }

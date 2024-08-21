@@ -1,10 +1,15 @@
 package com.deriys.divinerelics.event;
 
 import com.deriys.divinerelics.DivineRelics;
+import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpearsProvider;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.LeviathanBindingC2SPacket;
 import com.deriys.divinerelics.core.networking.packets.MjolnirBindingC2SPacket;
+import com.deriys.divinerelics.core.networking.packets.StuckSpearsS2CPacket;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -32,6 +37,16 @@ public class DRForgeEventBusEvents {
 
             LeviathanBindingC2SPacket leviathanPacket = new LeviathanBindingC2SPacket();
             DRMessages.sendToServer(leviathanPacket);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onStartTracking(PlayerEvent.StartTracking event) {
+        if (event.getTarget() instanceof LivingEntity) {
+            LivingEntity entity = (LivingEntity) event.getTarget();
+            entity.getCapability(StuckSpearsProvider.STUCK_SPEARS).ifPresent(cap -> {
+                DRMessages.sendToPlayer(new StuckSpearsS2CPacket(entity.getId(), cap.getSpears()), (ServerPlayer) event.getEntity());
+            });
         }
     }
 }
