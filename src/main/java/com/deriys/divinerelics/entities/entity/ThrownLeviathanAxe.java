@@ -153,10 +153,9 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         Entity owner = this.getOwner();
         float volume = 1.0F;
         this.dealtDamage = true;
-        SoundEvent soundEvent = DRSounds.LEVIATHAN_AXE_PIERCE.get();
+        SoundEvent soundEvent = DRSounds.LEVIATHAN_AXE_IMPACT.get();
         if (entity.hurt(this.damageSource, damage)) {
-            if (entity instanceof LivingEntity livingEntity) {
-//                Motosignir.gainMobEffects(livingEntity, Motosignir.NEGATIVE_EFFECTS, 200, 1);
+            if (entity instanceof LivingEntity livingEntity && livingEntity.isAlive()) {
                 livingEntity.setTicksFrozen(400);
             }
             volume = 5.0F;

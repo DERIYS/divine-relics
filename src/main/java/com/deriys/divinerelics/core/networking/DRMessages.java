@@ -41,6 +41,18 @@ public class DRMessages {
                 .consumerMainThread(LeviathanBindingC2SPacket::handle)
                 .add();
 
+        net.messageBuilder(ThorAnimationC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ThorAnimationC2SPacket::new)
+                .encoder(ThorAnimationC2SPacket::toBytes)
+                .consumerMainThread(ThorAnimationC2SPacket::handle)
+                .add();
+
+        net.messageBuilder(ThorSoundsC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
+                .decoder(ThorSoundsC2SPacket::new)
+                .encoder(ThorSoundsC2SPacket::toBytes)
+                .consumerMainThread(ThorSoundsC2SPacket::handle)
+                .add();
+
         net.messageBuilder(MotosignirParticleS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
                 .decoder(MotosignirParticleS2CPacket::new)
                 .encoder(MotosignirParticleS2CPacket::toBytes)

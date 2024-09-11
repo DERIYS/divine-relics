@@ -11,6 +11,7 @@ import com.deriys.divinerelics.capabilities.teammates.Teammates;
 import com.deriys.divinerelics.capabilities.teammates.TeammatesProvider;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.GauntletParticleS2CPacket;
+import com.deriys.divinerelics.entities.entity.ThorEntity;
 import com.deriys.divinerelics.entities.entity.ThrownLeviathanAxe;
 import com.deriys.divinerelics.init.DREffects;
 import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
@@ -22,6 +23,7 @@ import com.deriys.divinerelics.items.Mjolnir;
 import com.deriys.divinerelics.items.Motosignir;
 import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
@@ -41,6 +43,7 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
@@ -176,7 +179,8 @@ public class DREvents {
         @SubscribeEvent
         public static void onLightningStrike(EntityStruckByLightningEvent event) {
             ServerPlayer cause = event.getLightning().getCause();
-            if(event.getEntity() instanceof LivingEntity hitEntity && cause != null && (cause == hitEntity || hasTeammate(cause, hitEntity))) {
+            Entity entity = event.getEntity();
+            if(entity instanceof LivingEntity hitEntity && cause != null && (cause == hitEntity || hasTeammate(cause, hitEntity)) || entity instanceof ThorEntity) {
                 event.setCanceled(true);
             }
         }
@@ -249,6 +253,18 @@ public class DREvents {
                 if (!owner.equals(player.getUUID().toString())) {
                     event.setCanceled(true);
                 }
+            }
+        }
+
+        @SubscribeEvent
+        public static void onEntityJoinWorld(EntityJoinLevelEvent event) {
+            if (event.getEntity() instanceof ThorEntity thor && !thor.level.isClientSide && !thor.isSummoningComplete()) {
+                Level level = thor.level;
+                ServerLevel serverLevel = ((ServerLevel) level);
+                serverLevel.setWeatherParameters(0, 60000, true, true);
+                ItemStack musicDisc = new ItemStack(DRItems.THOR_FIGHT_MUSIC_DISC.get());
+                BlockPos onPos = thor.getOnPos();
+                level.levelEvent(null, 1010, onPos, Item.getId(musicDisc.getItem()));
             }
         }
 

@@ -76,7 +76,7 @@ public class DraugrEntity extends Monster implements IAnimatable {
         }
 
         LivingEntity target = this.getTarget();
-        this.setChasing(target != null && target.isAlive());
+        setChasing(this, FAST_SPEED_MODIFIER, SLOW_SPEED_MODIFIER, target != null && target.isAlive());
     }
 
     @Override
@@ -98,10 +98,6 @@ public class DraugrEntity extends Monster implements IAnimatable {
         return Monster.createMonsterAttributes().add(Attributes.FOLLOW_RANGE, 35.0D).add(Attributes.KNOCKBACK_RESISTANCE, 0.5f).add(Attributes.MOVEMENT_SPEED, 0.22F).add(Attributes.ATTACK_DAMAGE, 6.0D).add(Attributes.ARMOR, 9.0D).add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
     }
 
-    public static DraugrEntity create(EntityType<? extends DraugrEntity> entityType, Level level) {
-        return new DraugrEntity(entityType, level);
-    }
-
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         if(this.isAttacking() && this.attackingTicks == 0) {
             event.getController().markNeedsReload();
@@ -120,22 +116,22 @@ public class DraugrEntity extends Monster implements IAnimatable {
         return PlayState.CONTINUE;
     }
 
-    public void setChasing(boolean chasing) {
-        AttributeInstance speedAttribute = this.getAttribute(Attributes.MOVEMENT_SPEED);
+    public static void setChasing(LivingEntity livingEntity, AttributeModifier fast_speed_modifier, AttributeModifier slow_speed_modifier, boolean chasing) {
+        AttributeInstance speedAttribute = livingEntity.getAttribute(Attributes.MOVEMENT_SPEED);
         if (speedAttribute != null) {
             if (chasing) {
-                if (!speedAttribute.hasModifier(FAST_SPEED_MODIFIER)) {
-                    speedAttribute.addTransientModifier(FAST_SPEED_MODIFIER);
+                if (!speedAttribute.hasModifier(fast_speed_modifier)) {
+                    speedAttribute.addTransientModifier(fast_speed_modifier);
                 }
-                if (speedAttribute.hasModifier(SLOW_SPEED_MODIFIER)) {
-                    speedAttribute.removeModifier(SLOW_SPEED_MODIFIER);
+                if (speedAttribute.hasModifier(slow_speed_modifier)) {
+                    speedAttribute.removeModifier(slow_speed_modifier);
                 }
             } else {
-                if (!speedAttribute.hasModifier(SLOW_SPEED_MODIFIER)) {
-                    speedAttribute.addTransientModifier(SLOW_SPEED_MODIFIER);
+                if (!speedAttribute.hasModifier(slow_speed_modifier)) {
+                    speedAttribute.addTransientModifier(slow_speed_modifier);
                 }
-                if (speedAttribute.hasModifier(FAST_SPEED_MODIFIER)) {
-                    speedAttribute.removeModifier(FAST_SPEED_MODIFIER);
+                if (speedAttribute.hasModifier(fast_speed_modifier)) {
+                    speedAttribute.removeModifier(fast_speed_modifier);
                 }
             }
         }

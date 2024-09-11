@@ -22,6 +22,17 @@ public class DRSounds {
     public static final RegistryObject<SoundEvent> DRAUGR_AMBIENT_3 =
             registerSoundEvent("draugr_ambient_3");
 
+    public static final RegistryObject<SoundEvent> THOR_FIGHT_MUSIC =
+            registerSoundEvent("thor_fight_music");
+    public static final RegistryObject<SoundEvent> THOR_MELEE_ATTACK =
+            registerSoundEvent("thor_melee_attack");
+    public static final RegistryObject<SoundEvent> THOR_CLAP_ATTACK =
+            registerSoundEvent("thor_clap_attack");
+    public static final RegistryObject<SoundEvent> THOR_GROUND_ATTACK =
+            registerSoundEvent("thor_ground_attack");
+    public static final RegistryObject<SoundEvent> THOR_MJOLNIR_THROW_ATTACK =
+            registerSoundEvent("thor_mjolnir_throw_attack");
+
     public static final RegistryObject<SoundEvent> MOTOSIGNIR_SOUND_WAVE =
             registerSoundEvent("motosignir_sound_wave");
 

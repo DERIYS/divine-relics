@@ -7,8 +7,13 @@
   "item.divinerelics.yggdrasils_twig": "Yggdrasil's Twig",
   "item.divinerelics.leviathan_axe": "§9§lLeviathan Axe",
   "item.divinerelics.draugr_spawn_egg": "Draugr Spawn Egg",
+  "item.divinerelics.divine_mead": "Divine Mead",
+
+  "item.divinerelics.thor_fight_music_disc": "Thor Fight Music Disc",
+  "item.divinerelics.thor_fight_music_disc.desc": "Bear McCreary - The Hammer of Thor",
 
   "entity.divinerelics.draugr": "Draugr",
+  "entity.divinerelics.thor": "Thor",
 
   "effect.divinerelics.bifrost_protection": "Bifrost Protection",
 

@@ -130,5 +130,38 @@
       "sounds": [
         "divinerelics:draugr_ambient_3"
       ]
+    },
+    "thor_fight_music": {
+      "subtitle": "sounds.divinerelics.thor_fight_music",
+      "sounds": [
+        {
+          "name": "divinerelics:thor_fight_music",
+          "stream": true
+        }
+      ]
+    },
+    "thor_melee_attack": {
+      "subtitle": "sounds.divinerelics.thor_melee_attack",
+      "sounds": [
+          "divinerelics:thor_melee_attack"
+      ]
+    },
+    "thor_clap_attack": {
+      "subtitle": "sounds.divinerelics.thor_clap_attack",
+      "sounds": [
+        "divinerelics:thor_clap_attack"
+      ]
+    },
+    "thor_ground_attack": {
+      "subtitle": "sounds.divinerelics.thor_ground_attack",
+      "sounds": [
+        "divinerelics:thor_ground_attack"
+      ]
+    },
+    "thor_mjolnir_throw_attack": {
+      "subtitle": "sounds.divinerelics.thor_mjolnir_throw_attack",
+      "sounds": [
+        "divinerelics:thor_mjolnir_throw_attack"
+      ]
     }
   }

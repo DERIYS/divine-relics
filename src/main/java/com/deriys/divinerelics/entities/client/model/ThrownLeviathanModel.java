@@ -3,7 +3,6 @@ package com.deriys.divinerelics.entities.client.model;// Made with Blockbench 4.
 // Paste this class into your mod and generate all required imports
 
 
-import com.deriys.divinerelics.entities.client.animations.DRAnimationDefinitions;
 import com.deriys.divinerelics.entities.entity.ThrownLeviathanAxe;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -175,8 +174,5 @@ public class ThrownLeviathanModel extends HierarchicalModel<ThrownLeviathanAxe> 
 
 	@Override
 	public void setupAnim(ThrownLeviathanAxe thrownLeviathanAxe, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		this.root().getAllParts().forEach(ModelPart::resetPose);
-
-		this.animate(thrownLeviathanAxe.throwingAnimationState, DRAnimationDefinitions.LEVIATHAN_THROWING, ageInTicks);
 	}
 }

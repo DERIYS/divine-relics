@@ -1,10 +1,7 @@
 package com.deriys.divinerelics.init;
 
 import com.deriys.divinerelics.DivineRelics;
-import com.deriys.divinerelics.entities.entity.DraugrEntity;
-import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
-import com.deriys.divinerelics.entities.entity.ThrownLeviathanAxe;
-import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
+import com.deriys.divinerelics.entities.entity.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
@@ -22,6 +19,12 @@ public class DREntitiyTypes {
                     () -> EntityType.Builder.of(DraugrEntity::new, MobCategory.MONSTER)
                             .sized(0.7F, 1.8F)
                             .build(new ResourceLocation(DivineRelics.MODID, "draugr").toString()));
+
+    public static final RegistryObject<EntityType<ThorEntity>> THOR =
+            ENTITY_TYPES.register("thor",
+                    () -> EntityType.Builder.of(ThorEntity::new, MobCategory.MONSTER)
+                            .sized(1F, 2.8F)
+                            .build(new ResourceLocation(DivineRelics.MODID, "thor").toString()));
 
     public static final RegistryObject<EntityType<ThrownDraupnirSpear>> THROWN_DRAUPNIR_SPEAR =
             ENTITY_TYPES.register("thrown_draupnir_spear",

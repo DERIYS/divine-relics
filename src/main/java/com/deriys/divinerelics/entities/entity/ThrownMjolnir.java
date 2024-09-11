@@ -3,7 +3,6 @@ package com.deriys.divinerelics.entities.entity;
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
 import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.init.DRItems;
-import com.deriys.divinerelics.items.HeimdallGauntlet;
 import com.deriys.divinerelics.items.Motosignir;
 import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.core.BlockPos;
@@ -34,6 +33,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 import static com.deriys.divinerelics.capabilities.teammates.TeammatesProvider.hasTeammate;
+import static com.deriys.divinerelics.items.HeimdallGauntlet.RAND;
 
 public class ThrownMjolnir extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
@@ -70,13 +70,16 @@ public class ThrownMjolnir extends AbstractArrow {
     }
 
     public void tick() {
+        if (!this.level.isClientSide && this.getOwner() instanceof ThorEntity thor && !thor.isAlive()) {
+            this.discard();
+        }
+
         if (this.inGroundTime > 4) {
             this.dealtDamage = true;
         }
 
         if (!this.level.isClientSide) {
-            boolean properReturnOwner = this.isAcceptibleReturnOwner();
-            if (properReturnOwner && !this.isReturning()) {
+            if (this.isAcceptibleReturnOwner() && !this.isReturning()) {
                 if (this.position().distanceToSqr(this.getOwner().position()) > 10000) {
                     this.setReturning(true);
                     this.relaxed = false;
@@ -84,16 +87,16 @@ public class ThrownMjolnir extends AbstractArrow {
             }
         }
 
-        if (this.getOwner() instanceof Player player) {
+        if (this.getOwner() instanceof LivingEntity owner) {
             if (!this.isAcceptibleReturnOwner() && !this.level.isClientSide && !this.relaxed && this.pickup == Pickup.ALLOWED) {
                 this.pickup = Pickup.DISALLOWED;
                 this.relax();
-            } else if (!this.level.isClientSide && player.isAlive() && this.pickup == Pickup.DISALLOWED) {
+            } else if (!this.level.isClientSide && owner.isAlive() && this.pickup == Pickup.DISALLOWED) {
                 this.pickup = Pickup.ALLOWED;
             } else if (this.isReturning()) {
                 this.relaxed = false;
                 this.setNoPhysics(true);
-                Vec3 vectorPM = player.getEyePosition().subtract(this.position());
+                Vec3 vectorPM = owner.getEyePosition().subtract(this.position());
                 this.setPosRaw(this.getX(), this.getY() + vectorPM.y * 0.015 * 4, this.getZ());
                 if (this.level.isClientSide) {
                     this.yOld = this.getY();
@@ -167,8 +170,8 @@ public class ThrownMjolnir extends AbstractArrow {
             this.hit = true;
             Level level = this.level;
             BlockPos blockPos = entity.blockPosition();
-            if (!level.isClientSide && owner instanceof Player player) {
-                mjolnirHit(player, level, blockPos);
+            if (!level.isClientSide && owner instanceof LivingEntity livingEntity) {
+                mjolnirHit(livingEntity, level, blockPos);
             }
             soundEvent = DRSounds.MJOLNIR_THUNDER.get();
             volume = 5.0F;
@@ -189,7 +192,19 @@ public class ThrownMjolnir extends AbstractArrow {
     }
 
     public static BlockPos getRandBlockPos(BlockPos blockPos) {
-        return new BlockPos(blockPos.getX() + HeimdallGauntlet.RAND.nextFloat() * 10 - 5, blockPos.getY(), blockPos.getZ() + HeimdallGauntlet.RAND.nextFloat() * 10 - 5);
+        return new BlockPos(blockPos.getX() + RAND.nextFloat() * 10 - 5, blockPos.getY(), blockPos.getZ() + RAND.nextFloat() * 10 - 5);
+    }
+
+    public static BlockPos getRandBlockPos(BlockPos blockPos, int x, int z, int origin) {
+        return new BlockPos(blockPos.getX() + genRandSign(origin, x), blockPos.getY(), blockPos.getZ() + genRandSign(origin, z));
+    }
+
+    public static int genRandSign(int origin, int bound) {
+        if (RAND.nextBoolean()) {
+            return RAND.nextInt(origin, bound);
+        } else {
+            return -RAND.nextInt(origin, bound);
+        }
     }
 
     public static void spawnLightning(Level level, BlockPos blockPos, Entity owner) {
@@ -199,7 +214,7 @@ public class ThrownMjolnir extends AbstractArrow {
         level.addFreshEntity(lightningBolt);
     }
 
-    public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, LivingEntity owner, DamageSource damageSource, float damage, float force, int strikeRadius) {
+    public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, LivingEntity owner, DamageSource damageSource, float damage, float force, double strikeRadius) {
 
         double hammerX = hammer.getX();
         double hammerY = hammer.getY();
@@ -238,16 +253,16 @@ public class ThrownMjolnir extends AbstractArrow {
             boolean isBedrock = level.getBlockState(blockPos).getBlock() == Blocks.BEDROCK;
             Entity owner = this.getOwner();
 
-            if (owner instanceof Player player) {
+            if (owner instanceof LivingEntity livingEntity) {
                 if (!this.hit && !isBedrock) {
-                    mjolnirHit(player, level, blockPos);
+                    mjolnirHit(livingEntity, level, blockPos);
                     level.explode(null, this.damageSource, null, position.x, position.y, position.z, 2f, false, Explosion.BlockInteraction.DESTROY);
                     this.setDeltaMovement(prevMovement.scale(0.8f));
                 } else {
                     this.setNoGravity(false);
                     super.onHitBlock(blockHitResult);
                     if (!this.hit) {
-                        mjolnirHit(player, level, blockPos);
+                        mjolnirHit(livingEntity, level, blockPos);
                     }
                 }
             }
@@ -284,6 +299,16 @@ public class ThrownMjolnir extends AbstractArrow {
 //        return super.tryPickup(player) || this.isNoPhysics() && this.ownedBy(player) && player.getInventory().add(this.getPickupItem());
     }
 
+    public void shootMjolnirAtTarget(LivingEntity shooter, LivingEntity target) {
+        Vec3 startPos = shooter.position().add(0, shooter.getEyeHeight() / 1.5f, 0);
+        Vec3 targetPos = target.position().add(0, target.getEyeHeight() / 1.5f, 0);
+
+        Vec3 direction = targetPos.subtract(startPos).normalize();
+
+        this.setPos(startPos.x, startPos.y, startPos.z);
+        this.shoot(direction.x, direction.y, direction.z, 3.8F, 0);
+    }
+
     protected SoundEvent getDefaultHitGroundSoundEvent() {
         return DRSounds.MJOLNIR_IMPACT.get();
     }
@@ -294,19 +319,23 @@ public class ThrownMjolnir extends AbstractArrow {
         }
     }
 
-    public void readAdditionalSaveData(CompoundTag p_37578_) {
-        super.readAdditionalSaveData(p_37578_);
-        if (p_37578_.contains("Mjolnir", 10)) {
-            this.mjolnirItem = ItemStack.of(p_37578_.getCompound("Mjolnir"));
+    public void readAdditionalSaveData(CompoundTag tag) {
+        super.readAdditionalSaveData(tag);
+        if (tag.contains("Mjolnir", 10)) {
+            this.mjolnirItem = ItemStack.of(tag.getCompound("Mjolnir"));
         }
 
-        this.dealtDamage = p_37578_.getBoolean("DealtDamage");
+        this.dealtDamage = tag.getBoolean("DealtDamage");
+        this.hit = tag.getBoolean("thisHit");
+        this.setReturning(tag.getBoolean("Returning"));
     }
 
-    public void addAdditionalSaveData(CompoundTag p_37582_) {
-        super.addAdditionalSaveData(p_37582_);
-        p_37582_.put("Mjolnir", this.mjolnirItem.save(new CompoundTag()));
-        p_37582_.putBoolean("DealtDamage", this.dealtDamage);
+    public void addAdditionalSaveData(CompoundTag tag) {
+        super.addAdditionalSaveData(tag);
+        tag.put("Mjolnir", this.mjolnirItem.save(new CompoundTag()));
+        tag.putBoolean("DealtDamage", this.dealtDamage);
+        tag.putBoolean("thisHit", this.hit);
+        tag.putBoolean("Returning", this.isReturning());
     }
 
     public void tickDespawn() {
@@ -331,5 +360,9 @@ public class ThrownMjolnir extends AbstractArrow {
 
     public static ThrownMjolnir create(EntityType<? extends ThrownMjolnir> type, Level level) {
         return new ThrownMjolnir(type, level);
+    }
+
+    public boolean hasHit() {
+        return this.hit;
     }
 }

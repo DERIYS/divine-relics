@@ -1,10 +1,14 @@
 package com.deriys.divinerelics.entities.ai.draugr;
 
 import com.deriys.divinerelics.entities.entity.DraugrEntity;
+import com.deriys.divinerelics.init.DRSounds;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+
+import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 
 public class DraugrAttackGoal extends MeleeAttackGoal {
     private final DraugrEntity entity;
@@ -39,6 +43,7 @@ public class DraugrAttackGoal extends MeleeAttackGoal {
             }
 
             if(isTimeToAttack()) {
+                entity.level.playSound(null, entity.getOnPos(), DRSounds.DRAUGR_ATTACK.get(), SoundSource.HOSTILE, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
                 this.mob.getLookControl().setLookAt(pEnemy.getX(), pEnemy.getEyeY(), pEnemy.getZ());
                 performAttack(pEnemy);
 //                System.out.println("Performing attack");

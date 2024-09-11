@@ -168,7 +168,7 @@ public class Mjolnir extends AxeItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag flag) {
         if (Screen.hasShiftDown()) {
-            components.add(Component.literal("The legendary hammer of the God of T, forged by the Huldra brothers, is now at your possession. Be careful, for the hammer does not make you the God of Thunder."));
+            components.add(Component.literal("The legendary hammer of the God of Thunder, forged by the Huldra brothers, is now at your possession. Be careful, for the hammer does not make you its original possessor."));
         } else {
             components.add(Component.literal("Press SHIFT for more info").withStyle(ChatFormatting.YELLOW));
             String ownerName = stack.getOrCreateTag().getString("OwnerNickname");

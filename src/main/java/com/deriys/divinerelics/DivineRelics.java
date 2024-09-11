@@ -1,14 +1,8 @@
 package com.deriys.divinerelics;
 
 import com.deriys.divinerelics.core.networking.DRMessages;
-import com.deriys.divinerelics.entities.client.render.DraugrRenderer;
-import com.deriys.divinerelics.entities.client.render.ThrownLeviathanRenderer;
-import com.deriys.divinerelics.init.DREffects;
-import com.deriys.divinerelics.init.DREntitiyTypes;
-import com.deriys.divinerelics.entities.client.render.ThrownDraupnirSpearRenderer;
-import com.deriys.divinerelics.entities.client.render.ThrownMjolnirRenderer;
-import com.deriys.divinerelics.init.DRItems;
-import com.deriys.divinerelics.init.DRSounds;
+import com.deriys.divinerelics.entities.client.render.*;
+import com.deriys.divinerelics.init.*;
 import com.deriys.divinerelics.util.DRItemProperties;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
@@ -31,6 +25,7 @@ public class DivineRelics
 
         modEventBus.addListener(this::commonSetup);
         DRItems.register(modEventBus);
+        DRBlocks.register(modEventBus);
         DRSounds.register(modEventBus);
         DREffects.register(modEventBus);
         DREntitiyTypes.register(modEventBus);
@@ -49,6 +44,7 @@ public class DivineRelics
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             EntityRenderers.register(DREntitiyTypes.DRAUGR.get(), DraugrRenderer::new);
+            EntityRenderers.register(DREntitiyTypes.THOR.get(), ThorRenderer::new);
             EntityRenderers.register(DREntitiyTypes.THROWN_DRAUPNIR_SPEAR.get(), ThrownDraupnirSpearRenderer::new);
             EntityRenderers.register(DREntitiyTypes.THROWN_MJOLNIR.get(), ThrownMjolnirRenderer::new);
             EntityRenderers.register(DREntitiyTypes.THROWN_LEVIATHAN.get(), ThrownLeviathanRenderer::new);

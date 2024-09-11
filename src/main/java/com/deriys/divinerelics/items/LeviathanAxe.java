@@ -101,7 +101,7 @@ public class LeviathanAxe extends AxeItem {
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
         if (entity instanceof LivingEntity livingEntity && !player.getLevel().isClientSide) {
-            livingEntity.setTicksFrozen(livingEntity.getTicksFrozen() + 30);
+            livingEntity.setTicksFrozen(livingEntity.getTicksFrozen() + 60);
         }
         return super.onLeftClickEntity(stack, player, entity);
     }
