@@ -7,10 +7,12 @@ import software.bernie.geckolib3.model.AnimatedGeoModel;
 public class ThorModel extends AnimatedGeoModel<ThorEntity> {
     @Override
     public ResourceLocation getModelResource(ThorEntity thorEntity) {
-        if (thorEntity.hasMjolnir()) {
+        if (thorEntity.hasMjolnirInHands()) {
             return new ResourceLocation(DivineRelics.MODID, "geo/thor.geo.json");
+        } if (thorEntity.waitsForMjolnir()) {
+            return new ResourceLocation(DivineRelics.MODID, "geo/thor_no_mjolnir.geo.json");
         }
-        return new ResourceLocation(DivineRelics.MODID, "geo/thor_no_mjolnir.geo.json");
+        return new ResourceLocation(DivineRelics.MODID, "geo/thor_w_mjolnir.geo.json");
     }
 
     @Override

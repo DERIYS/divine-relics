@@ -146,6 +146,12 @@
           "divinerelics:thor_melee_attack"
       ]
     },
+    "thor_leg_attack": {
+      "subtitle": "sounds.divinerelics.thor_leg_attack",
+      "sounds": [
+        "divinerelics:thor_leg_attack"
+      ]
+    },
     "thor_clap_attack": {
       "subtitle": "sounds.divinerelics.thor_clap_attack",
       "sounds": [
@@ -162,6 +168,12 @@
       "subtitle": "sounds.divinerelics.thor_mjolnir_throw_attack",
       "sounds": [
         "divinerelics:thor_mjolnir_throw_attack"
+      ]
+    },
+    "thor_death_sound": {
+      "subtitle": "sounds.divinerelics.thor_death_sound",
+      "sounds": [
+        "divinerelics:thor_death_sound"
       ]
     }
   }

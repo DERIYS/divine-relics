@@ -1,7 +1,5 @@
 package com.deriys.divinerelics.entities.entity;
 
-import com.deriys.divinerelics.core.networking.DRMessages;
-import com.deriys.divinerelics.core.networking.packets.ThorSoundsC2SPacket;
 import com.deriys.divinerelics.entities.ai.thor.FireIgnoringPathNavigation;
 import com.deriys.divinerelics.entities.ai.thor.ThorAttackGoal;
 import com.deriys.divinerelics.entities.ai.thor.ThorAttackState;
@@ -65,7 +63,9 @@ public class ThorEntity extends Monster implements IAnimatable {
             SynchedEntityData.defineId(ThorEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Byte> ATTACK_STATE =
             SynchedEntityData.defineId(ThorEntity.class, EntityDataSerializers.BYTE);
-    private static final EntityDataAccessor<Boolean> HAS_MJOLNIR =
+    private static final EntityDataAccessor<Boolean> HAS_MJOLNIR_IN_HANDS =
+            SynchedEntityData.defineId(ThorEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> WAITS_FOR_MJOLNIR =
             SynchedEntityData.defineId(ThorEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> ATTACKING_TICKS =
             SynchedEntityData.defineId(ThorEntity.class, EntityDataSerializers.INT);
@@ -85,17 +85,12 @@ public class ThorEntity extends Monster implements IAnimatable {
     };
     public DamageSource thorDamageSource = DamageSource.mobAttack(this);
     public UUID thrownMjolnirUUID = null;
-    public boolean waitsForMjolnir = false;
-    public ThorEntity(EntityType<? extends Monster> p_33002_, Level p_33003_) {
-        super(p_33002_, p_33003_);
+    public ThorEntity(EntityType<? extends Monster> entityType, Level level) {
+        super(entityType, level);
         this.setPersistenceRequired();
     }
 
     public void setAttacking(boolean attacking) {
-        Player nearestPlayer = this.level.getNearestPlayer(this, 30D);
-        if (nearestPlayer != null) {
-            nearestPlayer.sendSystemMessage(Component.literal("Changed attacking to: " + attacking));
-        }
         this.entityData.set(ATTACKING, attacking);
     }
 
@@ -108,9 +103,8 @@ public class ThorEntity extends Monster implements IAnimatable {
 //        if (nearestPlayer != null) {
 //            nearestPlayer.sendSystemMessage(Component.literal("Changed attack state to: " + state));
 //        }
-
-        if (!state.equals(ThorAttackState.NONE)) {
-            setHasMjolnir(!state.equals(ThorAttackState.CLAP_ATTACK) && !state.equals(ThorAttackState.GROUND_ATTACK));
+        if (state != ThorAttackState.NONE) {
+            setHasMjolnirInHands(state != ThorAttackState.CLAP_ATTACK && state != ThorAttackState.GROUND_ATTACK && state != ThorAttackState.LEG_ATTACK);
         }
         this.entityData.set(ATTACK_STATE, (byte) state.ordinal());
     }
@@ -119,22 +113,23 @@ public class ThorEntity extends Monster implements IAnimatable {
         return ThorAttackState.getState(this.entityData.get(ATTACK_STATE));
     }
 
-    public void setHasMjolnir(boolean hasMjolnir) {
-//        Player nearestPlayer = this.level.getNearestPlayer(this, 30D);
-//        if (nearestPlayer != null) {
-//            nearestPlayer.sendSystemMessage(Component.literal("Has mjolnir: " + hasMjolnir));
-//        }
-        this.entityData.set(HAS_MJOLNIR, hasMjolnir);
+    public void setHasMjolnirInHands(boolean hasMjolnir) {
+        this.entityData.set(HAS_MJOLNIR_IN_HANDS, hasMjolnir);
     }
 
-    public boolean hasMjolnir() {
-        return this.entityData.get(HAS_MJOLNIR);
+    public boolean hasMjolnirInHands() {
+        return this.entityData.get(HAS_MJOLNIR_IN_HANDS);
+    }
+
+    public boolean waitsForMjolnir() {
+        return this.entityData.get(WAITS_FOR_MJOLNIR);
+    }
+
+    public void setWaitsForMjolnir(boolean waitsForMjolnir) {
+        this.entityData.set(WAITS_FOR_MJOLNIR, waitsForMjolnir);
     }
 
     public void setAttackingTicks(int ticks) {
-//        if (this.level.isClientSide) {
-//            DRMessages.sendToServer(new ThorAnimationC2SPacket(ticks, this.getId()));
-//        }
         this.entityData.set(ATTACKING_TICKS, ticks);
     }
 
@@ -181,7 +176,8 @@ public class ThorEntity extends Monster implements IAnimatable {
         super.defineSynchedData();
         this.entityData.define(ATTACKING, false);
         this.entityData.define(ATTACK_STATE, (byte) 0);
-        this.entityData.define(HAS_MJOLNIR, true);
+        this.entityData.define(HAS_MJOLNIR_IN_HANDS, true);
+        this.entityData.define(WAITS_FOR_MJOLNIR, false);
         this.entityData.define(ATTACKING_TICKS, 0);
         this.entityData.define(SUMMONING_COMPLETE, false);
     }
@@ -194,7 +190,7 @@ public class ThorEntity extends Monster implements IAnimatable {
             this.bossEvent.setProgress(bossBarProgress);
         }
 
-        if (!this.level.isClientSide && this.waitsForMjolnir) {
+        if (!this.level.isClientSide && this.waitsForMjolnir()) {
             ServerLevel serverLevel = (ServerLevel) level;
             if (serverLevel.getEntity(this.thrownMjolnirUUID) instanceof ThrownMjolnir thrownMjolnir) {
                 if (thrownMjolnir.isOnGround() || thrownMjolnir.hasHit()) {
@@ -203,10 +199,10 @@ public class ThorEntity extends Monster implements IAnimatable {
                 if (thrownMjolnir.isReturning() && this.position().distanceToSqr(thrownMjolnir.position()) < 15) {
                     ThorAttackState attackState = this.getAttackState();
                     if (attackState != ThorAttackState.CLAP_ATTACK && attackState != ThorAttackState.GROUND_ATTACK) {
-                        this.setHasMjolnir(true);
+                        this.setHasMjolnirInHands(true);
                     }
                     thrownMjolnir.discard();
-                    this.waitsForMjolnir = false;
+                    this.setWaitsForMjolnir(false);
                     this.thrownMjolnirUUID = null;
                 }
 
@@ -260,12 +256,12 @@ public class ThorEntity extends Monster implements IAnimatable {
         this.setSummoningComplete(compoundTag.getBoolean("SummoningComplete"));
         this.setAttacking(compoundTag.getBoolean("Attacking"));
         this.setAttackState(ThorAttackState.getState(compoundTag.getByte("AttackState")));
-        this.setHasMjolnir(compoundTag.getBoolean("HasMjolnir"));
+        this.setHasMjolnirInHands(compoundTag.getBoolean("HasMjolnirInHands"));
         this.setAttackingTicks(compoundTag.getInt("AttackingTicks"));
         if (compoundTag.hasUUID("ThrownMjolnirUUID")) {
             this.thrownMjolnirUUID = compoundTag.getUUID("ThrownMjolnirUUID");
         }
-        this.waitsForMjolnir = compoundTag.getBoolean("WaitsForMjolnir");
+        this.setWaitsForMjolnir(compoundTag.getBoolean("WaitsForMjolnir"));
     }
 
     @Override
@@ -273,8 +269,8 @@ public class ThorEntity extends Monster implements IAnimatable {
         super.addAdditionalSaveData(compoundTag);
         compoundTag.putBoolean("SummoningComplete", this.isSummoningComplete());
         compoundTag.putBoolean("Attacking", this.isAttacking());
-        compoundTag.putBoolean("HasMjolnir", this.entityData.get(HAS_MJOLNIR));
-        compoundTag.putBoolean("WaitsForMjolnir", this.waitsForMjolnir);
+        compoundTag.putBoolean("HasMjolnirInHands", this.entityData.get(HAS_MJOLNIR_IN_HANDS));
+        compoundTag.putBoolean("WaitsForMjolnir", this.waitsForMjolnir());
         compoundTag.putInt("AttackingTicks", this.getAttackingTicks());
         compoundTag.putInt("TickCount", this.tickCount);
         compoundTag.putByte("AttackState", this.entityData.get(ATTACK_STATE));
@@ -313,10 +309,10 @@ public class ThorEntity extends Monster implements IAnimatable {
         super.die(p_21014_);
         this.bossEvent.setVisible(false);
 
-        if (this.level instanceof ServerLevel) {
-            ServerLevel serverLevel = (ServerLevel) this.level;
+        if (this.level instanceof ServerLevel serverLevel) {
             serverLevel.setWeatherParameters(0, 0, false, false);
             stopPlayingBossMusic();
+            this.level.playSound(null, this.getOnPos(), DRSounds.THOR_DEATH_SOUND.get(), SoundSource.HOSTILE, 2.0f, 1.0f);
         }
     }
 
@@ -324,18 +320,11 @@ public class ThorEntity extends Monster implements IAnimatable {
         if(this.isAttacking() && this.getAttackingTicks() == 0) {
             event.getController().markNeedsReload();
             switch (this.getAttackState()){
-                case MELEE_ATTACK -> {
-                    setAttackAnimation(event, "animation.thor.melee_attack", 24);
-                }
-                case CLAP_ATTACK -> {
-                    setAttackAnimation(event, "animation.thor.clap_attack", 48);
-                }
-                case GROUND_ATTACK -> {
-                    setAttackAnimation(event, "animation.thor.ground_attack", 50);
-                }
-                case MJOLNIR_THROW -> {
-                    setAttackAnimation(event, "animation.thor.mjolnir_throw_attack", 30);
-                }
+                case MELEE_ATTACK -> setAttackAnimation(event, "animation.thor.melee_attack", 24);
+                case LEG_ATTACK -> setAttackAnimation(event, "animation.thor.leg_attack", 30);
+                case CLAP_ATTACK -> setAttackAnimation(event, "animation.thor.clap_attack", 48);
+                case GROUND_ATTACK -> setAttackAnimation(event, "animation.thor.ground_attack", 50);
+                case MJOLNIR_THROW -> setAttackAnimation(event, "animation.thor.mjolnir_throw_attack", 30);
             }
             return PlayState.CONTINUE;
         }
@@ -352,7 +341,6 @@ public class ThorEntity extends Monster implements IAnimatable {
 
     private <E extends IAnimatable> void setAttackAnimation(AnimationEvent<E> event, String animationName, int ticks) {
         event.getController().setAnimation(new AnimationBuilder().addAnimation(animationName, ILoopType.EDefaultLoopTypes.PLAY_ONCE));
-        DRMessages.sendToServer(new ThorSoundsC2SPacket(this.getId(), ((byte) this.getAttackState().ordinal())));
         this.setAttackingTicks(ticks);
     }
 
@@ -360,6 +348,7 @@ public class ThorEntity extends Monster implements IAnimatable {
         SoundEvent soundEvent = DRSounds.THOR_MELEE_ATTACK.get();;
         switch (attackState) {
             case MELEE_ATTACK -> soundEvent = DRSounds.THOR_MELEE_ATTACK.get();
+            case LEG_ATTACK -> soundEvent = DRSounds.THOR_LEG_ATTACK.get();
             case CLAP_ATTACK -> soundEvent = DRSounds.THOR_CLAP_ATTACK.get();
             case GROUND_ATTACK -> soundEvent = DRSounds.THOR_GROUND_ATTACK.get();
             case MJOLNIR_THROW -> soundEvent = DRSounds.THOR_MJOLNIR_THROW_ATTACK.get();

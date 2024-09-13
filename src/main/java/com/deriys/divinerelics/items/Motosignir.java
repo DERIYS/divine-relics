@@ -142,14 +142,19 @@ public class Motosignir extends SwordItem {
 
 //                owner.sendSystemMessage(Component.literal("Dealt " + Math.floor(Math.min(adjustedDamage, adjustedDamage * distanceFactor)*100)/100 + " damage to " + livingEntity.getDisplayName().getString() + " at " + Math.floor(distanceToEnemy*100)/100 + " distance"));
 
+                if (!livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
+//                    if (damageSource.getEntity() instanceof ThorEntity) {
+//                        applyKnockBack(livingEntity, force, ratioX, ratioZ);
+//                    } else {
+//                        livingEntity.knockback(force, ratioX, ratioZ);
+//                    }
+                    livingEntity.knockback(force, ratioX, ratioZ);
+                }
+
                 livingEntity.hurt(damageSource, Math.min(adjustedDamage, adjustedDamage * distanceFactor));
 
                 EnchantmentHelper.doPostHurtEffects(livingEntity, owner);
                 EnchantmentHelper.doPostDamageEffects(owner, livingEntity);
-
-                if (!livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
-                    livingEntity.knockback(force, ratioX, ratioZ);
-                }
 
                 if (attacker instanceof ThrownDraupnirSpear) {
                     livingEntity.invulnerableTime = 1;
@@ -192,6 +197,26 @@ public class Motosignir extends SwordItem {
                     gainMobEffects(livingEntity, mobEffects, duration, amplifier);
                 }
             }
+        }
+    }
+
+    public static void applyKnockBack(LivingEntity livingEntity, Entity attacker, double force) {
+        double entityX = livingEntity.getX();
+        double entityZ = livingEntity.getZ();
+
+        double angle = Math.atan2(entityZ - attacker.getZ(), entityX - attacker.getX());
+        double ratioX = -Math.cos(angle);
+        double ratioZ = -Math.sin(angle);
+        applyKnockBack(livingEntity, force, ratioX, ratioZ);
+    }
+
+    public static void applyKnockBack(LivingEntity livingEntity, double force, double ratioX, double ratioZ) {
+        force *= 1.0D - livingEntity.getAttributeValue(Attributes.KNOCKBACK_RESISTANCE);
+        if (!(force <= 0.0D)) {
+            livingEntity.hasImpulse = true;
+            Vec3 vec3 = livingEntity.getDeltaMovement();
+            Vec3 vec31 = (new Vec3(ratioX, 0.0D, ratioZ)).normalize().scale(force);
+            livingEntity.setDeltaMovement(vec3.x / 2.0D - vec31.x, livingEntity.isOnGround() ? Math.min(0.4D, vec3.y / 2.0D + force) : vec3.y, vec3.z / 2.0D - vec31.z);
         }
     }
 

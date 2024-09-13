@@ -40,6 +40,7 @@ public class ThorAttackGoal extends MeleeAttackGoal {
             shouldCountTillNextAttack = true;
             if(isTimeToStartAttackAnimation()) {
                 entity.setAttacking(true);
+                entity.playAttackSound(entity.getAttackState());
             }
 
             if(isTimeToAttack()) {
@@ -47,7 +48,7 @@ public class ThorAttackGoal extends MeleeAttackGoal {
                 performAttack(pEnemy);
             }
         } else {
-            if (!entity.getAttackState().equals(ThorAttackState.NONE)) {
+            if (entity.getAttackState() != ThorAttackState.NONE) {
                 entity.setAttackState(ThorAttackState.NONE);
             }
         }
@@ -61,55 +62,54 @@ public class ThorAttackGoal extends MeleeAttackGoal {
         double distance = getAttackReachSqr(pEnemy) + attackRange * attackRange;
         if (pDistToEnemySqr <= distance) {
             if (!isAttacking) {
-                ThorAttackState randAttack = ThorAttackState.genCloseState(this.lastAttack, thor);
+                ThorAttackState randAttack = ThorAttackState.genCloseState(thor, this.lastAttack);
                 setNewAttackState(randAttack);
             }
             return true;
         } else {
             ThorAttackState attackState = thor.getAttackState();
-            if (pDistToEnemySqr <= distance * 2f && (shouldClapAttack() || attackState.equals(ThorAttackState.CLAP_ATTACK))) {
+            if (pDistToEnemySqr <= distance * 2f && (shouldClapAttack() || attackState == ThorAttackState.CLAP_ATTACK)) {
                 if (!isAttacking && canClapAttack()) {
                     setNewAttackState(ThorAttackState.CLAP_ATTACK);
                 }
                 return true;
-            } else if (pDistToEnemySqr <= distance * 5f && (shouldGroundAttack() || attackState.equals(ThorAttackState.GROUND_ATTACK))) {
+            } else if (pDistToEnemySqr <= distance * 5f && (shouldGroundAttack() || attackState == ThorAttackState.GROUND_ATTACK)) {
                 if (!isAttacking && canGroundAttack()) {
                     setNewAttackState(ThorAttackState.GROUND_ATTACK);
                 }
                 return true;
-            } else if (pDistToEnemySqr > distance * 5f && entity.canSeeTarget(pEnemy) && (shouldMjolnirThrow() || attackState.equals(ThorAttackState.MJOLNIR_THROW))) {
-                if (!isAttacking && !thor.waitsForMjolnir) {
+            } else if (pDistToEnemySqr > distance * 5f && entity.canSeeTarget(pEnemy) && (shouldMjolnirThrow() || attackState == ThorAttackState.MJOLNIR_THROW)) {
+                if (!isAttacking && !thor.waitsForMjolnir()) {
                     setNewAttackState(ThorAttackState.MJOLNIR_THROW);
                 }
                 return true;
-            } else return attackState.equals(ThorAttackState.MJOLNIR_THROW) && isAttacking;
+            } else return attackState == ThorAttackState.MJOLNIR_THROW && isAttacking;
         }
     }
 
     private boolean shouldMjolnirThrow() {
-        return RAND.nextDouble() < 0.05D;
+        return RAND.nextDouble() < 0.04D;
     }
 
     private boolean shouldClapAttack() {
-        return RAND.nextDouble() < 0.1D;
+        return RAND.nextDouble() < 0.078D;
     }
 
     private boolean shouldGroundAttack() {
-        return RAND.nextDouble() < 0.03D;
+        return RAND.nextDouble() < 0.04D;
     }
 
     private boolean canGroundAttack() {
-        return !this.lastAttack.equals(ThorAttackState.GROUND_ATTACK);
+        return this.lastAttack != ThorAttackState.GROUND_ATTACK;
     }
 
     private boolean canClapAttack() {
-        return !this.lastAttack.equals(ThorAttackState.CLAP_ATTACK);
+        return this.lastAttack != ThorAttackState.CLAP_ATTACK;
     }
 
     private void setNewAttackState(ThorAttackState attackState) {
         this.lastAttack = attackState;
         this.entity.setAttackState(attackState);
-//        this.shouldChangeAttack.set(attackState);
         this.assignDelayTicks();
     }
 
@@ -137,13 +137,13 @@ public class ThorAttackGoal extends MeleeAttackGoal {
 
 
     protected void performAttack(LivingEntity pEnemy) {
-        if (!this.entity.getAttackState().equals(ThorAttackState.MJOLNIR_THROW)) {
+        if (this.entity.getAttackState() != ThorAttackState.MJOLNIR_THROW) {
             this.mob.swing(InteractionHand.MAIN_HAND);
             this.mob.doHurtTarget(pEnemy);
         } else {
             ThorEntity thor = this.entity;
-            thor.setHasMjolnir(false);
-            thor.waitsForMjolnir = true;
+            thor.setHasMjolnirInHands(false);
+            thor.setWaitsForMjolnir(true);
             Level level = thor.level;
             ThrownMjolnir thrownMjolnir = new ThrownMjolnir(level, thor, new ItemStack(DRItems.MJOLNIR.get()));
             thrownMjolnir.shootMjolnirAtTarget(thor, pEnemy);
@@ -171,19 +171,15 @@ public class ThorAttackGoal extends MeleeAttackGoal {
             this.ticksUntilNextAttack--;
             if (this.ticksUntilNextAttack == 0){
                 thor.setAttacking(false);
-                if (!((state.equals(ThorAttackState.NONE) && this.lastAttack.equals(ThorAttackState.MJOLNIR_THROW)) || state.equals(ThorAttackState.MJOLNIR_THROW))) {
-                    if (!thor.waitsForMjolnir) {
-                        thor.setHasMjolnir(true);
-                    }
-                } else {
+                if ((state == ThorAttackState.NONE && this.lastAttack == ThorAttackState.MJOLNIR_THROW) || state == ThorAttackState.MJOLNIR_THROW) {
                     thor.setAttackState(ThorAttackState.NONE);
                 }
             }
         }
     }
 
-    private boolean performsAttack(ThorEntity thor, int x, ThorAttackState attackState, ThorAttackState clapAttack) {
-        return !thor.level.isClientSide && this.ticksUntilNextAttack == x && (attackState.equals(clapAttack) || (lastAttack.equals(clapAttack) && attackState.equals(ThorAttackState.NONE)));
+    private boolean performsAttack(ThorEntity thor, int x, ThorAttackState thorAttackState, ThorAttackState attackState) {
+        return !thor.level.isClientSide && this.ticksUntilNextAttack == x && (thorAttackState == attackState || (lastAttack == attackState && thorAttackState == ThorAttackState.NONE));
     }
 
     @Override

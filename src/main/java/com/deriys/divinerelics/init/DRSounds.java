@@ -26,12 +26,16 @@ public class DRSounds {
             registerSoundEvent("thor_fight_music");
     public static final RegistryObject<SoundEvent> THOR_MELEE_ATTACK =
             registerSoundEvent("thor_melee_attack");
+    public static final RegistryObject<SoundEvent> THOR_LEG_ATTACK =
+            registerSoundEvent("thor_leg_attack");;
     public static final RegistryObject<SoundEvent> THOR_CLAP_ATTACK =
             registerSoundEvent("thor_clap_attack");
     public static final RegistryObject<SoundEvent> THOR_GROUND_ATTACK =
             registerSoundEvent("thor_ground_attack");
     public static final RegistryObject<SoundEvent> THOR_MJOLNIR_THROW_ATTACK =
             registerSoundEvent("thor_mjolnir_throw_attack");
+    public static final RegistryObject<SoundEvent> THOR_DEATH_SOUND =
+            registerSoundEvent("thor_death_sound");
 
     public static final RegistryObject<SoundEvent> MOTOSIGNIR_SOUND_WAVE =
             registerSoundEvent("motosignir_sound_wave");

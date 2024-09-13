@@ -223,6 +223,8 @@ public class ThrownMjolnir extends AbstractArrow {
         List<LivingEntity> entitiesInArea =
                 Motosignir.getEntitiesInArea(level, hammerX, hammerY, hammerZ, strikeRadius);
 
+        Motosignir.hurtAndKnockbackEntites(entitiesInArea, owner, hammer, damageSource, damage, force);
+
         int lightningCount = 0; // how many lightnings are spawned
 
         for (LivingEntity hitEntity: entitiesInArea) {
@@ -236,8 +238,6 @@ public class ThrownMjolnir extends AbstractArrow {
                 spawnLightning(level, getRandBlockPos(blockPos), owner);
             }
         }
-
-        Motosignir.hurtAndKnockbackEntites(entitiesInArea, owner, hammer, damageSource, damage, force);
     }
 
     @Override

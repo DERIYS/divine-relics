@@ -180,8 +180,10 @@ public class DREvents {
         public static void onLightningStrike(EntityStruckByLightningEvent event) {
             ServerPlayer cause = event.getLightning().getCause();
             Entity entity = event.getEntity();
-            if(entity instanceof LivingEntity hitEntity && cause != null && (cause == hitEntity || hasTeammate(cause, hitEntity)) || entity instanceof ThorEntity) {
-                event.setCanceled(true);
+            if (entity instanceof LivingEntity hitEntity) {
+                if (cause != null && (cause == hitEntity || hasTeammate(cause, hitEntity)) || entity instanceof ThorEntity || hitEntity.isBlocking()) {
+                    event.setCanceled(true);
+                }
             }
         }
 

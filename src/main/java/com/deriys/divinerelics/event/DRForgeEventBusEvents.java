@@ -44,9 +44,7 @@ public class DRForgeEventBusEvents {
     public static void onStartTracking(PlayerEvent.StartTracking event) {
         if (event.getTarget() instanceof LivingEntity) {
             LivingEntity entity = (LivingEntity) event.getTarget();
-            entity.getCapability(StuckSpearsProvider.STUCK_SPEARS).ifPresent(cap -> {
-                DRMessages.sendToPlayer(new StuckSpearsS2CPacket(entity.getId(), cap.getSpears()), (ServerPlayer) event.getEntity());
-            });
+            entity.getCapability(StuckSpearsProvider.STUCK_SPEARS).ifPresent(cap -> DRMessages.sendToPlayer(new StuckSpearsS2CPacket(entity.getId(), cap.getSpears()), (ServerPlayer) event.getEntity()));
         }
     }
 }
