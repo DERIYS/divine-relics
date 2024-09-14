@@ -1,0 +1,10 @@
+{
+  "type": "minecraft:smelting",
+  "cookingtime": 300,
+  "experience": 1,
+  "group": "svartalfheim_steel",
+  "ingredient": {
+    "item": "divinerelics:raw_svartalfheim_steel"
+  },
+  "result": "divinerelics:svartalfheim_steel_ingot"
+}

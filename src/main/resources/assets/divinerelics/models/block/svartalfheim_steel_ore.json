@@ -1,0 +1,6 @@
+{
+  "parent": "block/cube_all",
+  "textures": {
+    "all": "divinerelics:block/svartalfheim_steel_ore"
+  }
+}

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "   ",
+    " ##",
+    " ##"
+  ],
+  "key": {
+    "#": {
+      "item": "divinerelics:hacksilver"
+    }
+  },
+  "result": {
+    "item": "divinerelics:compressed_hacksilver"
+  }
+}

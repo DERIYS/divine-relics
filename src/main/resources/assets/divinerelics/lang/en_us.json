@@ -6,13 +6,26 @@
   "item.divinerelics.guardian_shield": "Guardian Shield",
   "item.divinerelics.yggdrasils_twig": "Yggdrasil's Twig",
   "item.divinerelics.leviathan_axe": "§9§lLeviathan Axe",
+
   "item.divinerelics.draugr_spawn_egg": "Draugr Spawn Egg",
+
   "item.divinerelics.divine_mead": "Divine Mead",
+
+  "item.divinerelics.hacksilver": "Hacksilver",
+  "item.divinerelics.raw_svartalfheim_steel": "§3Raw Svartalfheim Steel",
+  "item.divinerelics.svartalfheim_steel_ingot": "§3Svartalfheim Steel Ingot",
+  "item.divinerelics.compressed_hacksilver": "Compressed Hacksilver",
+  "item.divinerelics.hacksilver_ingot": "Hacksilver Ingot",
 
   "item.divinerelics.thor_fight_music_disc": "Thor Fight Music Disc",
   "item.divinerelics.thor_fight_music_disc.desc": "Bear McCreary - The Hammer of Thor",
 
-  "entity.divinerelics.draugr": "Draugr",
+  "block.divinerelics.hacksilver_ore": "Hacksilver Ore",
+  "block.divinerelics.deepslate_hacksilver_ore": "Deepslate Hacksilver Ore",
+  "block.divinerelics.svartalfheim_steel_ore": "Svartalfheim Steel Ore",
+  "block.divinerelics.deepslate_svartalfheim_steel_ore": "Deepslate Svartalfheim Steel Ore",
+
+  "entity.divinerelics.draugr": "Draugr Warrior",
   "entity.divinerelics.thor": "Thor",
 
   "effect.divinerelics.bifrost_protection": "Bifrost Protection",

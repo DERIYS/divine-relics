@@ -4,6 +4,8 @@ import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.entities.client.render.*;
 import com.deriys.divinerelics.init.*;
 import com.deriys.divinerelics.util.DRItemProperties;
+import com.deriys.divinerelics.world.feature.DRConfiguredFeatures;
+import com.deriys.divinerelics.world.feature.DRPlacedFeatures;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
@@ -24,11 +26,13 @@ public class DivineRelics
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         modEventBus.addListener(this::commonSetup);
-        DRItems.register(modEventBus);
         DRBlocks.register(modEventBus);
+        DRItems.register(modEventBus);
         DRSounds.register(modEventBus);
         DREffects.register(modEventBus);
         DREntitiyTypes.register(modEventBus);
+        DRConfiguredFeatures.register(modEventBus);
+        DRPlacedFeatures.register(modEventBus);
         GeckoLib.initialize();
 
         MinecraftForge.EVENT_BUS.register(this);

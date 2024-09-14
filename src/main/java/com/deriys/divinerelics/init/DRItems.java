@@ -50,6 +50,20 @@ public class DRItems {
     public static final RegistryObject<Item> DRAUGR_SPAWN_EGG = ITEMS.register("draugr_spawn_egg",
             () -> new ForgeSpawnEggItem(DREntitiyTypes.DRAUGR, 0x7e9680, 0xc5d1c5, new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
 
+    public static final RegistryObject<Item> HACKSILVER = ITEMS.register("hacksilver",
+            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+
+    public static final RegistryObject<Item> RAW_SVARTALFHEIM_STEEL = ITEMS.register("raw_svartalfheim_steel",
+            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+
+    public static final RegistryObject<Item> COMPRESSED_HACKSILVER = ITEMS.register("compressed_hacksilver",
+            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+
+    public static final RegistryObject<Item> HACKSILVER_INGOT = ITEMS.register("hacksilver_ingot",
+            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+    public static final RegistryObject<Item> SVARTALFHEIM_STEEL_INGOT = ITEMS.register("svartalfheim_steel_ingot",
+            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
