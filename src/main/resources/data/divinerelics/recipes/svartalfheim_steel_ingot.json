@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "divinerelics:svartalfheim_steel_nugget"
+    }
+  },
+  "result": {
+    "item": "divinerelics:svartalfheim_steel_ingot"
+  }
+}

@@ -44,6 +44,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
     private double throwerZ;
     private ItemStack spearItem;
     private boolean dealtDamage;
+    public boolean isOnGround = false;
 
     static {
         ID_FOIL = SynchedEntityData.defineId(ThrownDraupnirSpear.class, EntityDataSerializers.BOOLEAN);
@@ -93,6 +94,10 @@ public class ThrownDraupnirSpear extends AbstractArrow {
     }
 
     public void tick() {
+        if (this.inGroundTime > 0) {
+            this.isOnGround = true;
+        }
+
         if (this.inGroundTime > 4) {
             this.dealtDamage = true;
         }

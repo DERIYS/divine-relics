@@ -40,14 +40,7 @@ public class DraugrEntity extends Monster implements IAnimatable {
     private static final EntityDataAccessor<Boolean> ATTACKING =
             SynchedEntityData.defineId(DraugrEntity.class, EntityDataSerializers.BOOLEAN);
     public int attackingTicks = 0;
-
-    public enum AnimationState {
-        IDLE,
-        WALKING,
-        ATTACKING
-    }
     private AnimationFactory factory = GeckoLibUtil.createFactory(this);
-    private AnimationState currentState = AnimationState.IDLE;
 
     public DraugrEntity(EntityType<? extends DraugrEntity> entityType, Level level) {
         super(entityType, level);
@@ -141,8 +134,6 @@ public class DraugrEntity extends Monster implements IAnimatable {
     public void registerControllers(AnimationData animationData) {
         animationData.addAnimationController(new AnimationController(this, "controller",
                 0, this::predicate));
-//        animationData.addAnimationController(new AnimationController(this, "attackController",
-//                0, this::attackPredicate));
     }
 
     @Override

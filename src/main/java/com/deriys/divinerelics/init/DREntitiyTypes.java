@@ -20,6 +20,18 @@ public class DREntitiyTypes {
                             .sized(0.7F, 1.8F)
                             .build(new ResourceLocation(DivineRelics.MODID, "draugr").toString()));
 
+    public static final RegistryObject<EntityType<BrokEntity>> BROK =
+            ENTITY_TYPES.register("brok",
+                    () -> EntityType.Builder.of(BrokEntity::new, MobCategory.CREATURE)
+                            .sized(0.5F, 1.6F)
+                            .build(new ResourceLocation(DivineRelics.MODID, "brok").toString()));
+
+    public static final RegistryObject<EntityType<SindriEntity>> SINDRI =
+            ENTITY_TYPES.register("sindri",
+                    () -> EntityType.Builder.of(SindriEntity::new, MobCategory.CREATURE)
+                            .sized(0.5F, 1.6F)
+                            .build(new ResourceLocation(DivineRelics.MODID, "sindri").toString()));
+
     public static final RegistryObject<EntityType<ThorEntity>> THOR =
             ENTITY_TYPES.register("thor",
                     () -> EntityType.Builder.of(ThorEntity::new, MobCategory.MONSTER)

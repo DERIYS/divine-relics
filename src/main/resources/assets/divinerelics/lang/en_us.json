@@ -12,10 +12,14 @@
   "item.divinerelics.divine_mead": "Divine Mead",
 
   "item.divinerelics.hacksilver": "Hacksilver",
-  "item.divinerelics.raw_svartalfheim_steel": "§3Raw Svartalfheim Steel",
-  "item.divinerelics.svartalfheim_steel_ingot": "§3Svartalfheim Steel Ingot",
   "item.divinerelics.compressed_hacksilver": "Compressed Hacksilver",
   "item.divinerelics.hacksilver_ingot": "Hacksilver Ingot",
+  "item.divinerelics.raw_svartalfheim_steel": "§3Raw Svartalfheim Steel",
+  "item.divinerelics.svartalfheim_steel_nugget": "§3Svartalfheim Steel Nugget",
+  "item.divinerelics.svartalfheim_steel_ingot": "§3Svartalfheim Steel Ingot",
+  "item.divinerelics.asgardian_steel_nugget": "Asgardian Steel Nugget",
+  "item.divinerelics.raw_asgardian_steel": "Raw Asgardian Steel",
+  "item.divinerelics.asgardian_steel_ingot": "Asgardian Steel Ingot",
 
   "item.divinerelics.thor_fight_music_disc": "Thor Fight Music Disc",
   "item.divinerelics.thor_fight_music_disc.desc": "Bear McCreary - The Hammer of Thor",
@@ -24,9 +28,15 @@
   "block.divinerelics.deepslate_hacksilver_ore": "Deepslate Hacksilver Ore",
   "block.divinerelics.svartalfheim_steel_ore": "Svartalfheim Steel Ore",
   "block.divinerelics.deepslate_svartalfheim_steel_ore": "Deepslate Svartalfheim Steel Ore",
+  "block.divinerelics.asgardian_steel_ore": "Asgardian Steel Ore",
+  "block.divinerelics.deepslate_asgardian_steel_ore": "Deepslate Asgardian Steel Ore",
 
   "entity.divinerelics.draugr": "Draugr Warrior",
   "entity.divinerelics.thor": "Thor",
+  "entity.divinerelics.brok": "Brok",
+  "entity.divinerelics.sindri": "Sindri",
+  "entity.divinerelics.brok.divinerelics.brok_master": "Brok",
+  "entity.divinerelics.sindri.divinerelics.sindri_master": "Sindri",
 
   "effect.divinerelics.bifrost_protection": "Bifrost Protection",
 

@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "GHG",
+    "#G#",
+    " # "
+  ],
+  "key": {
+    "#": {
+      "item": "divinerelics:asgardian_steel_ingot"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "H": {
+      "item": "minecraft:honey_block"
+    }
+  },
+  "result": {
+    "item": "divinerelics:divine_mead"
+  }
+}

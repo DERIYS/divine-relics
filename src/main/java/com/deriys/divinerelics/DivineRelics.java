@@ -1,6 +1,7 @@
 package com.deriys.divinerelics;
 
 import com.deriys.divinerelics.core.networking.DRMessages;
+import com.deriys.divinerelics.dwarfs.DRDwarfs;
 import com.deriys.divinerelics.entities.client.render.*;
 import com.deriys.divinerelics.init.*;
 import com.deriys.divinerelics.util.DRItemProperties;
@@ -26,6 +27,7 @@ public class DivineRelics
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         modEventBus.addListener(this::commonSetup);
+
         DRBlocks.register(modEventBus);
         DRItems.register(modEventBus);
         DRSounds.register(modEventBus);
@@ -33,6 +35,7 @@ public class DivineRelics
         DREntitiyTypes.register(modEventBus);
         DRConfiguredFeatures.register(modEventBus);
         DRPlacedFeatures.register(modEventBus);
+        DRDwarfs.register(modEventBus);
         GeckoLib.initialize();
 
         MinecraftForge.EVENT_BUS.register(this);
@@ -48,6 +51,8 @@ public class DivineRelics
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
             EntityRenderers.register(DREntitiyTypes.DRAUGR.get(), DraugrRenderer::new);
+            EntityRenderers.register(DREntitiyTypes.BROK.get(), BrokRenderer::new);
+            EntityRenderers.register(DREntitiyTypes.SINDRI.get(), SindriRenderer::new);
             EntityRenderers.register(DREntitiyTypes.THOR.get(), ThorRenderer::new);
             EntityRenderers.register(DREntitiyTypes.THROWN_DRAUPNIR_SPEAR.get(), ThrownDraupnirSpearRenderer::new);
             EntityRenderers.register(DREntitiyTypes.THROWN_MJOLNIR.get(), ThrownMjolnirRenderer::new);

@@ -28,8 +28,7 @@ public class DRItems {
 
     public static final RegistryObject<Item> THROWN_DRAUPNIR_SPEAR = ITEMS.register("thrown_draupnir_spear_item",
             () -> new Item(new Item.Properties()));
-//    public static final RegistryObject<Item> ORACLE_COMPASS = ITEMS.register("oracle_compass",
-//            () -> new OracleCompass(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
+
     public static final RegistryObject<Item> MJOLNIR = ITEMS.register("mjolnir",
             () -> new Mjolnir(DRTiers.MJOLNIR, 0, 0, new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> GUARDIAN_SHIELD = ITEMS.register("guardian_shield",
@@ -52,17 +51,24 @@ public class DRItems {
 
     public static final RegistryObject<Item> HACKSILVER = ITEMS.register("hacksilver",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
-
-    public static final RegistryObject<Item> RAW_SVARTALFHEIM_STEEL = ITEMS.register("raw_svartalfheim_steel",
-            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
-
     public static final RegistryObject<Item> COMPRESSED_HACKSILVER = ITEMS.register("compressed_hacksilver",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
-
     public static final RegistryObject<Item> HACKSILVER_INGOT = ITEMS.register("hacksilver_ingot",
+            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+
+    public static final RegistryObject<Item> SVARTALFHEIM_STEEL_NUGGET = ITEMS.register("svartalfheim_steel_nugget",
+            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+    public static final RegistryObject<Item> RAW_SVARTALFHEIM_STEEL = ITEMS.register("raw_svartalfheim_steel",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> SVARTALFHEIM_STEEL_INGOT = ITEMS.register("svartalfheim_steel_ingot",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+
+    public static final RegistryObject<Item> ASGARDIAN_STEEL_NUGGET = ITEMS.register("asgardian_steel_nugget",
+            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB).rarity(Rarity.EPIC)));
+    public static final RegistryObject<Item> RAW_ASGARDIAN_STEEL = ITEMS.register("raw_asgardian_steel",
+            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB).rarity(Rarity.EPIC)));
+    public static final RegistryObject<Item> ASGARDIAN_STEEL_INGOT = ITEMS.register("asgardian_steel_ingot",
+            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB).rarity(Rarity.EPIC)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

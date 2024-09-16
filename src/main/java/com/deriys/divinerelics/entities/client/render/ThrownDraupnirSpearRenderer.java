@@ -30,6 +30,11 @@ public class ThrownDraupnirSpearRenderer extends EntityRenderer<ThrownDraupnirSp
         matrixStackIn.pushPose();
         matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(Mth.lerp(partialTicks, entityIn.yRotO, entityIn.getYRot()) - 90.0F));
         matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(Mth.lerp(partialTicks, entityIn.xRotO, entityIn.getXRot()) + 90.0F));
+
+        float rotationAngle = entityIn.tickCount + partialTicks;
+        if (!entityIn.isOnGround) {
+            matrixStackIn.mulPose(Vector3f.YN.rotationDegrees(rotationAngle * 50f));
+        }
         VertexConsumer $$6 = ItemRenderer.getFoilBufferDirect(bufferIn, this.model.renderType(this.getTextureLocation(entityIn)), false, entityIn.isFoil());
         this.model.renderToBuffer(matrixStackIn, $$6, packedLightIn, OverlayTexture.NO_OVERLAY, 1.0F, 1.0F, 1.0F, 1.0F);
         matrixStackIn.popPose();

@@ -21,17 +21,25 @@ public class DRBlocks {
 
     public static final RegistryObject<Block> HACKSILVER_ORE = registerBlock("hacksilver_ore",
             () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
-                    .strength(5f).requiresCorrectToolForDrops()), DRCreativeTab.MAINTAB);
+                    .strength(4f).requiresCorrectToolForDrops()), DRCreativeTab.MAINTAB);
 
     public static final RegistryObject<Block> DEEPSLATE_HACKSILVER_ORE = registerBlock("deepslate_hacksilver_ore",
             () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
-                    .strength(5f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)), DRCreativeTab.MAINTAB);
+                    .strength(4f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)), DRCreativeTab.MAINTAB);
 
     public static final RegistryObject<Block> SVARTALFHEIM_STEEL_ORE = registerBlock("svartalfheim_steel_ore",
             () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
                     .strength(6f).requiresCorrectToolForDrops()), DRCreativeTab.MAINTAB);
 
     public static final RegistryObject<Block> DEEPSLATE_SVARTALFHEIM_STEEL_ORE = registerBlock("deepslate_svartalfheim_steel_ore",
+            () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
+                    .strength(6f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)), DRCreativeTab.MAINTAB);
+
+    public static final RegistryObject<Block> ASGARDIAN_STEEL_ORE = registerBlock("asgardian_steel_ore",
+            () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
+                    .strength(6f).requiresCorrectToolForDrops()), DRCreativeTab.MAINTAB);
+
+    public static final RegistryObject<Block> DEEPSLATE_ASGARDIAN_STEEL_ORE = registerBlock("deepslate_asgardian_steel_ore",
             () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
                     .strength(6f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)), DRCreativeTab.MAINTAB);
 
