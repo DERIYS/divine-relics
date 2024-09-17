@@ -32,7 +32,7 @@ import java.util.List;
 import static com.deriys.divinerelics.capabilities.teammates.TeammatesProvider.hasTeammate;
 
 
-public class Motosignir extends SwordItem {
+public class Motosignir extends Item {
     public static final MobEffect[] STUN_EFFECTS = {
             MobEffects.CONFUSION,
             MobEffects.MOVEMENT_SLOWDOWN,
@@ -42,8 +42,8 @@ public class Motosignir extends SwordItem {
     public static final int EFFECTS_DURATION = 200;
     public static final int AMPLIFIER = 1;
 
-    public Motosignir(Tier p_43269_, int p_43270_, float p_43271_, Properties p_43272_) {
-        super(p_43269_, p_43270_, p_43271_, p_43272_);
+    public Motosignir(Properties p_41383_) {
+        super(p_41383_);
     }
 
 

@@ -47,7 +47,7 @@ import static com.deriys.divinerelics.effects.BifrostProtection.findNormVec;
 import static com.deriys.divinerelics.event.DREvents.ForgeEvents.bindItemToEntity;
 import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
 
-public class DraupnirSpear extends Item {
+public class DraupnirSpear extends SwordItem {
     public static final int THROW_THRESHOLD_TIME = 8;
     public static final float BASE_DAMAGE = 10.0F;
     public static final float SHOOT_POWER = 3.5F;
@@ -59,8 +59,8 @@ public class DraupnirSpear extends Item {
     public static final float RANDOM_SOUND_PITCH = RAND.nextFloat() * 0.1F + 0.95F;
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
-    public DraupnirSpear(Item.Properties p_43381_) {
-        super(p_43381_);
+    public DraupnirSpear(Tier p_40521_, int p_40522_, float p_40523_, Properties p_40524_) {
+        super(p_40521_, p_40522_, p_40523_, p_40524_);
         ImmutableMultimap.Builder<Attribute, AttributeModifier> $$1 = ImmutableMultimap.builder();
         $$1.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", BASE_DAMAGE, AttributeModifier.Operation.ADDITION));
         $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -2.0000000953674316, AttributeModifier.Operation.ADDITION));

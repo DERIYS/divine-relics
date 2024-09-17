@@ -19,7 +19,7 @@ import java.util.Random;
 
 import static com.deriys.divinerelics.items.Motosignir.gainMobEffects;
 
-public class HeimdallGauntlet extends SwordItem {
+public class HeimdallGauntlet extends Item {
 
     public static final Random RAND = new Random();
     public static final double VECTOR_ANGLE_CONSTANT = 3 * Math.PI / 2 - Math.PI / 4;
@@ -31,10 +31,9 @@ public class HeimdallGauntlet extends SwordItem {
     private final int EFFECTS_DURATION = 300;
     private final int AMPLIFIER = 0;
 
-    public HeimdallGauntlet(Tier p_43269_, int p_43270_, float p_43271_, Properties p_43272_) {
-        super(p_43269_, p_43270_, p_43271_, p_43272_);
+    public HeimdallGauntlet(Properties p_41383_) {
+        super(p_41383_);
     }
-
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> components, TooltipFlag flag) {

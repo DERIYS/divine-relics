@@ -2,10 +2,7 @@ package com.deriys.divinerelics.init;
 
 import com.deriys.divinerelics.DivineRelics;
 import com.deriys.divinerelics.items.*;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
-import net.minecraft.world.item.RecordItem;
+import net.minecraft.world.item.*;
 import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -18,16 +15,16 @@ public class DRItems {
             DeferredRegister.create(ForgeRegistries.ITEMS, DivineRelics.MODID);
 
     public static final RegistryObject<Item> MOTOSIGNIR = ITEMS.register("motosignir",
-            () -> new Motosignir(DRTiers.MOTOSIGNIR, -3, -1.5F, new Item.Properties().fireResistant().tab(DRCreativeTab.MAINTAB)));
+            () -> new Motosignir(new Item.Properties().fireResistant().tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> HEIMDALL_GAUNTLET = ITEMS.register("heimdall_gauntlet",
-            () -> new HeimdallGauntlet(DRTiers.HEIMDALL_GAUNTLET, -3, -3F, new Item.Properties().fireResistant().tab(DRCreativeTab.MAINTAB)));
+            () -> new HeimdallGauntlet(new Item.Properties().fireResistant().tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> DRAUPNIR_SPEAR = ITEMS.register("draupnir_spear",
-            () -> new DraupnirSpear(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
+            () -> new DraupnirSpear(DRTiers.DRAUPNIR, 0, 0, new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> THROWN_DRAUPNIR_SPEAR = ITEMS.register("thrown_draupnir_spear_item",
-            () -> new Item(new Item.Properties()));
+            () -> new Item(new Item.Properties())); // for stuck spears rendering
 
     public static final RegistryObject<Item> MJOLNIR = ITEMS.register("mjolnir",
             () -> new Mjolnir(DRTiers.MJOLNIR, 0, 0, new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
@@ -62,6 +59,8 @@ public class DRItems {
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> SVARTALFHEIM_STEEL_INGOT = ITEMS.register("svartalfheim_steel_ingot",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+    public static final RegistryObject<Item> SVARTALFHEIM_STEEL_PICKAXE = ITEMS.register("svartalfheim_steel_pickaxe",
+            () -> new PickaxeItem(DRTiers.SVARTALFHEIM_STEEL_TIER, 1, -2.8f, new Item.Properties().tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> ASGARDIAN_STEEL_NUGGET = ITEMS.register("asgardian_steel_nugget",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB).rarity(Rarity.EPIC)));
@@ -69,7 +68,6 @@ public class DRItems {
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB).rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> ASGARDIAN_STEEL_INGOT = ITEMS.register("asgardian_steel_ingot",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB).rarity(Rarity.EPIC)));
-
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }
