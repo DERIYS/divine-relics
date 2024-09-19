@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " G#",
+    " #G",
+    "P# "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:acacia_log"
+    },
+    "G": {
+      "item": "minecraft:gold_ingot"
+    },
+    "P": {
+      "item": "divinerelics:perfect_asgardian_steel_ingot"
+    }
+  },
+  "result": {
+    "item": "divinerelics:leviathan_handle"
+  }
+}

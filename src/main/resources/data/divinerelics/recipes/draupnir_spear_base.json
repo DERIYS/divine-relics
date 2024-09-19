@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "  #",
+    " #F",
+    "#  "
+  ],
+  "key": {
+    "#": {
+      "item": "divinerelics:perfect_asgardian_steel_ingot"
+    },
+    "F": {
+      "item": "minecraft:red_wool"
+    }
+  },
+  "result": {
+    "item": "divinerelics:draupnir_spear_base"
+  }
+}

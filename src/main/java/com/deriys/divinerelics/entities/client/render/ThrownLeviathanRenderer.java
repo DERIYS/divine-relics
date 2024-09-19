@@ -35,7 +35,7 @@ public class ThrownLeviathanRenderer extends EntityRenderer<ThrownLeviathanAxe> 
         matrixStackIn.pushPose();
         matrixStackIn.mulPose(Vector3f.YP.rotationDegrees(Mth.lerp(partialTicks, entityIn.yRotO, entityIn.getYRot()) - 90.0F));
         float rotationAngle = entityIn.tickCount + partialTicks;
-        if (!entityIn.isOnGround()) {
+        if (!entityIn.isOnGround) {
             float rotationFactor = (entityIn.dealtDamage) ? 30.0F: -75.0F;
             matrixStackIn.mulPose(Vector3f.ZP.rotationDegrees(rotationAngle * rotationFactor));
         } else if (entityIn.isReturning()) {

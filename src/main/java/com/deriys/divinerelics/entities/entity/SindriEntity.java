@@ -35,7 +35,7 @@ public class SindriEntity extends Villager implements IAnimatable {
     private AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     private long lastRestockTime = 0;
-    private static final int RESTOCK_INTERVAL = 36000;
+    private static final int RESTOCK_INTERVAL = 600;
 
     public SindriEntity(EntityType<? extends Villager> p_35381_, Level p_35382_) {
         super(p_35381_, p_35382_);
@@ -97,8 +97,12 @@ public class SindriEntity extends Villager implements IAnimatable {
     }
 
     @Override
-    public void setOffers(MerchantOffers p_35477_) {
-        super.setOffers(p_35477_);
+    public MerchantOffers getOffers() {
+        MerchantOffers offers = super.getOffers();
+        for (MerchantOffer offer : offers) {
+            offer.resetSpecialPriceDiff();
+        }
+        return offers;
     }
 
     @Override

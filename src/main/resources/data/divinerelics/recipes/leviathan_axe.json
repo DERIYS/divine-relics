@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "CO",
+    "I "
+  ],
+  "key": {
+    "C": {
+      "item": "divinerelics:leviathan_head"
+    },
+    "O": {
+      "item": "divinerelics:frozen_flame"
+    },
+    "I": {
+      "item": "divinerelics:leviathan_handle"
+    }
+  },
+  "result": {
+    "item": "divinerelics:leviathan_axe"
+  }
+}

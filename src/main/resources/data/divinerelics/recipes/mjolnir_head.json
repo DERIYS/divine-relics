@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "## ",
+    "#P#",
+    "P##"
+  ],
+  "key": {
+    "#": {
+      "item": "divinerelics:hacksilver_block"
+    },
+    "P": {
+      "item": "divinerelics:perfect_asgardian_steel_ingot"
+    }
+  },
+  "result": {
+    "item": "divinerelics:mjolnir_head"
+  }
+}

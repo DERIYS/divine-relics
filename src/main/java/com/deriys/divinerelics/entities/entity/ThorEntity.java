@@ -3,6 +3,7 @@ package com.deriys.divinerelics.entities.entity;
 import com.deriys.divinerelics.entities.ai.thor.FireIgnoringPathNavigation;
 import com.deriys.divinerelics.entities.ai.thor.ThorAttackGoal;
 import com.deriys.divinerelics.entities.ai.thor.ThorAttackState;
+import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -33,6 +34,7 @@ import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
@@ -306,6 +308,10 @@ public class ThorEntity extends Monster implements IAnimatable {
 
     @Override
     public void die(DamageSource p_21014_) {
+        this.spawnAtLocation(new ItemStack(DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get(), 4));
+        if (RAND.nextFloat() < 0.1) {
+            this.spawnAtLocation(new ItemStack(DRItems.ASGARDIAN_STEEL_NUGGET.get(), RAND.nextInt(3, 7)));
+        }
         super.die(p_21014_);
         this.bossEvent.setVisible(false);
 

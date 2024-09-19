@@ -16,17 +16,17 @@ public class DRPlacedFeatures {
 
     public static final RegistryObject<PlacedFeature> HACKSILVER_ORE_PLACED = PLACED_FEATURES.register("hacksilver_ore_placed",
             () -> new PlacedFeature(DRConfiguredFeatures.HACKSILVER_ORE.getHolder().get(),
-                    commonOrePlacement(4, // VeinsPerChunk
+                    commonOrePlacement(6,
                             HeightRangePlacement.triangle(VerticalAnchor.aboveBottom(-80), VerticalAnchor.aboveBottom(80)))));
 
     public static final RegistryObject<PlacedFeature> SVARTALFHEIM_STEEL_ORE_PLACED = PLACED_FEATURES.register("svartalfheim_steel_ore_placed",
             () -> new PlacedFeature(DRConfiguredFeatures.SVARTALFHEIM_STEEL_ORE.getHolder().get(),
-                    rareOrePlacement(6, // VeinsPerChunk
+                    rareOrePlacement(6,
                             HeightRangePlacement.triangle(VerticalAnchor.aboveBottom(-80), VerticalAnchor.aboveBottom(80)))));
 
     public static final RegistryObject<PlacedFeature> ASGARDIAN_STEEL_ORE_PLACED = PLACED_FEATURES.register("asgardian_steel_ore_placed",
             () -> new PlacedFeature(DRConfiguredFeatures.ASGARDIAN_STEEL_ORE.getHolder().get(),
-                    rareOrePlacement(2, // VeinsPerChunk
+                    rareOrePlacement(3,
                             HeightRangePlacement.triangle(VerticalAnchor.aboveBottom(-80), VerticalAnchor.aboveBottom(80)))));
 
     public static List<PlacementModifier> orePlacement(PlacementModifier p_195347_, PlacementModifier p_195348_) {

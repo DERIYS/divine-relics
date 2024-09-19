@@ -11,6 +11,9 @@ public class DRTags {
         public static final TagKey<Block> NEEDS_SVARTALFHEIM_STEEL_TOOL
                 = tag("needs_svartalfheim_steel_tool");
 
+        public static final TagKey<Block> NEEDS_ASGARDIAN_STEEL_TOOL
+                = tag("needs_asgardian_steel_tool");
+
         private static TagKey<Block> tag(String name) {
             return BlockTags.create(new ResourceLocation(DivineRelics.MODID, name));
         }

@@ -1,0 +1,16 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "###",
+    "###",
+    "###"
+  ],
+  "key": {
+    "#": {
+      "item": "divinerelics:hacksilver_ingot"
+    }
+  },
+  "result": {
+    "item": "divinerelics:hacksilver_block"
+  }
+}

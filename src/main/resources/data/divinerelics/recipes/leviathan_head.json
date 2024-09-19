@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "#LP",
+    "#L ",
+    "#  "
+  ],
+  "key": {
+    "#": {
+      "item": "divinerelics:hacksilver_block"
+    },
+    "P": {
+      "item": "divinerelics:perfect_asgardian_steel_ingot"
+    },
+    "L": {
+      "item": "divinerelics:lapis_block"
+    }
+  },
+  "result": {
+    "item": "divinerelics:leviathan_head"
+  }
+}

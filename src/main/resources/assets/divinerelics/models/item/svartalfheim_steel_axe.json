@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "divinerelics:item/svartalfheim_steel_axe"
+  }
+}

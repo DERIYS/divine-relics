@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " A#",
+    "P#P",
+    "#A "
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:dark_oak_log"
+    },
+    "A": {
+      "item": "divine_relics:asgardian_steel_ingot"
+    },
+    "P": {
+      "item": "divinerelics:perfect_asgardian_steel_ingot"
+    }
+  },
+  "result": {
+    "item": "divinerelics:mjolnir_handle"
+  }
+}

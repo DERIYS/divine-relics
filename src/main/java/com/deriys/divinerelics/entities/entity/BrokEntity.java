@@ -1,7 +1,6 @@
 package com.deriys.divinerelics.entities.entity;
 
 import com.deriys.divinerelics.dwarfs.DRDwarfs;
-import com.deriys.divinerelics.entities.ai.draugr.DraugrAttackGoal;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -36,7 +35,7 @@ public class BrokEntity extends Villager implements IAnimatable {
     private AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     private long lastRestockTime = 0;
-    private static final int RESTOCK_INTERVAL = 36000;
+    private static final int RESTOCK_INTERVAL = 600;
 
     public BrokEntity(EntityType<? extends Villager> p_35381_, Level p_35382_) {
         super(p_35381_, p_35382_);
@@ -98,8 +97,12 @@ public class BrokEntity extends Villager implements IAnimatable {
     }
 
     @Override
-    public void setOffers(MerchantOffers p_35477_) {
-        super.setOffers(p_35477_);
+    public MerchantOffers getOffers() {
+        MerchantOffers offers = super.getOffers();
+        for (MerchantOffer offer : offers) {
+            offer.resetSpecialPriceDiff();
+        }
+        return offers;
     }
 
     @Override

@@ -4,6 +4,7 @@ import com.deriys.divinerelics.DivineRelics;
 import com.deriys.divinerelics.core.networking.packets.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
@@ -92,5 +93,9 @@ public class DRMessages {
 
     public static <MSG> void sendToChunk(MSG message, LevelChunk chunk) {
         INSTANCE.send(PacketDistributor.TRACKING_CHUNK.with(() -> chunk), message);
+    }
+
+    public static <MSG> void sendToTrackingEntity(MSG message, Entity entity) {
+        INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), message);
     }
 }

@@ -11,28 +11,53 @@
 
   "item.divinerelics.divine_mead": "Divine Mead",
 
+  "item.divinerelics.mjolnir_handle": "§e§lMjolnir Handle",
+  "item.divinerelics.mjolnir_head": "§e§lMjolnir Head",
+
+  "item.divinerelics.leviathan_handle": "§e§lLeviathan Handle",
+  "item.divinerelics.leviathan_head": "§e§lLeviathan Head",
+  "item.divinerelics.frozen_flame": "§e§lFrozen Flame",
+
+  "item.divinerelics.draupnir_ring": "§e§lDraupnir Ring",
+  "item.divinerelics.draupnir_spear_base": "§e§lDraupnir Spear Base",
+
   "item.divinerelics.hacksilver": "Hacksilver",
   "item.divinerelics.compressed_hacksilver": "Compressed Hacksilver",
   "item.divinerelics.hacksilver_ingot": "Hacksilver Ingot",
+
   "item.divinerelics.raw_svartalfheim_steel": "§3Raw Svartalfheim Steel",
   "item.divinerelics.svartalfheim_steel_nugget": "§3Svartalfheim Steel Nugget",
   "item.divinerelics.svartalfheim_steel_ingot": "§3Svartalfheim Steel Ingot",
+  "item.divinerelics.svartalfheim_steel_sword": "§3Svartalfheim Steel Sword",
+  "item.divinerelics.svartalfheim_steel_shovel": "§3Svartalfheim Steel Shovel",
   "item.divinerelics.svartalfheim_steel_pickaxe": "§3Svartalfheim Steel Pickaxe",
-
+  "item.divinerelics.svartalfheim_steel_axe": "§3Svartalfheim Steel Axe",
+  "item.divinerelics.svartalfheim_steel_hoe": "§3Svartalfheim Steel Hoe",
 
   "item.divinerelics.asgardian_steel_nugget": "Asgardian Steel Nugget",
   "item.divinerelics.raw_asgardian_steel": "Raw Asgardian Steel",
   "item.divinerelics.asgardian_steel_ingot": "Asgardian Steel Ingot",
+  "item.divinerelics.asgardian_steel_sword": "Asgardian Steel Sword",
+  "item.divinerelics.asgardian_steel_shovel": "Asgardian Steel Shovel",
+  "item.divinerelics.asgardian_steel_pickaxe": "Asgardian Steel Pickaxe",
+  "item.divinerelics.asgardian_steel_axe": "Asgardian Steel Axe",
+  "item.divinerelics.asgardian_steel_hoe": "Asgardian Steel Hoe",
+  "block.divinerelics.asgardian_steel_ore": "Asgardian Steel Ore",
+  "block.divinerelics.deepslate_asgardian_steel_ore": "Deepslate Asgardian Steel Ore",
+
+  "item.divinerelics.perfect_asgardian_steel_ingot": "§e§lPerfect Asgardian Steel Ingot",
 
   "item.divinerelics.thor_fight_music_disc": "Thor Fight Music Disc",
   "item.divinerelics.thor_fight_music_disc.desc": "Bear McCreary - The Hammer of Thor",
 
   "block.divinerelics.hacksilver_ore": "Hacksilver Ore",
   "block.divinerelics.deepslate_hacksilver_ore": "Deepslate Hacksilver Ore",
+  "block.divinerelics.hacksilver_block": "Hacksilver Block",
+
   "block.divinerelics.svartalfheim_steel_ore": "Svartalfheim Steel Ore",
   "block.divinerelics.deepslate_svartalfheim_steel_ore": "Deepslate Svartalfheim Steel Ore",
-  "block.divinerelics.asgardian_steel_ore": "Asgardian Steel Ore",
-  "block.divinerelics.deepslate_asgardian_steel_ore": "Deepslate Asgardian Steel Ore",
+
+
 
   "entity.divinerelics.draugr": "Draugr Warrior",
   "entity.divinerelics.thor": "Thor",

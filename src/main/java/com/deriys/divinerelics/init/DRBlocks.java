@@ -27,6 +27,10 @@ public class DRBlocks {
             () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
                     .strength(4f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)), DRCreativeTab.MAINTAB);
 
+    public static final RegistryObject<Block> HACKSILVER_BLOCK = registerBlock("hacksilver_block",
+            () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
+                    .strength(4f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)), DRCreativeTab.MAINTAB);
+
     public static final RegistryObject<Block> SVARTALFHEIM_STEEL_ORE = registerBlock("svartalfheim_steel_ore",
             () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
                     .strength(6f).requiresCorrectToolForDrops()), DRCreativeTab.MAINTAB);
