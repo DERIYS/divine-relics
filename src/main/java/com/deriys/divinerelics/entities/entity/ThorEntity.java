@@ -32,7 +32,6 @@ import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
@@ -93,6 +92,10 @@ public class ThorEntity extends Monster implements IAnimatable {
     }
 
     public void setAttacking(boolean attacking) {
+        Player nearestPlayer = this.level.getNearestPlayer(this, 30D);
+        if (nearestPlayer != null) {
+            nearestPlayer.sendSystemMessage(Component.literal("Attacking: " + attacking));
+        }
         this.entityData.set(ATTACKING, attacking);
     }
 
@@ -101,10 +104,10 @@ public class ThorEntity extends Monster implements IAnimatable {
     }
 
     public void setAttackState(ThorAttackState state) {
-//        Player nearestPlayer = this.level.getNearestPlayer(this, 30D);
-//        if (nearestPlayer != null) {
-//            nearestPlayer.sendSystemMessage(Component.literal("Changed attack state to: " + state));
-//        }
+        Player nearestPlayer = this.level.getNearestPlayer(this, 30D);
+        if (nearestPlayer != null) {
+            nearestPlayer.sendSystemMessage(Component.literal("Changed attack state to: " + state));
+        }
         if (state != ThorAttackState.NONE) {
             setHasMjolnirInHands(state != ThorAttackState.CLAP_ATTACK && state != ThorAttackState.GROUND_ATTACK && state != ThorAttackState.LEG_ATTACK);
         }
@@ -128,6 +131,10 @@ public class ThorEntity extends Monster implements IAnimatable {
     }
 
     public void setWaitsForMjolnir(boolean waitsForMjolnir) {
+        Player nearestPlayer = this.level.getNearestPlayer(this, 30D);
+        if (nearestPlayer != null) {
+            nearestPlayer.sendSystemMessage(Component.literal("Changed waits for mjolnir: " + waitsForMjolnir));
+        }
         this.entityData.set(WAITS_FOR_MJOLNIR, waitsForMjolnir);
     }
 
@@ -159,7 +166,7 @@ public class ThorEntity extends Monster implements IAnimatable {
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this)).setAlertOthers(DraugrEntity.class));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Villager.class, true));
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Monster.class, true));
     }
 
     public static AttributeSupplier.Builder createAttributes () {

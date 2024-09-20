@@ -28,8 +28,8 @@ public class DivineRelics
 
         modEventBus.addListener(this::commonSetup);
 
-        DRBlocks.register(modEventBus);
         DRItems.register(modEventBus);
+        DRBlocks.register(modEventBus);
         DRSounds.register(modEventBus);
         DREffects.register(modEventBus);
         DREntitiyTypes.register(modEventBus);

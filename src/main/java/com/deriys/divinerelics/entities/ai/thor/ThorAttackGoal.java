@@ -79,7 +79,7 @@ public class ThorAttackGoal extends MeleeAttackGoal {
                 }
                 return true;
             } else if (pDistToEnemySqr > distance * 5f && entity.canSeeTarget(pEnemy) && (shouldMjolnirThrow() || attackState == ThorAttackState.MJOLNIR_THROW)) {
-                if (!isAttacking && !thor.waitsForMjolnir()) {
+                if (!isAttacking && !thor.waitsForMjolnir() && thor.thrownMjolnirUUID == null) {
                     setNewAttackState(ThorAttackState.MJOLNIR_THROW);
                 }
                 return true;
@@ -167,11 +167,11 @@ public class ThorAttackGoal extends MeleeAttackGoal {
             onHitLighnting(thor.level, thor, thor.getOnPos(), thor, thor.thorDamageSource, 17f, 5f, 8);
         }
 
-        if(shouldCountTillNextAttack && this.ticksUntilNextAttack > 0) {
+        if(!thor.level.isClientSide && shouldCountTillNextAttack && this.ticksUntilNextAttack > 0) {
             this.ticksUntilNextAttack--;
             if (this.ticksUntilNextAttack == 0){
                 thor.setAttacking(false);
-                if ((state == ThorAttackState.NONE && this.lastAttack == ThorAttackState.MJOLNIR_THROW) || state == ThorAttackState.MJOLNIR_THROW) {
+                if (state == ThorAttackState.MJOLNIR_THROW) {
                     thor.setAttackState(ThorAttackState.NONE);
                 }
             }

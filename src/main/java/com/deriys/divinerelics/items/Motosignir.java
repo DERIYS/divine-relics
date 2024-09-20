@@ -2,6 +2,7 @@ package com.deriys.divinerelics.items;
 
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.MotosignirParticleS2CPacket;
+import com.deriys.divinerelics.entities.entity.ThorEntity;
 import com.deriys.divinerelics.init.DREffects;
 import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
 import com.deriys.divinerelics.init.DRSounds;
@@ -40,7 +41,7 @@ public class Motosignir extends Item {
     };
 
     public static final int EFFECTS_DURATION = 200;
-    public static final int AMPLIFIER = 1;
+    public static final int AMPLIFIER = 2;
 
     public Motosignir(Properties p_41383_) {
         super(p_41383_);
@@ -142,12 +143,7 @@ public class Motosignir extends Item {
 
 //                owner.sendSystemMessage(Component.literal("Dealt " + Math.floor(Math.min(adjustedDamage, adjustedDamage * distanceFactor)*100)/100 + " damage to " + livingEntity.getDisplayName().getString() + " at " + Math.floor(distanceToEnemy*100)/100 + " distance"));
 
-                if (!livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
-//                    if (damageSource.getEntity() instanceof ThorEntity) {
-//                        applyKnockBack(livingEntity, force, ratioX, ratioZ);
-//                    } else {
-//                        livingEntity.knockback(force, ratioX, ratioZ);
-//                    }
+                if (!livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get()) || damageSource.getEntity() instanceof ThorEntity) {
                     livingEntity.knockback(force, ratioX, ratioZ);
                 }
 

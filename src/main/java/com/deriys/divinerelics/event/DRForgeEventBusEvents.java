@@ -68,11 +68,11 @@ public class DRForgeEventBusEvents {
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.HACKSILVER.get(), 9),
-                    new ItemStack(DRItems.COMPRESSED_HACKSILVER.get(), 4),10,3,0.01F));
+                    new ItemStack(DRItems.COMPRESSED_HACKSILVER.get(), 4),4,3,0.0F));
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.HACKSILVER_INGOT.get(), 16),
-                    new ItemStack(DRBlocks.HACKSILVER_BLOCK.get(), 2),10,5,0.01F));
+                    new ItemStack(DRBlocks.HACKSILVER_BLOCK.get(), 2),2,2,0.0F));
 
             villagerLevel = 2;
 
@@ -100,12 +100,12 @@ public class DRForgeEventBusEvents {
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get(), 2),
                     new ItemStack(DRItems.ASGARDIAN_STEEL_NUGGET.get(), 4),
-                    new ItemStack(DRItems.MOTOSIGNIR.get(), 1),1,120,0.5F));
+                    new ItemStack(DRItems.MOTOSIGNIR.get(), 1),1,120,4F));
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get(), 3),
                     new ItemStack(Items.SHIELD, 1),
-                    new ItemStack(DRItems.GUARDIAN_SHIELD.get(), 1),1,120,0.5F));
+                    new ItemStack(DRItems.GUARDIAN_SHIELD.get(), 1),1,120,4F));
 
             villagerLevel = 5;
 
@@ -125,17 +125,17 @@ public class DRForgeEventBusEvents {
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.COMPRESSED_HACKSILVER.get(), 8),
-                    new ItemStack(DRItems.HACKSILVER_INGOT.get(), 9),5,3,0.01F));
+                    new ItemStack(DRItems.HACKSILVER_INGOT.get(), 9),3,3,0.0F));
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRBlocks.HACKSILVER_BLOCK.get(), 2),
-                    new ItemStack(DRItems.HACKSILVER_INGOT.get(), 16),10,2,0.01F));
+                    new ItemStack(DRItems.HACKSILVER_INGOT.get(), 16),2,2,0.0F));
 
             villagerLevel = 2;
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRBlocks.HACKSILVER_BLOCK.get(), 1),
-                    new ItemStack(DRItems.SVARTALFHEIM_STEEL_NUGGET.get(), 2),4,10,0.02F));
+                    new ItemStack(DRItems.SVARTALFHEIM_STEEL_NUGGET.get(), 2),5,10,0.02F));
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.RAW_SVARTALFHEIM_STEEL.get(), 4),
@@ -156,24 +156,24 @@ public class DRForgeEventBusEvents {
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get(), 4),
                     new ItemStack(DRItems.SVARTALFHEIM_STEEL_INGOT.get(), 16),
-                    new ItemStack(DRItems.HEIMDALL_GAUNTLET.get(), 1),1,120,0.5F));
+                    new ItemStack(DRItems.HEIMDALL_GAUNTLET.get(), 1),1,120,10F));
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get(), 2),
                     new ItemStack(Blocks.BIRCH_LOG, 1),
-                    new ItemStack(DRItems.YGGDRASILS_TWIG.get(), 1),1,120,0.5F));
+                    new ItemStack(DRItems.YGGDRASILS_TWIG.get(), 1),1,120,5F));
 
             villagerLevel = 5;
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get(), 1),
                     new ItemStack(DRItems.ASGARDIAN_STEEL_INGOT.get(), 2),
-                    new ItemStack(DRItems.DRAUPNIR_RING.get(), 1),1,20,0.8F));
+                    new ItemStack(DRItems.DRAUPNIR_RING.get(), 1),1,200,8F));
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.DRAUPNIR_SPEAR_BASE.get(), 1),
                     new ItemStack(DRItems.DRAUPNIR_RING.get(), 1),
-                    new ItemStack(DRItems.DRAUPNIR_SPEAR.get(), 1),1,20,0.8F));
+                    new ItemStack(DRItems.DRAUPNIR_SPEAR.get(), 1),1,200,3F));
         }
     }
 }

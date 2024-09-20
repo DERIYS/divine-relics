@@ -30,7 +30,7 @@ public enum ThorAttackState {
         if (rand < 0.2 && !lastAttack.equals(CLAP_ATTACK)) {
             return CLAP_ATTACK;
         } else if (!thor.waitsForMjolnir()){
-            if (RAND.nextFloat() > 0.4) {
+            if (RAND.nextFloat() > 0.3) {
                 return MELEE_ATTACK;
             } else {
                 return LEG_ATTACK;

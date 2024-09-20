@@ -11,7 +11,6 @@ import com.deriys.divinerelics.capabilities.teammates.Teammates;
 import com.deriys.divinerelics.capabilities.teammates.TeammatesProvider;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.GauntletParticleS2CPacket;
-import com.deriys.divinerelics.dwarfs.DRDwarfs;
 import com.deriys.divinerelics.entities.entity.ThorEntity;
 import com.deriys.divinerelics.entities.entity.ThrownLeviathanAxe;
 import com.deriys.divinerelics.init.DREffects;
@@ -23,7 +22,6 @@ import com.deriys.divinerelics.items.LeviathanAxe;
 import com.deriys.divinerelics.items.Mjolnir;
 import com.deriys.divinerelics.items.Motosignir;
 import com.deriys.divinerelics.init.DRSounds;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -37,13 +35,9 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.npc.VillagerProfession;
-import net.minecraft.world.entity.npc.VillagerTrades;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
@@ -56,7 +50,6 @@ import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.minecraftforge.event.village.VillagerTradesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -304,7 +297,7 @@ public class DREvents {
         }
 
         private static boolean isValidAttacker(Entity attacker, Entity directAttacker) {
-            return !(directAttacker instanceof ThrownDraupnirSpear) && (attacker instanceof LivingEntity livingEntity && !(livingEntity.getMainHandItem().getItem() == DRItems.DRAUPNIR_SPEAR.get() && directAttacker == attacker));
+            return !(directAttacker instanceof ThrownDraupnirSpear) && (attacker instanceof LivingEntity livingEntity && !(livingEntity.getMainHandItem().getItem() == DRItems.DRAUPNIR_SPEAR.get() && directAttacker == attacker) && !(livingEntity instanceof ThorEntity));
         }
 
         public static boolean isDRWeapon(Entity directAttacker) {
