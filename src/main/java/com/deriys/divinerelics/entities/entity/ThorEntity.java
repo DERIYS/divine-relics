@@ -38,6 +38,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -77,7 +78,7 @@ public class ThorEntity extends Monster implements IAnimatable {
 
     private final ServerBossEvent bossEvent = new ServerBossEvent(Component.literal("Thor").withStyle(ChatFormatting.BOLD), BossEvent.BossBarColor.BLUE, BossEvent.BossBarOverlay.PROGRESS);
     public static final int INVULNERABLE_TICKS = 549;
-    public static final int[] LIGHNING_TICKS = {
+    public static final int[] LIGHTNING_TICKS = {
             149,
             223,
             323,
@@ -92,7 +93,7 @@ public class ThorEntity extends Monster implements IAnimatable {
     private List<ServerPlayer> trackingPlayers = new ArrayList<>();
     public short ambientSoundCount = -1;
 
-    private SoundEvent[] ambientSounds = {
+    public static final SoundEvent[] AMBIENT_SOUNDS = {
             DRSounds.THOR_AMBIENT_1.get(),
             DRSounds.THOR_AMBIENT_2.get(),
             DRSounds.THOR_AMBIENT_3.get(),
@@ -182,7 +183,7 @@ public class ThorEntity extends Monster implements IAnimatable {
     protected void addBehaviourGoals () {
         this.goalSelector.addGoal(1, new ThorAttackGoal(this, 1.0D, true));
         this.goalSelector.addGoal(7, new WaterAvoidingRandomStrollGoal(this, 1.0D));
-        this.targetSelector.addGoal(1, (new HurtByTargetGoal(this)).setAlertOthers(DraugrEntity.class));
+        this.targetSelector.addGoal(1, (new HurtByTargetGoal(this)));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Monster.class, true));
     }
@@ -206,9 +207,8 @@ public class ThorEntity extends Monster implements IAnimatable {
         this.entityData.define(HAS_MJOLNIR_IN_HANDS, true);
         this.entityData.define(WAITS_FOR_MJOLNIR, false);
         this.entityData.define(ATTACKING_TICKS, 0);
-        this.entityData.define(SUMMONING_COMPLETE, true);
+        this.entityData.define(SUMMONING_COMPLETE, false);
     }
-
 
     @Override
     public void tick() {
@@ -250,7 +250,7 @@ public class ThorEntity extends Monster implements IAnimatable {
 
         if (!summoningComplete && !this.level.isClientSide) {
             if (this.tickCount < INVULNERABLE_TICKS) {
-                if (contains(LIGHNING_TICKS, this.tickCount)) {
+                if (contains(LIGHTNING_TICKS, this.tickCount)) {
                     spawnLightning(this.level, getRandBlockPos(onPos, 100, 100, 50), this);
                 }
             } else if (this.tickCount == INVULNERABLE_TICKS) {
@@ -287,7 +287,7 @@ public class ThorEntity extends Monster implements IAnimatable {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compoundTag) {
+    public void readAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.readAdditionalSaveData(compoundTag);
         this.tickCount = compoundTag.getInt("TickCount");
         this.ambientSoundCount = compoundTag.getShort("AmbientSoundCount");
@@ -303,7 +303,7 @@ public class ThorEntity extends Monster implements IAnimatable {
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compoundTag) {
+    public void addAdditionalSaveData(@NotNull CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         compoundTag.putBoolean("SummoningComplete", this.isSummoningComplete());
         compoundTag.putBoolean("Attacking", this.isAttacking());
@@ -325,7 +325,7 @@ public class ThorEntity extends Monster implements IAnimatable {
     }
 
     @Override
-    public void startSeenByPlayer(ServerPlayer serverPlayer) {
+    public void startSeenByPlayer(@NotNull ServerPlayer serverPlayer) {
         super.startSeenByPlayer(serverPlayer);
         if (!this.isSummoningComplete()) {
             this.trackingPlayers.add(serverPlayer);
@@ -338,9 +338,9 @@ public class ThorEntity extends Monster implements IAnimatable {
     public void checkDespawn() { }
 
     @Override
-    public void stopSeenByPlayer(ServerPlayer p_31488_) {
-        super.stopSeenByPlayer(p_31488_);
-        this.bossEvent.removePlayer(p_31488_);
+    public void stopSeenByPlayer(@NotNull ServerPlayer serverPlayer) {
+        super.stopSeenByPlayer(serverPlayer);
+        this.bossEvent.removePlayer(serverPlayer);
     }
 
     private void stopPlayingBossMusic() {
@@ -348,12 +348,12 @@ public class ThorEntity extends Monster implements IAnimatable {
     }
 
     @Override
-    public void die(DamageSource p_21014_) {
+    public void die(@NotNull DamageSource damageSource) {
         this.spawnAtLocation(new ItemStack(DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get(), 4));
         if (RAND.nextFloat() < 0.1) {
             this.spawnAtLocation(new ItemStack(DRItems.ASGARDIAN_STEEL_NUGGET.get(), RAND.nextInt(3, 7)));
         }
-        super.die(p_21014_);
+        super.die(damageSource);
         this.bossEvent.setVisible(false);
 
         if (this.level instanceof ServerLevel serverLevel) {
@@ -457,10 +457,7 @@ public class ThorEntity extends Monster implements IAnimatable {
 
     @Override
     public boolean isNoAi() {
-        if (!this.isSummoningComplete()) {
-            return true;
-        }
-        return super.isNoAi();
+        return !this.isSummoningComplete();
     }
 
     @Override
@@ -473,7 +470,7 @@ public class ThorEntity extends Monster implements IAnimatable {
     protected SoundEvent getAmbientSound() {
         LivingEntity target = this.getTarget();
         if (target != null && target.isAlive() && target instanceof Player && this.isSummoningComplete()) {
-           return this.ambientSounds[++this.ambientSoundCount % 9];
+           return this.AMBIENT_SOUNDS[++this.ambientSoundCount % 9];
         }
         return null;
     }

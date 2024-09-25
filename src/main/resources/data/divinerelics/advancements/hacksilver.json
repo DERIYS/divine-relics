@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:hacksilver"
+    },
+    "title": "Who chopped it?",
+    "description": "Acquire Hacksilver",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "divinerelics:root",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "divinerelics:hacksilver"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

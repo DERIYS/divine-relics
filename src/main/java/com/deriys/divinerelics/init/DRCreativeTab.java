@@ -14,7 +14,6 @@ public class DRCreativeTab {
         @Override
         public void fillItemList(NonNullList<ItemStack> items) {
             super.fillItemList(items);
-
             items.clear();
 
             items.add(new ItemStack(DRItems.MOTOSIGNIR.get()));

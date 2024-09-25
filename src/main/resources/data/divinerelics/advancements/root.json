@@ -1,27 +1,23 @@
 {
   "display": {
     "icon": {
-      "item": "divinerelics:hacksilver"
+      "item": "divinerelics:motosignir"
     },
     "title": "Divine Relics",
-    "description": "Acquire Hacksilver",
+    "description": "May your journey begin!",
     "frame": "task",
     "show_toast": true,
     "announce_to_chat": true,
     "background": "divinerelics:textures/block/hacksilver_block.png"
   },
   "criteria": {
-    "requirement": {
-      "trigger": "minecraft:inventory_changed",
-      "conditions": {
-        "items": [
-          {
-            "items": [
-              "divinerelics:hacksilver"
-            ]
-          }
-        ]
-      }
+    "tick": {
+      "trigger": "minecraft:tick"
     }
+  },
+  "rewards": {
+    "loot": [
+      "divinerelics:grant_book_on_first_join"
+    ]
   }
 }

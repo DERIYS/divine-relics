@@ -9,7 +9,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SlabBlock;
+import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.phys.Vec3;
 
 public class DivineMead extends Item {
@@ -21,9 +24,14 @@ public class DivineMead extends Item {
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         Player player = context.getPlayer();
         Level level = context.getLevel();
-        if (!level.isClientSide && player != null && player.getMainHandItem() == stack && context.getClickedFace() == Direction.UP && level.getBlockState(context.getClickedPos()).getBlock() != Blocks.LAVA) {
+        Block clickedBlock = level.getBlockState(context.getClickedPos()).getBlock();
+        if (!level.isClientSide && player != null && player.getMainHandItem() == stack && context.getClickedFace() == Direction.UP && clickedBlock != Blocks.LAVA) {
             ThorEntity thor = new ThorEntity(DREntitiyTypes.THOR.get(), level);
-            thor.setPos(Vec3.atCenterOf(context.getClickedPos()).add(0D, 1D, 0D));
+            if (clickedBlock instanceof SlabBlock || clickedBlock instanceof SnowLayerBlock) {
+                thor.setPos(Vec3.atCenterOf(context.getClickedPos()).add(0D, 0.1D, 0D));
+            } else {
+                thor.setPos(Vec3.atCenterOf(context.getClickedPos()).add(0D, 1D, 0D));
+            }
             thor.setSummoningComplete(false);
             level.addFreshEntity(thor);
             if (!player.isCreative()) {

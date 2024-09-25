@@ -1,0 +1,15 @@
+{
+  "type": "patchouli:shaped_book_recipe",
+  "pattern": [
+    "#H"
+  ],
+  "key": {
+    "#": {
+      "item": "minecraft:book"
+    },
+    "H": {
+      "item": "divinerelics:hacksilver"
+    }
+  },
+  "book": "divinerelics:divinerelics_guidebook"
+}
