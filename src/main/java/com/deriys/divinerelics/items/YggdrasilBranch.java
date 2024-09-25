@@ -19,8 +19,8 @@ import java.util.List;
 
 import static com.deriys.divinerelics.capabilities.teammates.TeammatesProvider.hasTeammate;
 
-public class YggdrasilsTwig extends Item {
-    public YggdrasilsTwig(Properties p_41383_) {
+public class YggdrasilBranch extends Item {
+    public YggdrasilBranch(Properties p_41383_) {
         super(p_41383_);
     }
 

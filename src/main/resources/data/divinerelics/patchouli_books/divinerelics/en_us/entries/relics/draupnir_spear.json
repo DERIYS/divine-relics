@@ -1,0 +1,31 @@
+{
+  "name": "§6§lDraupnir Spear",
+  "icon": "divinerelics:draupnir_spear",
+  "category": "divinerelics:relics",
+  "advancement": "divinerelics:god_killer",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Draupnir Spear$() is a legendary weapon of unparalleled might, forged by the Lady of the Forge and blessed by $(l)Brok$(). $(br2)This spear, born from the enchanted Draupnir Ring, possesses the extraordinary ability to replicate itself endlessly, making it a formidable tool in the hands of a true warrior.$(br2)$(l)Abilities:$()$(li)$(l)Replication:$() Draupnir Spear can multiply itself, allowing the wielder to launch a barrage of spears at their foes.$(li)$(l)Wind’s Concussive Force:$() Each spear can be detonated with a shift right click (no more than 5 spears at a time), unleashing a powerful concussive blast of wind that devastates enemies.$(li)$(l)Rapid Strikes:$() The spear can strike with incredible speed, advancing the wielder closer to their target with each blow.$(li)$(l)Loyalty:$() The spear is loyal to its master, ensuring that no other warrior can lift it from the ground."
+    },
+    {
+      "type": "patchouli:crafting",
+      "title": "Draupnir Spear Base",
+      "recipe": "divinerelics:draupnir_spear_base",
+      "text": "Obtaining this weapon involves both crafting and trading. $(br2)Firstly, one must craft the $(l)Draupnir Spear Base$()."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "title": "Draupnir Ring",
+      "item": "divinerelics:draupnir_ring",
+      "border": true,
+      "text": "Secondly, one will need the $(l)Draupnir Ring$(), which can be purchased from $(l)Brok and Sindri$()."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "item": "divinerelics:draupnir_spear",
+      "border": true,
+      "text": "Which will both be given to the Huldra brothers to make the legendary $(l)Draupnir Spear$()."
+    }
+  ]
+}

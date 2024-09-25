@@ -1,0 +1,29 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:svartalfheim_steel_nugget"
+    },
+    "title": "Dwarven Remnants",
+    "description": "Obtain Svartalfheim Steel",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "divinerelics:root",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "divinerelics:svartalfheim_steel_nugget",
+              "divinerelics:raw_svartalfheim_steel",
+              "divinerelics:svartalfheim_steel_ingot"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -34,6 +34,24 @@ public class DRSounds {
             registerSoundEvent("thor_ground_attack");
     public static final RegistryObject<SoundEvent> THOR_MJOLNIR_THROW_ATTACK =
             registerSoundEvent("thor_mjolnir_throw_attack");
+    public static final RegistryObject<SoundEvent> THOR_AMBIENT_1 =
+            registerSoundEvent("thor_ambient_1");
+    public static final RegistryObject<SoundEvent> THOR_AMBIENT_2 =
+            registerSoundEvent("thor_ambient_2");
+    public static final RegistryObject<SoundEvent> THOR_AMBIENT_3 =
+            registerSoundEvent("thor_ambient_3");
+    public static final RegistryObject<SoundEvent> THOR_AMBIENT_4 =
+            registerSoundEvent("thor_ambient_4");
+    public static final RegistryObject<SoundEvent> THOR_AMBIENT_5 =
+            registerSoundEvent("thor_ambient_5");
+    public static final RegistryObject<SoundEvent> THOR_AMBIENT_6 =
+            registerSoundEvent("thor_ambient_6");
+    public static final RegistryObject<SoundEvent> THOR_AMBIENT_7 =
+            registerSoundEvent("thor_ambient_7");
+    public static final RegistryObject<SoundEvent> THOR_AMBIENT_8 =
+            registerSoundEvent("thor_ambient_8");
+    public static final RegistryObject<SoundEvent> THOR_AMBIENT_9 =
+            registerSoundEvent("thor_ambient_9");
     public static final RegistryObject<SoundEvent> THOR_DEATH_SOUND =
             registerSoundEvent("thor_death_sound");
 

@@ -1,0 +1,21 @@
+{
+  "name": "Thor",
+  "icon": "divinerelics:divine_mead",
+  "category": "divinerelics:entities",
+  "advancement": "divinerelics:asgardian_steel_ingot",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Thor Odinson$(), the God of Thunder, is an immeasurably powerful foe. $(br2)As the son of Odin and wielder of the legendary hammer $(l:relics/mjolnir)Mjölnir$(), he commands the raw power of thunder and lightning. His immense strength and near-invulnerability make him a terrifying adversary. $(br2)$(l)Thor$() is a vengeful and brutal god, driven by an unyielding thirst not even for victory but for the fight itself. He is relentless, showing no mercy to those who oppose him or threaten Asgard."
+    },
+    {
+      "type": "patchouli:text",
+      "text": "Thor is capable of performing various attacks:$(li)$(l)Melee Attack with Mjölnir:$() A strike with the hammer, delivering blows that shatter bones and spirits alike.$(li)$(l)Melee Attack with a Kick:$() A powerful kick that sends enemies sprawling.$(li)$(l)Thunder Clap:$() With a mighty clap, he creates a shockwave, accompanied by lightning that strikes all within its reach.$(li)$(l)Thunder Quake:$() An enhanced version of Thunder Clap, this attack devastates a larger area with unparalleled force.$(li)$(l)Throwing Mjölnir:$() Thor hurls his hammer with incomparable force, striking distant targets with deadly precision. $(br2)Note: It is $(#CC0000)highly inadvisable$() to engage him in combat with armor that is not enchanted for maximum $(l)Protection$() and $(l)Unbreaking$(), for his destructive blows will shake even the strongest and most shock-resistant armor."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:divine_mead",
+      "text": "To summon and challenge the mighty $(l)God of Thunder$(), one must first procure $(l)Divine Mead$() — an elixir worthy of the attention of the Champion of Asgard himself. $(br2)Upon securing this sacred draught, seek out a flat expanse of land. There, with the $(l)Divine Mead$() in hand, right-click upon the earth’s surface. $(br2)Brace thyself, for thou art about to engage in a battle that shall be sung of in legends for generations to come..."
+    }
+  ]
+}

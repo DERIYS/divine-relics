@@ -13,7 +13,7 @@ import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 public class DraugrAttackGoal extends MeleeAttackGoal {
     private final DraugrEntity entity;
     private int attackDelay = 15;
-    private int ticksUntilNextAttack = 15;
+    private int ticksUntilNextAttack = 30;
     private boolean shouldCountTillNextAttack = false;
 
     public DraugrAttackGoal(PathfinderMob pathfinderMob, double pSpeedModifier, boolean pFollowingTargetEvenIfNotSeen) {
@@ -25,7 +25,7 @@ public class DraugrAttackGoal extends MeleeAttackGoal {
     public void start() {
         super.start();
         attackDelay = 15;
-        ticksUntilNextAttack = 15;
+        ticksUntilNextAttack = 30;
     }
 
     @Override
@@ -38,12 +38,12 @@ public class DraugrAttackGoal extends MeleeAttackGoal {
         if (isEnemyWithinAttackDistance(pEnemy, pDistToEnemySqr)) {
             shouldCountTillNextAttack = true;
             if(isTimeToStartAttackAnimation()) {
+                entity.level.playSound(null, entity.getOnPos(), DRSounds.DRAUGR_ATTACK.get(), SoundSource.HOSTILE, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
                 entity.setAttacking(true);
 //                System.out.println("Starting attack animation");
             }
 
             if(isTimeToAttack()) {
-                entity.level.playSound(null, entity.getOnPos(), DRSounds.DRAUGR_ATTACK.get(), SoundSource.HOSTILE, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
                 this.mob.getLookControl().setLookAt(pEnemy.getX(), pEnemy.getEyeY(), pEnemy.getZ());
                 performAttack(pEnemy);
 //                System.out.println("Performing attack");
@@ -52,8 +52,6 @@ public class DraugrAttackGoal extends MeleeAttackGoal {
             resetAttackCooldown();
             shouldCountTillNextAttack = false;
             entity.setAttacking(false);
-            entity.attackingTicks = 0;
-//            System.out.println("Resetting attack cooldown");
         }
     }
 
@@ -68,11 +66,11 @@ public class DraugrAttackGoal extends MeleeAttackGoal {
     }
 
     protected boolean isTimeToAttack() {
-        return this.ticksUntilNextAttack <= 0;
+        return this.ticksUntilNextAttack == this.attackDelay;
     }
 
     protected boolean isTimeToStartAttackAnimation() {
-        return this.ticksUntilNextAttack <= this.attackDelay;
+        return this.ticksUntilNextAttack == this.attackDelay * 2;
     }
 
     protected int getTicksUntilNextAttack() {
@@ -81,7 +79,6 @@ public class DraugrAttackGoal extends MeleeAttackGoal {
 
 
     protected void performAttack(LivingEntity pEnemy) {
-        this.resetAttackCooldown();
         this.mob.swing(InteractionHand.MAIN_HAND);
         this.mob.doHurtTarget(pEnemy);
     }
@@ -89,8 +86,15 @@ public class DraugrAttackGoal extends MeleeAttackGoal {
     @Override
     public void tick() {
         super.tick();
-        if(shouldCountTillNextAttack && this.ticksUntilNextAttack > 0) {
+//        if (!entity.level.isClientSide && this.ticksUntilNextAttack == 15) {
+//            entity.level.playSound(null, entity.getOnPos(), DRSounds.DRAUGR_ATTACK.get(), SoundSource.HOSTILE, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
+//        }
+        if (shouldCountTillNextAttack && this.ticksUntilNextAttack > 0) {
             this.ticksUntilNextAttack--;
+            if (this.ticksUntilNextAttack == 0) {
+                entity.setAttacking(false);
+                this.resetAttackCooldown();
+            }
         }
     }
 

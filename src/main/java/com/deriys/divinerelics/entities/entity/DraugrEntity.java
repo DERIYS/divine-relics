@@ -1,15 +1,20 @@
 package com.deriys.divinerelics.entities.entity;
 
 import com.deriys.divinerelics.entities.ai.draugr.DraugrAttackGoal;
+import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -20,7 +25,9 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -88,7 +95,14 @@ public class DraugrEntity extends Monster implements IAnimatable {
     }
 
     public static AttributeSupplier.Builder createAttributes() {
-        return Monster.createMonsterAttributes().add(Attributes.FOLLOW_RANGE, 35.0D).add(Attributes.KNOCKBACK_RESISTANCE, 0.5f).add(Attributes.MOVEMENT_SPEED, 0.22F).add(Attributes.ATTACK_DAMAGE, 6.0D).add(Attributes.ARMOR, 9.0D).add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
+        return Monster.createMonsterAttributes()
+                .add(Attributes.FOLLOW_RANGE, 35.0D)
+                .add(Attributes.MAX_HEALTH, 30.0D)
+                .add(Attributes.KNOCKBACK_RESISTANCE, 0.5f)
+                .add(Attributes.MOVEMENT_SPEED, 0.22F)
+                .add(Attributes.ATTACK_DAMAGE, 6.0D)
+                .add(Attributes.ARMOR, 9.0D)
+                .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
@@ -153,7 +167,22 @@ public class DraugrEntity extends Monster implements IAnimatable {
     }
 
     @Override
+    protected SoundEvent getDeathSound() {
+        return SoundEvents.SKELETON_DEATH;
+    }
+
+    @Override
+    public void die(DamageSource p_21014_) {
+        this.spawnAtLocation(new ItemStack(DRItems.HACKSILVER.get(), RAND.nextInt(0, 2)));
+        super.die(p_21014_);
+    }
+
+    @Override
     public AnimationFactory getFactory() {
         return this.factory;
+    }
+
+    public static boolean canSpawn(EntityType<DraugrEntity> draugrEntityEntityType, ServerLevelAccessor serverLevelAccessor, MobSpawnType mobSpawnType, BlockPos blockPos, RandomSource randomSource) {
+        return checkMobSpawnRules(draugrEntityEntityType, serverLevelAccessor, mobSpawnType, blockPos, randomSource) && blockPos.getY() > 60 && serverLevelAccessor.getDifficulty() != Difficulty.PEACEFUL;
     }
 }

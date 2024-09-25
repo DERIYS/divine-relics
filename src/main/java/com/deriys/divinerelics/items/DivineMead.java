@@ -9,6 +9,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
 
 public class DivineMead extends Item {
@@ -20,7 +21,7 @@ public class DivineMead extends Item {
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         Player player = context.getPlayer();
         Level level = context.getLevel();
-        if (!level.isClientSide && player != null && player.getMainHandItem() == stack && context.getClickedFace() == Direction.UP) {
+        if (!level.isClientSide && player != null && player.getMainHandItem() == stack && context.getClickedFace() == Direction.UP && level.getBlockState(context.getClickedPos()).getBlock() != Blocks.LAVA) {
             ThorEntity thor = new ThorEntity(DREntitiyTypes.THOR.get(), level);
             thor.setPos(Vec3.atCenterOf(context.getClickedPos()).add(0D, 1D, 0D));
             thor.setSummoningComplete(false);

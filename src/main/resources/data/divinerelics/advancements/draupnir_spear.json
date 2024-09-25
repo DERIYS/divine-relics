@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:draupnir_spear"
+    },
+    "title": "Lethal Reproduction",
+    "description": "Acquire Draupnir Spear",
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "divinerelics:god_killer",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "divinerelics:leviathan_axe"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

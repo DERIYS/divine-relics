@@ -1,0 +1,24 @@
+{
+  "name": "Brok and Sindri Shop",
+  "icon": "minecraft:emerald",
+  "category": "divinerelics:structures",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Brok and Sindri Shop$() is a rare structure, nestled within the frosty expanses of winter biomes and the dense, evergreen taiga. $(br2)Resembling a camp more than a traditional shop, it is here that you can forge profitable trade relations with the legendary Huldra brothers."
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "divinerelics:textures/gui/entries/structures/brok_and_sindri_shop.png"
+      ],
+      "border": true,
+      "text": "Naturally spawning $(l)Brok and Sindri Shop$()"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:dwarven_compass",
+      "text": "$(br)To aid in your quest, the brothers have invented a special $(l)Dwarven Compass$(), designed to guide you to their elusive shops with ease."
+    }
+  ]
+}

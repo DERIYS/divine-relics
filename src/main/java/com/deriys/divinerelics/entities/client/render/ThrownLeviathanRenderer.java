@@ -18,7 +18,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
 public class ThrownLeviathanRenderer extends EntityRenderer<ThrownLeviathanAxe> {
-    public static final ResourceLocation LEVIATHAN_LOCATION = new ResourceLocation("divinerelics:textures/entity/thrown_leviathan.png");
+    public static final ResourceLocation LEVIATHAN_LOCATION = new ResourceLocation("divinerelics:textures/entity/thrown_leviathan_axe.png");
     private final ThrownLeviathanModel model;
 
     public ThrownLeviathanRenderer(EntityRendererProvider.Context context) {

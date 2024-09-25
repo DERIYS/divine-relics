@@ -145,7 +145,7 @@ public class DREvents {
                             handleMjolnirAction(player, mjolnir, itemStack, event);
                         }
                         mjolnir.setRiptideFlying(itemStack, false);
-                    } else if (player.getUseItem().is(DRItems.GUARDIAN_SHIELD.get())) {
+                    } else if (player.getUseItem().is(DRItems.GUARDIAN_SHIELD.get()) && player.getLookAngle().y < -0.85D) {
                         handleGuardianShieldAction(player, event);
                     }
                 }

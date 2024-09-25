@@ -19,7 +19,7 @@ public class DRTiers {
                     DRTags.Blocks.NEEDS_SVARTALFHEIM_STEEL_TOOL, () -> Ingredient.of(DRItems.SVARTALFHEIM_STEEL_INGOT.get())),
             new ResourceLocation(DivineRelics.MODID, "svartalfheim_steel"), List.of(Tiers.NETHERITE), List.of());
     public static final Tier ASGARDIAN_STEEL_TIER = TierSortingRegistry.registerTier(
-            new ForgeTier(5, 3000, 11.0f, 6f, 20,
+            new ForgeTier(4, 3000, 11.0f, 6f, 20,
                     DRTags.Blocks.NEEDS_ASGARDIAN_STEEL_TOOL, () -> Ingredient.of(DRItems.ASGARDIAN_STEEL_INGOT.get())),
             new ResourceLocation(DivineRelics.MODID, "asgardian_steel"), List.of(SVARTALFHEIM_STEEL_TIER), List.of());
     public static final Tier DRAUPNIR = TierSortingRegistry.registerTier(

@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:heimdall_gauntlet"
+    },
+    "title": "His favourite toy",
+    "description": "Acquire Heimdall's Gauntlet",
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "divinerelics:god_killer",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "divinerelics:heimdall_gauntlet"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

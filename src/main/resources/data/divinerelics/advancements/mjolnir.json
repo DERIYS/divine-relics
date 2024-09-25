@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:mjolnir"
+    },
+    "title": "The Hammer of Thor",
+    "description": "Acquire Mjolnir",
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "divinerelics:god_killer",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "divinerelics:mjolnir"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

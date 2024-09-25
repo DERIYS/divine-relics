@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "SSS",
+    "SCS",
+    "SSS"
+  ],
+  "key": {
+    "C": {
+      "item": "minecraft:compass"
+    },
+    "S": {
+      "item": "divinerelics:svartalfheim_steel_nugget"
+    }
+  },
+  "result": {
+    "item": "divinerelics:dwarven_compass"
+  }
+}

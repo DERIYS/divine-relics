@@ -1,0 +1,24 @@
+{
+  "name": "Perfect Asgardian Steel",
+  "icon": "divinerelics:perfect_asgardian_steel_ingot",
+  "category": "divinerelics:resources",
+  "advancement": "divinerelics:god_killer",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Perfect Asgardian Steel$(), a mythical resource of unparalleled legend, remains the exclusive treasure of the mighty Aesir gods. $(br2)Known to exist only in the form of ingots, this extraordinary material is imbued with the primordial magic of all elements and realms, rendering it a singular resource for the creation of divine weaponry. $(br2)Though it yields easily to deformation, only the most exalted blacksmiths, chosen by fate and skill, possess the prowess to forge truly divine relics from this celestial metal."
+    },
+    {
+      "type": "patchouli:relations",
+      "entries": [
+        "divinerelics:relics/motosignir",
+        "divinerelics:relics/guardian_shield",
+        "divinerelics:relics/heimdall_gauntlet",
+        "divinerelics:relics/yggdrasil_branch",
+        "divinerelics:relics/leviathan_axe",
+        "divinerelics:relics/draupnir_spear",
+        "divinerelics:relics/mjolnir"
+      ]
+    }
+  ]
+}

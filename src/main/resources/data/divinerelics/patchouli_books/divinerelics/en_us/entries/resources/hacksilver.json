@@ -1,0 +1,29 @@
+{
+  "name": "Hacksilver",
+  "icon": "divinerelics:hacksilver_ore",
+  "category": "divinerelics:resources",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Hacksilver$() is the fundamental resource in this mod, serving as the primary currency for trading with the esteemed dwarven craftsmen, $(l)Brok and Sindri$(). $(br2)This versatile metal can be discovered within the depths of overworld caves or hidden within the mod's dungeons. $(br2)Additionally, there exists a chance for Hacksilver to be obtained from the fallen $(l:entities/draugrs)Draugrs$(), making it a valuable and sought-after commodity in your adventures."
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "divinerelics:textures/gui/entries/resources/hacksilver_ores.png"
+      ],
+      "border": true,
+      "text": "$(l)Hacksilver Ore$() variations."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:compressed_hacksilver",
+      "text": "To transform ordinary $(l)Hacksilver$() into a truly valuable currency, it must be processed into ingots. $(br2)Each ingot is smelted from one $(l)Compressed Hacksilver$(), which can be obtained by combining four $(l)Hacksilvers$() in a crafting table."
+    },
+    {
+      "type": "patchouli:smelting",
+      "recipe": "divinerelics:hacksilver_ingot_from_smelting_compressed_hacksilver",
+      "text": "$(br)Smelting $(l)Hacksilver Ingot$() from $(l)Compressed Hacksilver$()."
+    }
+  ]
+}

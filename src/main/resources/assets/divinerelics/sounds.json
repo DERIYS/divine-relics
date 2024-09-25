@@ -170,6 +170,60 @@
         "divinerelics:thor_mjolnir_throw_attack"
       ]
     },
+    "thor_ambient_1": {
+      "subtitle": "sounds.divinerelics.thor_ambient_1",
+      "sounds": [
+        "divinerelics:thor_ambient_1"
+      ]
+    },
+    "thor_ambient_2": {
+      "subtitle": "sounds.divinerelics.thor_ambient_2",
+      "sounds": [
+        "divinerelics:thor_ambient_2"
+      ]
+    },
+    "thor_ambient_3": {
+      "subtitle": "sounds.divinerelics.thor_ambient_3",
+      "sounds": [
+        "divinerelics:thor_ambient_3"
+      ]
+    },
+    "thor_ambient_4": {
+      "subtitle": "sounds.divinerelics.thor_ambient_4",
+      "sounds": [
+        "divinerelics:thor_ambient_4"
+      ]
+    },
+    "thor_ambient_5": {
+      "subtitle": "sounds.divinerelics.thor_ambient_5",
+      "sounds": [
+        "divinerelics:thor_ambient_5"
+      ]
+    },
+    "thor_ambient_6": {
+      "subtitle": "sounds.divinerelics.thor_ambient_6",
+      "sounds": [
+        "divinerelics:thor_ambient_6"
+      ]
+    },
+    "thor_ambient_7": {
+      "subtitle": "sounds.divinerelics.thor_ambient_7",
+      "sounds": [
+        "divinerelics:thor_ambient_7"
+      ]
+    },
+    "thor_ambient_8": {
+      "subtitle": "sounds.divinerelics.thor_ambient_8",
+      "sounds": [
+        "divinerelics:thor_ambient_8"
+      ]
+    },
+    "thor_ambient_9": {
+      "subtitle": "sounds.divinerelics.thor_ambient_9",
+      "sounds": [
+        "divinerelics:thor_ambient_9"
+      ]
+    },
     "thor_death_sound": {
       "subtitle": "sounds.divinerelics.thor_death_sound",
       "sounds": [

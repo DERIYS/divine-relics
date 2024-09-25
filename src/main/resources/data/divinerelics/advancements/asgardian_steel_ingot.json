@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:asgardian_steel_ingot"
+    },
+    "title": "The Gold of the Aesir",
+    "description": "Acquire an Asgardian Steel Ingot",
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "divinerelics:brok_and_sindri_trade",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "divinerelics:asgardian_steel_ingot"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "name": "§b§lYggdrasil Branch",
+  "icon": "divinerelics:yggdrasil_branch",
+  "category": "divinerelics:relics",
+  "advancement": "divinerelics:god_killer",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Yggdrasil Branch$() is a rare and unique artifact, hewn directly from the cosmic tree itself. $(br2)This sacred relic allows its bearer to forge invisible bonds between allies, shielding them from harm inflicted by your divine relics. $(br2)$(l)Abilities:$()$(li)$(l)Protective Link:$() This magical bond safeguards your ally from damage caused by your divine relics.$(br2)It is worth noting that the $(l)Protective Link$() does not shield against ordinary damage, such as left-mouse-button-click strikes from any weapon, but solely against the extraordinary forces, such as shockwaves or thrown weapons, conjured by the divine relics."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "title": "Obtaining",
+      "item": "divinerelics:yggdrasil_branch",
+      "border": true,
+      "text": "This legendary relic can only be obtained through trade with the masterful Huldra brothers, $(l)Brok and Sindri$()."
+    }
+  ]
+}

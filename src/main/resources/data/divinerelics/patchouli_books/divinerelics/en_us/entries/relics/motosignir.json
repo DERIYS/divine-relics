@@ -1,0 +1,19 @@
+{
+  "name": "§6§lMotosignir",
+  "icon": "divinerelics:motosignir",
+  "category": "divinerelics:relics",
+  "advancement": "divinerelics:god_killer",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Motosignir$() is a tuning fork of extraordinary quality and its form precision. $(br2)Forged to the nanometer, its whiskers create a destructive sonic wave that wreaks colossal havoc upon all living creatures within a 10-block radius, stunning them with its sheer force. $(br2)The closer the enemy is to the source of this sonic wave, the greater the devastation they endure."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "title": "Obtaining",
+      "item": "divinerelics:motosignir",
+      "border": true,
+      "text": "This legendary relic can only be obtained through trade with the masterful Huldra brothers, $(l)Brok and Sindri$()."
+    }
+  ]
+}

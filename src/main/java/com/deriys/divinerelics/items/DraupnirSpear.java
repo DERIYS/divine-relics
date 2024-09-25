@@ -291,6 +291,7 @@ public class DraupnirSpear extends SwordItem {
         double speed = 0.7F * distanceModification;
         player.getLevel().playSound(null, player.getOnPos(), DRSounds.DRAUPNIR_SPEAR_HIT.get(), SoundSource.PLAYERS, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
         player.setDeltaMovement(new Vec3(lookVec.x * speed, 0, lookVec.z * speed));
+        entity.invulnerableTime = 9;
         return false;
     }
 

@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:yggdrasil_branch"
+    },
+    "title": "One Branch to unite them all...",
+    "description": "Acquire Yggdrasil Branch",
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "divinerelics:god_killer",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "divinerelics:yggdrasil_branch"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

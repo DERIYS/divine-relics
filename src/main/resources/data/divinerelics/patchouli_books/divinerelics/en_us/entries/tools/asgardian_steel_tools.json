@@ -1,0 +1,26 @@
+{
+  "name": "Asgardian Steel Tools",
+  "icon": "divinerelics:asgardian_steel_sword",
+  "category": "divinerelics:tools",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "Though the $(l)Asgardian Steel Tools$() may not rival the legendary ones forged by the masterful Dwarves for the mighty Aesir in the ancient epochs, they remain unparalleled in their power and durability within the mod. $(br2)These tools, imbued with the essence of celestial craftsmanship, stand as a testament to the enduring legacy of Dwarven metallurgy. $(br2)Their blades cut through the toughest materials with ease, and their resilience ensures they endure where lesser tools would falter. Whether you are delving into the deepest mines or battling the fiercest foes, the $(l)Asgardian Steel Tools$() will serve you faithfully, embodying the strength and endurance of the gods themselves."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:asgardian_steel_sword",
+      "recipe2": "divinerelics:asgardian_steel_pickaxe"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:asgardian_steel_axe",
+      "recipe2": "divinerelics:asgardian_steel_shovel"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:asgardian_steel_hoe",
+      "text": "Though it is unimaginable why one would need the last two."
+    }
+  ]
+}

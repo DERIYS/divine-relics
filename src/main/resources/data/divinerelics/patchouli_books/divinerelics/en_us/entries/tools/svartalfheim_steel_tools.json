@@ -1,0 +1,26 @@
+{
+  "name": "Svartalfheim Steel Tools",
+  "icon": "divinerelics:svartalfheim_steel_pickaxe",
+  "category": "divinerelics:tools",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Svartalfheim Steel Tools$() are renowned for their reliability, durability, and magical potency, enabling feats that ordinary tools cannot achieve. $(br2)A pickaxe forged from $(l:resources/svartalfheim_steel)Svartalfheim Steel$(), for instance, possesses magical properties that allow it to mine $(l:resources/asgardian_steel)Asgardian Steel Ore$() — an endeavor impossible for tools made from any other material. $(br2)A sword forged from $(l:resources/svartalfheim_steel)Svartalfheim Steel$(), while not as strong as other legendary weapons, allows for rapid strikes due to the material's lightness."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:svartalfheim_steel_pickaxe",
+      "recipe2": "divinerelics:svartalfheim_steel_sword"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:svartalfheim_steel_axe",
+      "recipe2": "divinerelics:svartalfheim_steel_shovel"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:svartalfheim_steel_hoe",
+      "text": "Though it is doubtful that one would need the last two."
+    }
+  ]
+}

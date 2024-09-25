@@ -1,0 +1,31 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:svartalfheim_steel_pickaxe"
+    },
+    "title": "Wow... Dwarfes really knew their stuff",
+    "description": "Craft a Svartalfheim Steel tool",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "divinerelics:svartalfheim_steel",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "divinerelics:svartalfheim_steel_sword",
+              "divinerelics:svartalfheim_steel_shovel",
+              "divinerelics:svartalfheim_steel_pickaxe",
+              "divinerelics:svartalfheim_steel_axe",
+              "divinerelics:svartalfheim_steel_hoe"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -23,7 +23,7 @@ public class DRCreativeTab {
 
             items.add(new ItemStack(DRItems.GUARDIAN_SHIELD.get()));
 
-            items.add(new ItemStack(DRItems.YGGDRASILS_TWIG.get()));
+            items.add(new ItemStack(DRItems.YGGDRASIL_BRANCH.get()));
 
             items.add(new ItemStack(DRItems.DRAUPNIR_RING.get()));
             items.add(new ItemStack(DRItems.DRAUPNIR_SPEAR_BASE.get()));
@@ -31,6 +31,7 @@ public class DRCreativeTab {
 
             items.add(new ItemStack(DRItems.LEVIATHAN_HANDLE.get()));
             items.add(new ItemStack(DRItems.LEVIATHAN_HEAD.get()));
+            items.add(new ItemStack(DRItems.FROZEN_FLAME.get()));
             items.add(new ItemStack(DRItems.LEVIATHAN_AXE.get()));
 
             items.add(new ItemStack(DRItems.MJOLNIR_HANDLE.get()));
@@ -52,6 +53,7 @@ public class DRCreativeTab {
             items.add(new ItemStack(DRItems.SVARTALFHEIM_STEEL_PICKAXE.get()));
             items.add(new ItemStack(DRItems.SVARTALFHEIM_STEEL_AXE.get()));
             items.add(new ItemStack(DRItems.SVARTALFHEIM_STEEL_HOE.get()));
+            items.add(new ItemStack(DRItems.DWARVEN_COMPASS.get()));
 
             items.add(new ItemStack(DRItems.ASGARDIAN_STEEL_NUGGET.get()));
             items.add(new ItemStack(DRItems.RAW_ASGARDIAN_STEEL.get()));

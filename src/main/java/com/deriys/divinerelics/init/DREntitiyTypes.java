@@ -51,7 +51,7 @@ public class DREntitiyTypes {
                             .build(new ResourceLocation(DivineRelics.MODID, "thrown_mjolnir").toString()));
 
     public static final RegistryObject<EntityType<ThrownLeviathanAxe>> THROWN_LEVIATHAN =
-            ENTITY_TYPES.register("thrown_leviathan",
+            ENTITY_TYPES.register("thrown_leviathan_axe",
                     () -> EntityType.Builder.of(ThrownLeviathanAxe::create, MobCategory.MISC)
                             .sized(0.5F, 0.5F)
                             .build(new ResourceLocation(DivineRelics.MODID, "thrown_leviathan").toString()));

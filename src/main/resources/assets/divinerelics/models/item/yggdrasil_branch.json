@@ -1,9 +1,9 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "divinerelics:item/yggdrasils_twig",
+		"0": "divinerelics:item/yggdrasil_branch",
 		"1": "divinerelics:item/yggdrasils_leaves",
-		"particle": "divinerelics:item/yggdrasils_twig"
+		"particle": "divinerelics:item/yggdrasil_branch"
 	},
 	"elements": [
 		{

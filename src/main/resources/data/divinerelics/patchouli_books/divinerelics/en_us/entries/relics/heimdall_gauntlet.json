@@ -1,0 +1,19 @@
+{
+  "name": "§3§lHeimdall's Gauntlet",
+  "icon": "divinerelics:heimdall_gauntlet",
+  "category": "divinerelics:relics",
+  "advancement": "divinerelics:god_killer",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Heimdall’s Gauntlet$() is the wellspring of his formidable power, bestowing upon this Aesir god the gift of short-term clairvoyance. With this artifact, Heimdall can deftly evade and, if he so desires, counter any attack with unparalleled precision. $(br2)The origins of this gauntlet are shrouded in mystery, but it is known that the dwarves, through their unmatched craftsmanship and the use of $(l:resources/svartalfheim_steel)Svartalfheim Steel$(), have made this relic accessible to mere mortals. $(br2)$(l)Abilities$():$(li)$(l)Bifrost Protection:$() Upon activation, the gauntlet grants 15 seconds of Bifrost Protection and Speed effects, rendering the wearer virtually invulnerable. After use, the Gauntlet is placed on a one-minute cooldown."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "title": "Obtaining",
+      "item": "divinerelics:heimdall_gauntlet",
+      "border": true,
+      "text": "This legendary relic can only be obtained through trade with the masterful Huldra brothers, $(l)Brok and Sindri$()."
+    }
+  ]
+}

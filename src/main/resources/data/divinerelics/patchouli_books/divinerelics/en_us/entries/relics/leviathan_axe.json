@@ -1,0 +1,38 @@
+{
+  "name": "§9§lLeviathan Axe",
+  "icon": "divinerelics:leviathan_axe",
+  "category": "divinerelics:relics",
+  "advancement": "divinerelics:god_killer",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Leviathan Axe$() is a legendary weapon of immense power, forged by the masterful hands of the Huldra brothers, $(l)Brok and Sindri$(). $(br2)Crafted to counter the might of Thor’s $(l:relics/mjolnir)Mjölnir$(), this axe was bestowed upon Kratos by his beloved wife, Laufey. $(br2)$(l)Abilities:$()$(li)$(l)Cryokinesis:$() The Leviathan Axe harnesses the power of ice, allowing its wielder to freeze enemies and unleash devastating frost attacks.$(li)$(l)Weapon Throwing:$() The axe can be hurled at enemies with great force, dealing significant damage from a distance.$(li)$(l)Weapon Summoning:$() With a mere thought, the axe returns to its master’s hand.$(li)$(l)Extended Freeze:$() Each strike of the axe increases the duration of the freezing effect on enemies, rendering them immobile for longer periods.$(li)$(l)Loyalty:$() The axe is loyal to its master, ensuring that no other warrior can lift it from the ground."
+    },
+    {
+      "type": "patchouli:crafting",
+      "title": "Levithan Handle",
+      "recipe": "divinerelics:leviathan_handle",
+      "text": "Obtaining this weapon involves both crafting and trading. $(br2)Firstly, one must craft the $(l)Levithan Handle$()."
+    },
+    {
+      "type": "patchouli:crafting",
+      "title": "Levithan Head",
+      "recipe": "divinerelics:leviathan_head",
+      "border": true,
+      "text": "Secondly, one will also need to craft the $(l)Levithan Head$()."
+    },
+    {
+      "type": "patchouli:spotlight",
+      "title": "Frozen Flame",
+      "item": "divinerelics:frozen_flame",
+      "border": true,
+      "text": "Thirdly, one must obtain the $(l)Frozen Flame$(), the embodiment of icy fury, which can be purchased from $(l)Brok and Sindri$()."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:leviathan_axe",
+      "border": true,
+      "text": "Finally, to create the legendary $(l)Leviathan Axe$(), one must combine all three ingredients together."
+    }
+  ]
+}

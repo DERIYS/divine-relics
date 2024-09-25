@@ -1,0 +1,29 @@
+{
+  "name": "Svartalfheim Steel",
+  "icon": "divinerelics:svartalfheim_steel_ore",
+  "category": "divinerelics:resources",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Svartalfheim Steel$() is a material of high rarity and utility, unearthed by the dwarves of yore. $(br2)This enchanted metal, suffused with the arcane magics of the dwarven kin, could be discerned only by their keen eyes, deep within the bowels of the earth. With their unmatched craftsmanship, they forged tools of such potency and mystery that they remained forever beyond the grasp of mere mortals. $(br2)The best place to seek it is within the $(l:structures/dwarven_mines)forsaken dwarven mines$(). $(br2)Yet, on the rarest of occasions, fragments of this precious metal may also be discovered in the depths of overworld caves."
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "divinerelics:textures/gui/entries/resources/svartalfheim_steel_ores.png"
+      ],
+      "border": true,
+      "text": "$(l)Svartalfheim Steel$() Ore variations."
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:raw_svartalfheim_steel",
+      "text": "$(br)Before you can create magical dwarven tools, you need to properly process the steel. $(br2)To obtain ingots, you first need Raw Svartalfheim Steel."
+    },
+    {
+      "type": "patchouli:smelting",
+      "recipe": "divinerelics:svartalfheim_steel_ingot_from_smelting_raw_svartalfheim_steel",
+      "text": "$(br)Then you should be able to smelt it into Svartalfheim Steel Ingots. $(br2)These ingots are imbued with the essence of dwarven magic, making them the key component in the creation of extraordinary tools and weapons."
+    }
+  ]
+}

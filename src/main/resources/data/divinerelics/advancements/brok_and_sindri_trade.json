@@ -1,0 +1,35 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:hacksilver_ingot"
+    },
+    "title": "Trade Relations",
+    "description": "Trade with Brok and Sindri",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "divinerelics:brok_and_sindri_shop",
+  "criteria": {
+    "trade": {
+      "trigger": "minecraft:villager_trade",
+      "conditions": {
+        "villager": {
+          "condition": "minecraft:entity_properties",
+          "entity": "this",
+          "predicate": {
+            "type": "minecraft:or",
+            "predicates": [
+              {
+                "type": "divinerelics:sindri"
+              },
+              {
+                "type": "divinerelics:brok"
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:motosignir"
+    },
+    "title": "Don't show this to the Wall of Asgard",
+    "description": "Acquire Motosignir",
+    "frame": "challenge",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "divinerelics:god_killer",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "divinerelics:motosignir"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

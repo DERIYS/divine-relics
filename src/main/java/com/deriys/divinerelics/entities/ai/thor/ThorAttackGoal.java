@@ -4,6 +4,7 @@ import com.deriys.divinerelics.entities.entity.ThorEntity;
 import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
+import com.deriys.divinerelics.items.Motosignir;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
@@ -23,6 +24,7 @@ public class ThorAttackGoal extends MeleeAttackGoal {
     private boolean shouldCountTillNextAttack = false;
     private ThorAttackState lastAttack = ThorAttackState.NONE;
 
+
     public ThorAttackGoal(PathfinderMob pathfinderMob, double pSpeedModifier, boolean pFollowingTargetEvenIfNotSeen) {
         super(pathfinderMob, pSpeedModifier, pFollowingTargetEvenIfNotSeen);
         entity = ((ThorEntity) pathfinderMob);
@@ -31,7 +33,7 @@ public class ThorAttackGoal extends MeleeAttackGoal {
     @Override
     public void start() {
         super.start();
-        assignDelayTicks();
+//        assignDelayTicks();
     }
 
     @Override
@@ -61,7 +63,7 @@ public class ThorAttackGoal extends MeleeAttackGoal {
         boolean isAttacking = thor.isAttacking();
         double distance = getAttackReachSqr(pEnemy) + attackRange * attackRange;
         if (pDistToEnemySqr <= distance) {
-            if (!isAttacking) {
+            if (!isAttacking && ticksUntilNextAttack <= 0) {
                 ThorAttackState randAttack = ThorAttackState.genCloseState(thor, this.lastAttack);
                 setNewAttackState(randAttack);
             }
@@ -69,17 +71,17 @@ public class ThorAttackGoal extends MeleeAttackGoal {
         } else {
             ThorAttackState attackState = thor.getAttackState();
             if (pDistToEnemySqr <= distance * 2f && (shouldClapAttack() || attackState == ThorAttackState.CLAP_ATTACK)) {
-                if (!isAttacking && canClapAttack()) {
+                if (!isAttacking && canClapAttack() && ticksUntilNextAttack <= 0) {
                     setNewAttackState(ThorAttackState.CLAP_ATTACK);
                 }
                 return true;
             } else if (pDistToEnemySqr <= distance * 5f && (shouldGroundAttack() || attackState == ThorAttackState.GROUND_ATTACK)) {
-                if (!isAttacking && canGroundAttack()) {
+                if (!isAttacking && canGroundAttack() && ticksUntilNextAttack <= 0) {
                     setNewAttackState(ThorAttackState.GROUND_ATTACK);
                 }
                 return true;
             } else if (pDistToEnemySqr > distance * 5f && entity.canSeeTarget(pEnemy) && (shouldMjolnirThrow() || attackState == ThorAttackState.MJOLNIR_THROW)) {
-                if (!isAttacking && !thor.waitsForMjolnir() && thor.thrownMjolnirUUID == null) {
+                if (!isAttacking && !thor.waitsForMjolnir() && thor.thrownMjolnirUUID == null && ticksUntilNextAttack <= 0) {
                     setNewAttackState(ThorAttackState.MJOLNIR_THROW);
                 }
                 return true;
@@ -137,7 +139,11 @@ public class ThorAttackGoal extends MeleeAttackGoal {
 
 
     protected void performAttack(LivingEntity pEnemy) {
-        if (this.entity.getAttackState() != ThorAttackState.MJOLNIR_THROW) {
+        ThorAttackState attackState = this.entity.getAttackState();
+        if (attackState != ThorAttackState.MJOLNIR_THROW) {
+            if (attackState == ThorAttackState.LEG_ATTACK) {
+                Motosignir.applyKnockBack(pEnemy, this.entity, 1.8f);
+            }
             this.mob.swing(InteractionHand.MAIN_HAND);
             this.mob.doHurtTarget(pEnemy);
         } else {
@@ -161,9 +167,9 @@ public class ThorAttackGoal extends MeleeAttackGoal {
 
         ThorEntity thor = this.entity;
         ThorAttackState state = thor.getAttackState();
-        if (performsAttack(thor, 24, state, ThorAttackState.CLAP_ATTACK)) {
+        if (performsAttack(thor, 24, ThorAttackState.CLAP_ATTACK)) {
             onHitLighnting(thor.level, thor, thor.getOnPos(), thor, thor.thorDamageSource, 7f, 3.5f, 6);
-        } else if (performsAttack(thor, 25, state, ThorAttackState.GROUND_ATTACK)) {
+        } else if (performsAttack(thor, 25, ThorAttackState.GROUND_ATTACK)) {
             onHitLighnting(thor.level, thor, thor.getOnPos(), thor, thor.thorDamageSource, 17f, 5f, 8);
         }
 
@@ -178,13 +184,15 @@ public class ThorAttackGoal extends MeleeAttackGoal {
         }
     }
 
-    private boolean performsAttack(ThorEntity thor, int x, ThorAttackState thorAttackState, ThorAttackState attackState) {
+    private boolean performsAttack(ThorEntity thor, int x, ThorAttackState attackState) {
+        ThorAttackState thorAttackState = thor.getAttackState();
         return !thor.level.isClientSide && this.ticksUntilNextAttack == x && (thorAttackState == attackState || (lastAttack == attackState && thorAttackState == ThorAttackState.NONE));
     }
 
     @Override
     public void stop() {
         entity.setAttacking(false);
+        entity.setAttackState(ThorAttackState.NONE); // to prevent mjolnir throw spamming
         super.stop();
     }
 }

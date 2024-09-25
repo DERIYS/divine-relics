@@ -38,10 +38,10 @@ public class DRItems {
             () -> new Mjolnir(DRTiers.MJOLNIR, 0, 0, new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> GUARDIAN_SHIELD = ITEMS.register("guardian_shield",
-            () -> new GuardianShield(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).fireResistant().tab(DRCreativeTab.MAINTAB)));
+            () -> new GuardianShield(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
 
-    public static final RegistryObject<Item> YGGDRASILS_TWIG = ITEMS.register("yggdrasils_twig",
-            () -> new YggdrasilsTwig(new Item.Properties().stacksTo(1).rarity(Rarity.EPIC).tab(DRCreativeTab.MAINTAB)));
+    public static final RegistryObject<Item> YGGDRASIL_BRANCH = ITEMS.register("yggdrasil_branch",
+            () -> new YggdrasilBranch(new Item.Properties().stacksTo(1).tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> LEVIATHAN_HANDLE = ITEMS.register("leviathan_handle",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB).stacksTo(1)));
@@ -75,7 +75,7 @@ public class DRItems {
     public static final RegistryObject<Item> SVARTALFHEIM_STEEL_INGOT = ITEMS.register("svartalfheim_steel_ingot",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> SVARTALFHEIM_STEEL_SWORD = ITEMS.register("svartalfheim_steel_sword",
-            () -> new SwordItem(DRTiers.SVARTALFHEIM_STEEL_TIER, 2, -2.3f, new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+            () -> new SwordItem(DRTiers.SVARTALFHEIM_STEEL_TIER, 2, -2.2f, new Item.Properties().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> SVARTALFHEIM_STEEL_SHOVEL = ITEMS.register("svartalfheim_steel_shovel",
             () -> new ShovelItem(DRTiers.SVARTALFHEIM_STEEL_TIER, 1.5F, -3.0f, new Item.Properties().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> SVARTALFHEIM_STEEL_PICKAXE = ITEMS.register("svartalfheim_steel_pickaxe",
@@ -104,6 +104,9 @@ public class DRItems {
 
     public static final RegistryObject<Item> PERFECT_ASGARDIAN_STEEL_INGOT = ITEMS.register("perfect_asgardian_steel_ingot",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+
+    public static final RegistryObject<Item> DWARVEN_COMPASS = ITEMS.register("dwarven_compass",
+            () -> new DwarvenCompass(new Item.Properties().tab(DRCreativeTab.MAINTAB).stacksTo(1)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

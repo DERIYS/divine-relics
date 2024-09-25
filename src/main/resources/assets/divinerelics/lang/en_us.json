@@ -2,17 +2,17 @@
   "item.divinerelics.motosignir": "§6§lMotosignir",
   "item.divinerelics.heimdall_gauntlet": "§3§lHeimdall's Gauntlet",
   "item.divinerelics.draupnir_spear": "§6§lDraupnir Spear",
-  "item.divinerelics.mjolnir": "§9§lMjolnir",
-  "item.divinerelics.guardian_shield": "Guardian Shield",
-  "item.divinerelics.yggdrasils_twig": "Yggdrasil's Twig",
+  "item.divinerelics.mjolnir": "§9§lMjölnir",
+  "item.divinerelics.guardian_shield": "§6§lGuardian Shield",
+  "item.divinerelics.yggdrasil_branch": "§b§lYggdrasil Branch",
   "item.divinerelics.leviathan_axe": "§9§lLeviathan Axe",
 
   "item.divinerelics.draugr_spawn_egg": "Draugr Spawn Egg",
 
   "item.divinerelics.divine_mead": "Divine Mead",
 
-  "item.divinerelics.mjolnir_handle": "§e§lMjolnir Handle",
-  "item.divinerelics.mjolnir_head": "§e§lMjolnir Head",
+  "item.divinerelics.mjolnir_handle": "§e§lMjölnir Handle",
+  "item.divinerelics.mjolnir_head": "§e§lMjölnir Head",
 
   "item.divinerelics.leviathan_handle": "§e§lLeviathan Handle",
   "item.divinerelics.leviathan_head": "§e§lLeviathan Head",
@@ -33,6 +33,7 @@
   "item.divinerelics.svartalfheim_steel_pickaxe": "§3Svartalfheim Steel Pickaxe",
   "item.divinerelics.svartalfheim_steel_axe": "§3Svartalfheim Steel Axe",
   "item.divinerelics.svartalfheim_steel_hoe": "§3Svartalfheim Steel Hoe",
+  "item.divinerelics.dwarven_compass": "§3Dwarven Compass",
 
   "item.divinerelics.asgardian_steel_nugget": "Asgardian Steel Nugget",
   "item.divinerelics.raw_asgardian_steel": "Raw Asgardian Steel",
@@ -57,14 +58,16 @@
   "block.divinerelics.svartalfheim_steel_ore": "Svartalfheim Steel Ore",
   "block.divinerelics.deepslate_svartalfheim_steel_ore": "Deepslate Svartalfheim Steel Ore",
 
-
-
   "entity.divinerelics.draugr": "Draugr Warrior",
   "entity.divinerelics.thor": "Thor",
   "entity.divinerelics.brok": "Brok",
   "entity.divinerelics.sindri": "Sindri",
   "entity.divinerelics.brok.divinerelics.brok_master": "Brok",
   "entity.divinerelics.sindri.divinerelics.sindri_master": "Sindri",
+
+  "entity.divinerelics.thrown_leviathan_axe": "Thrown Leviathan Axe",
+  "entity.divinerelics.thrown_draupnir_spear": "Thrown Draupnir Spear",
+  "entity.divinerelics.thrown_mjolnir": "Thrown Mjolnir",
 
   "effect.divinerelics.bifrost_protection": "Bifrost Protection",
 
@@ -75,5 +78,6 @@
   "sounds.divinerelics.draupnir_spear_explosion_hit": "Summoned Draupnir Explosion",
   "sounds.divinerelics.draupnir_spear_explosion": "Draupnir Spear exploded",
 
-  "itemGroup.drmaintab": "Divine Relics"
+  "itemGroup.drmaintab": "Divine Relics",
+  "divinerelics.rootDesc": "Desc"
 }

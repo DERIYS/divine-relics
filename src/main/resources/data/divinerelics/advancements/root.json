@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:hacksilver"
+    },
+    "title": "Divine Relics",
+    "description": "Acquire Hacksilver",
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "background": "divinerelics:textures/block/hacksilver_block.png"
+  },
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "divinerelics:hacksilver"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "display": {
+    "icon": {
+      "item": "divinerelics:asgardian_steel_nugget"
+    },
+    "title": "Why so little?",
+    "description": "Obtain Asgardian Steel",
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true
+  },
+  "parent": "divinerelics:svartalfheim_steel_tier",
+  "criteria": {
+    "requirement": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "divinerelics:asgardian_steel_nugget"
+            ]
+          }
+        ]
+      }
+    }
+  }
+}
