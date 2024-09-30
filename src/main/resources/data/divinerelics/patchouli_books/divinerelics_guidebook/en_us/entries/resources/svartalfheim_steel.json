@@ -13,7 +13,7 @@
         "divinerelics:textures/gui/entries/resources/svartalfheim_steel_ores.png"
       ],
       "border": true,
-      "text": "$(l)Svartalfheim Steel$() Ore variations."
+      "text": "$(l)Svartalfheim Steel$() Ore variations. Needs at least a Diamond Pickaxe to be mined."
     },
     {
       "type": "patchouli:crafting",

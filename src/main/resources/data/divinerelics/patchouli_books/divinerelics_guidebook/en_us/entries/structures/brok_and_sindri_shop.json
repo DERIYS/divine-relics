@@ -10,10 +10,10 @@
     {
       "type": "patchouli:image",
       "images": [
-        "divinerelics:textures/gui/entries/structures/brok_and_sindri_shop.png"
+        "divinerelics:textures/gui/entries/structures/brok_and_sindri_shop/1.png"
       ],
       "border": true,
-      "text": "Naturally spawning $(l)Brok and Sindri Shop$()"
+      "text": "Naturally spawned $(l)Brok and Sindri Shop$()"
     },
     {
       "type": "patchouli:crafting",

@@ -32,7 +32,7 @@ import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
 
 public class LeviathanAxe extends AxeItem {
     public static final int THROW_THRESHOLD_TIME = 10;
-    public static final float BASE_DAMAGE = 19.0F;
+    public static final float BASE_DAMAGE = 18.0F;
     public static final float SHOOT_POWER = 3F;
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 

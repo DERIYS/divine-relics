@@ -5,7 +5,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(l)Draugrs$(), the fearsome undead warriors of ancient lore, are beings of relentless fury and unyielding strength. $(br2)Once proud warriors who fell in battle, they refused the call of the Valkyries and were condemned to roam Midgard as husks of their former selves. $(br2)In this mod, $(l)Draugrs$() haunt the taiga regions, their eyes burning with unholy fire. These undead beings retain their physical prowess and wield their weapons with deadly precision. $(br2)They haunt in small groups, attacking any who dare disturb their slumber. Adventurers in the taiga must be vigilant, for the $(l)Draugrs’$() wrath is swift and merciless."
+      "text": "$(l)Draugrs$(), the fearsome undead warriors of ancient lore, are beings of relentless fury and unyielding strength. $(br2)Once proud warriors who fell in battle, they refused the call of the Valkyries and were condemned to roam Midgard as husks of their former selves. $(br2)$(l)Draugrs$() haunt the taiga regions, their eyes burning with unholy fire. These undead beings retain their physical prowess and wield their weapons with deadly precision. $(br2)They haunt in small groups, attacking any who dare disturb their slumber. Adventurers in the taiga must be vigilant, for the $(l)Draugrs’$() wrath is swift and merciless."
     },
     {
       "type": "patchouli:image",

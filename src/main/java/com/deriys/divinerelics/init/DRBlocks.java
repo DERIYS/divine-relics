@@ -47,6 +47,10 @@ public class DRBlocks {
             () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
                     .strength(6f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)), DRCreativeTab.MAINTAB);
 
+    public static final RegistryObject<Block> OBSIDIAN_ASGARDIAN_STEEL_ORE = registerBlock("obsidian_asgardian_steel_ore",
+            () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
+                    .strength(8f).requiresCorrectToolForDrops()), DRCreativeTab.MAINTAB);
+
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block, CreativeModeTab tab) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn, tab);

@@ -1,0 +1,20 @@
+{
+  "name": "Asgardian Craters",
+  "icon": "divinerelics:asgardian_steel_nugget",
+  "category": "divinerelics:structures",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Asgardian Craters$() are ancient impact sites, formed by objects hurled to the earth through the mighty forces of the Bifrost, descending straight from Asgard. $(br2)These craters are the primary source of the rarest $(l:resources/asgardian_steel)Asgardian Steel$(), once the most coveted prize of every dwarf in ancient times. $(br2)However, with the mysterious disappearance of this ancient race, many of these craters remained undiscovered and unexplored. Over the centuries, nature reclaimed these sites, shrouding them in mystery and overgrowth. Yet, the allure of $(l:resources/asgardian_steel)Asgardian Steel$() still calls to those brave enough to seek it out."
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "divinerelics:textures/gui/entries/structures/asgardian_craters/1.png",
+        "divinerelics:textures/gui/entries/structures/asgardian_craters/2.png"
+      ],
+      "border": true,
+      "text": "Naturally spawned $(l)Asgardian Crater$()"
+    }
+  ]
+}

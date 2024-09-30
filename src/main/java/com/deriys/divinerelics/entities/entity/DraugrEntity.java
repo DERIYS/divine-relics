@@ -100,7 +100,7 @@ public class DraugrEntity extends Monster implements IAnimatable {
                 .add(Attributes.MAX_HEALTH, 30.0D)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.5f)
                 .add(Attributes.MOVEMENT_SPEED, 0.22F)
-                .add(Attributes.ATTACK_DAMAGE, 6.0D)
+                .add(Attributes.ATTACK_DAMAGE, 9.0D)
                 .add(Attributes.ARMOR, 9.0D)
                 .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
     }
@@ -173,7 +173,9 @@ public class DraugrEntity extends Monster implements IAnimatable {
 
     @Override
     public void die(DamageSource p_21014_) {
-        this.spawnAtLocation(new ItemStack(DRItems.HACKSILVER.get(), RAND.nextInt(0, 2)));
+        if (RAND.nextFloat() > 0.5f) {
+            this.spawnAtLocation(new ItemStack(DRItems.HACKSILVER.get(), RAND.nextInt(0, 2)));
+        }
         super.die(p_21014_);
     }
 

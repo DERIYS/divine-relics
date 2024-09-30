@@ -10,10 +10,16 @@
     {
       "type": "patchouli:image",
       "images": [
-        "divinerelics:textures/gui/entries/structures/dwarven_mines.png"
+        "divinerelics:textures/gui/entries/structures/dwarven_mines/1.png",
+        "divinerelics:textures/gui/entries/structures/dwarven_mines/2.png"
       ],
       "border": true,
-      "text": "An entrance to Dwarven Mines"
+      "text": "Entrance to $(l)Dwarven Mines$()"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "divinerelics:dwarven_compass",
+      "text": "$(br)To aid in your quest, the Huldra brothers have invented a special $(l)Dwarven Compass$(), designed to guide you to the $(l)Ancient Dwarven Mines$()."
     }
   ]
 }

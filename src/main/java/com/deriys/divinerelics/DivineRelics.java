@@ -25,7 +25,7 @@ public class DivineRelics
 
     public DivineRelics() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
+        
         modEventBus.addListener(this::commonSetup);
 
         DRItems.register(modEventBus);
@@ -36,6 +36,7 @@ public class DivineRelics
         DRConfiguredFeatures.register(modEventBus);
         DRPlacedFeatures.register(modEventBus);
         DRDwarfs.register(modEventBus);
+        DRStructures.register(modEventBus);
         GeckoLib.initialize();
 
         MinecraftForge.EVENT_BUS.register(this);

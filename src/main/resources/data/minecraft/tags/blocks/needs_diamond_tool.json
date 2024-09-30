@@ -1,5 +1,7 @@
 {
   "replace": false,
   "values": [
+    "divinerelics:svartalfheim_steel_ore",
+    "divinerelics:deepslate_svartalfheim_steel_ore"
   ]
 }

@@ -73,6 +73,7 @@ public class DRCreativeTab {
 
             items.add(new ItemStack(DRBlocks.ASGARDIAN_STEEL_ORE.get()));
             items.add(new ItemStack(DRBlocks.DEEPSLATE_ASGARDIAN_STEEL_ORE.get()));
+            items.add(new ItemStack(DRBlocks.OBSIDIAN_ASGARDIAN_STEEL_ORE.get()));
         }
     };
 }

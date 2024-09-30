@@ -32,7 +32,7 @@ public class DRItemProperties {
 
     private static void makeDwarvenCompassAngle(DwarvenCompass compass) {
         ItemProperties.register(compass, new ResourceLocation("angle"), new CompassItemPropertyFunction((level, itemStack, entity) -> {
-            return GlobalPos.of(level.dimension(), new BlockPos(compass.getShopX(itemStack), 0, compass.getShopZ(itemStack)));
+            return GlobalPos.of(level.dimension(), new BlockPos(compass.getStructureX(itemStack), 0, compass.getStructureZ(itemStack)));
         }));
     }
 }
