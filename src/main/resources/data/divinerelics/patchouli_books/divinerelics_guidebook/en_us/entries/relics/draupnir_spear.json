@@ -19,7 +19,7 @@
       "title": "Draupnir Ring",
       "item": "divinerelics:draupnir_ring",
       "border": true,
-      "text": "Secondly, one will need the $(l)Draupnir Ring$(), which can be purchased from $(l)Brok and Sindri$()."
+      "text": "Secondly, one will need the $(l)Draupnir Ring$(), which can be purchased from $(l:entities/huldra_brothers)Brok and Sindri$()."
     },
     {
       "type": "patchouli:spotlight",

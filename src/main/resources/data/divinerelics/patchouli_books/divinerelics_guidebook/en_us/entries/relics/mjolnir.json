@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(l)Mjölnir$(), the legendary hammer of Thor, is a weapon of immense power, forged by the masterful dwarves, $(l)Brok and Sindri$(). $(br2)This divine instrument channels the raw energy of thunder and lightning, symbolizing Thor’s formidable strength and authority.$()$(br2)$(l)Abilities:$()$(li)$(l)Thunderous Impact:$() When thrown, Mjölnir strikes and knocks back all living creatures within a 5-block radius, unleashing devastating lightning bolts. Thrown Mjölnir will hit all the encountered targets while flying.$(li)$(l)Weapon Summoning:$() With a mere thought, the hammer returns to its master’s hand.$(li)$(l)Flight:$() By releasing Mjölnir while holding the shift key, one can soar through the skies. The hammer’s power allows for a dive attack, where increased velocity results in greater damage to surrounding entities (in Survival Mode only).$(li)$(l)Loyalty:$() Mjölnir is loyal to its master, ensuring that no other warrior can lift it from the ground."
+      "text": "$(l)Mjölnir$(), the legendary hammer of Thor, is a weapon of immense power, forged by the masterful dwarves, $(l:entities/huldra_brothers) Brok and Sindri$(). $(br2)This divine instrument channels the raw energy of thunder and lightning, symbolizing Thor’s formidable strength and authority.$()$(br2)$(l)Abilities:$()$(li)$(l)Thunderous Impact:$() When thrown, Mjölnir strikes and knocks back all living creatures within a 5-block radius, unleashing devastating lightning bolts. Thrown Mjölnir will hit all the encountered targets while flying.$(li)$(l)Weapon Summoning:$() With a mere thought, the hammer returns to its master’s hand.$(li)$(l)Flight:$() By releasing Mjölnir while holding the shift key, one can soar through the skies. The hammer’s power allows for a dive attack, where increased velocity results in greater damage to surrounding entities (in Survival Mode only).$(li)$(l)Loyalty:$() Mjölnir is loyal to its master, ensuring that no other warrior can lift it from the ground."
     },
     {
       "type": "patchouli:crafting",
@@ -25,7 +25,7 @@
       "type": "patchouli:spotlight",
       "item": "divinerelics:mjolnir",
       "border": true,
-      "text": "Finally, to obtain the legendary $(l)Mjölnir$(), one must give the $(l)Handle$() and the $(l)Head$() to $(l)Brok and Sindri$()."
+      "text": "Finally, to obtain the legendary $(l)Mjölnir$(), one must give the $(l)Handle$() and the $(l)Head$() to $(l:entities/huldra_brothers)Brok and Sindri$()."
     }
   ]
 }

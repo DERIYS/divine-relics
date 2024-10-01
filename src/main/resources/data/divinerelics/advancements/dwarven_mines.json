@@ -3,7 +3,7 @@
     "icon": {
       "item": "minecraft:chest_minecart"
     },
-    "title": "Beyond this threshold only despair lies",
+    "title": "Mines of Dwarvia",
     "description": "Find Ancient Dwarven Mines",
     "frame": "task",
     "show_toast": true,

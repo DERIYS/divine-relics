@@ -62,7 +62,7 @@ public class BrokEntity extends Villager implements IAnimatable {
         super.tick();
         if (!this.level.isClientSide) {
             long currentTime = this.level.getGameTime();
-            if (currentTime - lastRestockTime >= RESTOCK_INTERVAL) {
+            if (this.needsRestock() && currentTime - lastRestockTime >= RESTOCK_INTERVAL) {
                 restockTrades();
                 lastRestockTime = currentTime;
             }
@@ -80,6 +80,16 @@ public class BrokEntity extends Villager implements IAnimatable {
                 offer.resetUses();
             }
         }
+    }
+
+    private boolean needsRestock() {
+        if (this.offers != null) {
+            for (MerchantOffer offer : this.offers) {
+                if (offer.needsRestock()) {
+                    return true;
+                }
+            }
+        } return false;
     }
 
     @Override

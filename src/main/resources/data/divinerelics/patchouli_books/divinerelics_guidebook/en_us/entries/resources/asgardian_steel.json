@@ -19,7 +19,7 @@
       "type": "patchouli:crafting",
       "advancement": "divinerelics:svartalfheim_steel_tier",
       "recipe": "divinerelics:raw_asgardian_steel",
-      "text": "$(br)Due to its high refractoriness, hardness, and durability, the player lacks the skills and abilities to properly process this legendary metal. Thus, the only possible source of obtaining ingots is through trading with $(l)Brok and Sindri$(). $(br2)To do this, you must first have $(l)Raw Asgardian Steel$() which you can craft from nine $(l)Asgardian Steel Nuggets$()."
+      "text": "$(br)Due to its high refractoriness, hardness, and durability, the player lacks the skills and abilities to properly process this legendary metal. Thus, the only possible source of obtaining ingots is through trading with $(l:entities/huldra_brothers)Brok and Sindri$(). $(br2)To do this, you must first have $(l)Raw Asgardian Steel$() which you can craft from nine $(l)Asgardian Steel Nuggets$()."
     }
   ]
 }

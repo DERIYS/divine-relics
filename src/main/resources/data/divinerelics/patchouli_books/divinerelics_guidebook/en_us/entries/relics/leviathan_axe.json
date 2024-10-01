@@ -26,7 +26,7 @@
       "title": "Frozen Flame",
       "item": "divinerelics:frozen_flame",
       "border": true,
-      "text": "Thirdly, one must obtain the $(l)Frozen Flame$(), the embodiment of icy fury, which can be purchased from $(l)Brok and Sindri$()."
+      "text": "Thirdly, one must obtain the $(l)Frozen Flame$(), the embodiment of icy fury, which can be purchased from $(l:entities/huldra_brothers)Brok and Sindri$()."
     },
     {
       "type": "patchouli:crafting",

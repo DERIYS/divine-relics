@@ -13,7 +13,6 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.player.Player;
@@ -62,7 +61,7 @@ public class SindriEntity extends Villager implements IAnimatable {
         super.tick();
         if (!this.level.isClientSide) {
             long currentTime = this.level.getGameTime();
-            if (currentTime - lastRestockTime >= RESTOCK_INTERVAL) {
+            if (this.needsRestock() && currentTime - lastRestockTime >= RESTOCK_INTERVAL) {
                 restockTrades();
                 lastRestockTime = currentTime;
             }
@@ -80,6 +79,16 @@ public class SindriEntity extends Villager implements IAnimatable {
                 offer.resetUses();
             }
         }
+    }
+
+    private boolean needsRestock() {
+        if (this.offers != null) {
+            for (MerchantOffer offer : this.offers) {
+                if (offer.needsRestock()) {
+                    return true;
+                }
+            }
+        } return false;
     }
 
     @Override

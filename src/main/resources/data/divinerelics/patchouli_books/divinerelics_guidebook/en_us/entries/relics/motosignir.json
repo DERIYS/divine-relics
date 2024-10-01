@@ -13,7 +13,7 @@
       "title": "Obtaining",
       "item": "divinerelics:motosignir",
       "border": true,
-      "text": "This legendary relic can only be obtained through trade with the masterful Huldra brothers, $(l)Brok and Sindri$()."
+      "text": "This legendary relic can only be obtained through trade with the masterful Huldra brothers, $(l:entities/huldra_brothers)Brok and Sindri$()."
     }
   ]
 }

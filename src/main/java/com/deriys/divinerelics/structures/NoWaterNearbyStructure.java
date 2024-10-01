@@ -79,17 +79,12 @@ public class NoWaterNearbyStructure extends Structure {
         ChunkPos chunkPos = context.chunkPos();
         BlockPos blockPos = new BlockPos(chunkPos.getMinBlockX(), 0, chunkPos.getMinBlockZ());
 
-        // Check if the structure is far from water biomes
-        if (!isFarFromWaterBiomes(context, blockPos)) {
-            return false;
-        }
-
         return context.chunkGenerator().getFirstOccupiedHeight(
                 chunkPos.getMinBlockX(),
                 chunkPos.getMinBlockZ(),
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 context.heightAccessor(),
-                context.randomState()) < 90;
+                context.randomState()) < 90 && !isFarFromWaterBiomes(context, blockPos);
     }
 
     private static boolean isFarFromWaterBiomes(Structure.GenerationContext context, BlockPos pos) {

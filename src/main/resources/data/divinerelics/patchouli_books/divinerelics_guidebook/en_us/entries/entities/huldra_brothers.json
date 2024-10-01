@@ -1,0 +1,19 @@
+{
+  "name": "Huldra Brothers",
+  "icon": "minecraft:anvil",
+  "category": "divinerelics:entities",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Brok and Sindri$(), also known as the Huldra Brothers, are legendary blacksmiths renowned throughout the realms for their unparalleled craftsmanship. $(br2)These master artisans are responsible for forging some of the most powerful and iconic weapons and artifacts in all Nine Realms and are hence your key to obtaining them. $(br2)The Huldra Brothers are not only skilled in the art of forging but also possess an unmatched knowledge of processing $(l:resources)Divine Relics Ores$(). Their expertise ensures that these rare materials are processed with maximum efficiency, that is unreachable for a mere player. $(br2)$(l)Restocking:$() Ever industrious, the Huldra Brothers restock their inventory every half an hour, ensuring that their customers always have access to the best equipment and upgrades available."
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "divinerelics:textures/gui/entries/entities/brok_and_sindri.png"
+      ],
+      "border": true,
+      "text": "Can only be found in their rather rare occurring $(l:structures/brok_and_sindri_shop)Shops$()"
+    }
+  ]
+}
