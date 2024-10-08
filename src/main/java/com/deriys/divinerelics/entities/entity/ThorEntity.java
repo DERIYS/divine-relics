@@ -1,5 +1,6 @@
 package com.deriys.divinerelics.entities.entity;
 
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.ai.thor.FireIgnoringPathNavigation;
 import com.deriys.divinerelics.entities.ai.thor.ThorAttackGoal;
 import com.deriys.divinerelics.entities.ai.thor.ThorAttackState;
@@ -22,9 +23,11 @@ import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.goal.FloatGoal;
 import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal;
 import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
@@ -62,7 +65,7 @@ import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 public class ThorEntity extends Monster implements IAnimatable {
     private AnimationFactory factory = GeckoLibUtil.createFactory(this);
     private static final AttributeModifier SLOW_SPEED_MODIFIER = new AttributeModifier("SlowSpeed", 0, AttributeModifier.Operation.MULTIPLY_BASE);
-    private static final AttributeModifier FAST_SPEED_MODIFIER = new AttributeModifier("FastSpeed", 0.3, AttributeModifier.Operation.MULTIPLY_BASE);
+    private static final AttributeModifier FAST_SPEED_MODIFIER = new AttributeModifier("FastSpeed", DivineRelicsCommonConfig.THOR_SPEED_MODIFIER.get(), AttributeModifier.Operation.MULTIPLY_BASE);
     private static final EntityDataAccessor<Boolean> ATTACKING =
             SynchedEntityData.defineId(ThorEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Byte> ATTACK_STATE =
@@ -93,14 +96,16 @@ public class ThorEntity extends Monster implements IAnimatable {
     private List<ServerPlayer> trackingPlayers = new ArrayList<>();
     public short ambientSoundCount = -1;
 
+    public int ambientSoundInterval = this.getAmbientSoundInterval();
+
     public static final SoundEvent[] AMBIENT_SOUNDS = {
             DRSounds.THOR_AMBIENT_1.get(),
             DRSounds.THOR_AMBIENT_2.get(),
             DRSounds.THOR_AMBIENT_3.get(),
+            DRSounds.THOR_AMBIENT_7.get(),
             DRSounds.THOR_AMBIENT_4.get(),
             DRSounds.THOR_AMBIENT_5.get(),
             DRSounds.THOR_AMBIENT_6.get(),
-            DRSounds.THOR_AMBIENT_7.get(),
             DRSounds.THOR_AMBIENT_8.get(),
             DRSounds.THOR_AMBIENT_9.get(),
     };
@@ -186,16 +191,17 @@ public class ThorEntity extends Monster implements IAnimatable {
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this)));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Monster.class, true));
+        this.goalSelector.addGoal(4, new FloatGoal(this));
     }
 
     public static AttributeSupplier.Builder createAttributes () {
         return Monster.createMonsterAttributes()
-                .add(Attributes.MAX_HEALTH, 600.0D)
-                .add(Attributes.FOLLOW_RANGE, 50.0D)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 0.7f)
+                .add(Attributes.MAX_HEALTH, DivineRelicsCommonConfig.THOR_HP.get())
+                .add(Attributes.FOLLOW_RANGE, DivineRelicsCommonConfig.THOR_FOLLOW_RANGE.get())
+                .add(Attributes.KNOCKBACK_RESISTANCE, DivineRelicsCommonConfig.THOR_KB_RESISTANCE.get())
                 .add(Attributes.MOVEMENT_SPEED, 0.23F)
-                .add(Attributes.ATTACK_DAMAGE, 20.0D)
-                .add(Attributes.ARMOR, 20.0D)
+                .add(Attributes.ATTACK_DAMAGE, DivineRelicsCommonConfig.THOR_DAMAGE.get())
+                .add(Attributes.ARMOR, DivineRelicsCommonConfig.THOR_ARMOR.get())
                 .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
     }
 
@@ -219,12 +225,23 @@ public class ThorEntity extends Monster implements IAnimatable {
 
         boolean summoningComplete = this.isSummoningComplete();
         if (!this.level.isClientSide && summoningComplete) {
-            for (ServerPlayer trackingPlayer: this.trackingPlayers) {
-                if (trackingPlayer.position().distanceToSqr(this.position()) < 10000) {
-                    this.bossEvent.addPlayer(trackingPlayer);
+
+            if (!this.trackingPlayers.isEmpty()) {
+                for (ServerPlayer trackingPlayer: this.trackingPlayers) {
+                    if (trackingPlayer.position().distanceToSqr(this.position()) < 2500) {
+                        this.bossEvent.addPlayer(trackingPlayer);
+                    }
+                }
+                this.trackingPlayers = new ArrayList<>();
+            }
+
+            LivingEntity target = this.getTarget();
+            if (this.isAggressive() && !(target instanceof Mob)) {
+                if (this.isAlive() && this.random.nextInt(1000) < this.ambientSoundInterval++) {
+                    this.resetAmbientInterval();
+                    this.playSound(AMBIENT_SOUNDS[++this.ambientSoundCount % 9], this.getSoundVolume(), this.getVoicePitch());
                 }
             }
-            this.trackingPlayers = new ArrayList<>();
         }
 
         if (!this.level.isClientSide && this.waitsForMjolnir()) {
@@ -257,6 +274,7 @@ public class ThorEntity extends Monster implements IAnimatable {
                 spawnLightning(this.level, onPos, this);
                 onHitLighnting(this.level, this, onPos, this, this.thorDamageSource, 10f, 2f, 12);
                 this.setSummoningComplete(true);
+                this.setNoAi(false);
             }
         }
 
@@ -316,12 +334,6 @@ public class ThorEntity extends Monster implements IAnimatable {
         if (this.thrownMjolnirUUID != null) {
             compoundTag.putUUID("ThrownMjolnirUUID", this.thrownMjolnirUUID);
         }
-    }
-
-    @Override
-    public void setCustomName(@Nullable Component p_20053_) {
-        super.setCustomName(p_20053_);
-        this.bossEvent.setName(this.getDisplayName());
     }
 
     @Override
@@ -455,10 +467,10 @@ public class ThorEntity extends Monster implements IAnimatable {
         return super.hurt(p_21016_, p_21017_);
     }
 
-    @Override
-    public boolean isNoAi() {
-        return !this.isSummoningComplete();
-    }
+//    @Override
+//    public boolean isNoAi() {
+//        return !this.isSummoningComplete();
+//    }
 
     @Override
     public boolean fireImmune() {
@@ -468,11 +480,23 @@ public class ThorEntity extends Monster implements IAnimatable {
     @Nullable
     @Override
     protected SoundEvent getAmbientSound() {
-        LivingEntity target = this.getTarget();
-        if (target != null && target.isAlive() && target instanceof Player && this.isSummoningComplete()) {
-           return this.AMBIENT_SOUNDS[++this.ambientSoundCount % 9];
-        }
         return null;
+    }
+
+    private void resetAmbientInterval() {
+        this.ambientSoundInterval = -this.getAmbientSoundInterval();
+    }
+
+    @Override
+    public int getAmbientSoundInterval() {
+        return 200;
+    }
+
+    @Override
+    public void setTarget(@Nullable LivingEntity newTarget) {
+        if (!(this.getTarget() instanceof Player player) || newTarget != null || !player.isAlive() || player.getAbilities().instabuild) {
+            super.setTarget(newTarget);
+        }
     }
 
     @Override

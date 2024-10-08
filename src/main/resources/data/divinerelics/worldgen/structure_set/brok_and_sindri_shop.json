@@ -20,10 +20,12 @@
 
     // The kind of placement to use. The other kind is ring based like strongholds use.
     "type": "minecraft:random_spread",
+
     "exclusion_zone": {
-      "chunk_count": 5,
-      "other_set": "minecraft:villages"
+      "chunk_count": 7,
+      "other_set": "divinerelics:dwarven_mines"
     },
+
     "frequency": 0.3,
     "frequency_reduction_method": "legacy_type_1"
   }

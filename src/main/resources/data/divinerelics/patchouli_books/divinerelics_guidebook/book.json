@@ -3,5 +3,8 @@
   "landing_text": "Welcome to Divine Relics!",
   "version": 1,
   "creative_tab": "minecraft:tools_and_utilities",
+  "model": "divinerelics:guidebook",
+  "book_texture": "patchouli:textures/gui/book_blue.png",
+  "filler_texture": "divinerelics:textures/gui/guidebook/page_filler.png",
   "use_resource_pack": false
 }

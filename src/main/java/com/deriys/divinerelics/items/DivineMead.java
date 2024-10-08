@@ -3,6 +3,7 @@ package com.deriys.divinerelics.items;
 import com.deriys.divinerelics.entities.entity.ThorEntity;
 import com.deriys.divinerelics.init.DREntitiyTypes;
 import net.minecraft.core.Direction;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -25,7 +26,7 @@ public class DivineMead extends Item {
         Player player = context.getPlayer();
         Level level = context.getLevel();
         Block clickedBlock = level.getBlockState(context.getClickedPos()).getBlock();
-        if (!level.isClientSide && player != null && player.getMainHandItem() == stack && context.getClickedFace() == Direction.UP && clickedBlock != Blocks.LAVA) {
+        if (!level.isClientSide && level.getDifficulty() != Difficulty.PEACEFUL && player != null && player.getMainHandItem() == stack && context.getClickedFace() == Direction.UP && clickedBlock != Blocks.LAVA) {
             ThorEntity thor = new ThorEntity(DREntitiyTypes.THOR.get(), level);
             if (clickedBlock instanceof SlabBlock || clickedBlock instanceof SnowLayerBlock) {
                 thor.setPos(Vec3.atCenterOf(context.getClickedPos()).add(0D, 0.1D, 0D));

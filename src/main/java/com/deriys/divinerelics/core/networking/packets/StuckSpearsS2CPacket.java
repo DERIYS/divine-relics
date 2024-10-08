@@ -62,38 +62,4 @@ public class StuckSpearsS2CPacket {
         });
         return true;
     }
-
-//    private final int entityId;
-//    private final int spears;
-//    public StuckSpearsS2CPacket(int entityId, int spears) {
-//        this.entityId = entityId;
-//        this.spears = spears;
-//    }
-//
-//    public StuckSpearsS2CPacket(FriendlyByteBuf buf) {
-//        entityId = buf.readInt();
-//        spears = buf.readInt();
-//    }
-//
-//    public void toBytes(FriendlyByteBuf buf) {
-//        buf.writeInt(entityId);
-//        buf.writeInt(spears);
-//    }
-//
-//    public boolean handle(Supplier<NetworkEvent.Context> supplier) {
-//        NetworkEvent.Context context = supplier.get();
-//        context.enqueueWork(() -> {
-//            Minecraft mc = Minecraft.getInstance();
-//            ClientLevel level = mc.level;
-//            if (level != null) {
-//                Entity entity = level.getEntity(entityId);
-//                if (entity instanceof LivingEntity) {
-//                    entity.getCapability(StuckSpearsProvider.STUCK_SPEARS).ifPresent(cap -> {
-//                        cap.setSpears(spears);
-//                    });
-//                }
-//            }
-//        });
-//        return true;
-//    }
 }

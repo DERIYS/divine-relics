@@ -6,7 +6,7 @@ import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.LeviathanBindingC2SPacket;
 import com.deriys.divinerelics.core.networking.packets.MjolnirBindingC2SPacket;
 import com.deriys.divinerelics.core.networking.packets.StuckSpearsS2CPacket;
-import com.deriys.divinerelics.dwarfs.DRDwarfs;
+import com.deriys.divinerelics.init.DRDwarfs;
 import com.deriys.divinerelics.init.DRBlocks;
 import com.deriys.divinerelics.init.DRItems;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -88,12 +88,12 @@ public class DRForgeEventBusEvents {
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.ASGARDIAN_STEEL_NUGGET.get(), 18),
-                    new ItemStack(DRItems.RAW_ASGARDIAN_STEEL.get(), 3),4, 15,0.02F));
+                    new ItemStack(DRItems.RAW_ASGARDIAN_STEEL.get(), 3),4, 14,0.02F));
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.RAW_ASGARDIAN_STEEL.get(), 2),
                     new ItemStack(DRItems.HACKSILVER_INGOT.get(), 32),
-                    new ItemStack(DRItems.ASGARDIAN_STEEL_INGOT.get(), 2),2,20,0.02F));
+                    new ItemStack(DRItems.ASGARDIAN_STEEL_INGOT.get(), 2),2,16,0.02F));
 
             villagerLevel = 4;
 
@@ -176,4 +176,15 @@ public class DRForgeEventBusEvents {
                     new ItemStack(DRItems.DRAUPNIR_SPEAR.get(), 1),1,200,40F));
         }
     }
+
+//    @SubscribeEvent
+//    public static void thorChangeTargetEvent(LivingChangeTargetEvent event) {
+//        Entity entity = event.getEntity();
+//
+//        if (entity instanceof ThorEntity && event.getNewTarget() == null) {
+//            if (event.getOriginalTarget() instanceof Player player && player.isAlive()) {
+//                event.setCanceled(true);
+//            }
+//        }
+//    }
 }

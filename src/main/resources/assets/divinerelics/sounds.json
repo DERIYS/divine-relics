@@ -120,15 +120,105 @@
       ]
     },
     "draugr_ambient_2": {
-      "subtitle": "sounds.divinerelics.draugr_ambient_2",
+      "subtitle": "sounds.divinerelics.draugr_ambient_1",
       "sounds": [
         "divinerelics:draugr_ambient_2"
       ]
     },
     "draugr_ambient_3": {
-      "subtitle": "sounds.divinerelics.draugr_ambient_3",
+      "subtitle": "sounds.divinerelics.draugr_ambient_1",
       "sounds": [
         "divinerelics:draugr_ambient_3"
+      ]
+    },
+    "hel_walker_attack_1": {
+      "subtitle": "sounds.divinerelics.hel_walker_attack_1",
+      "sounds": [
+        "divinerelics:hel_walker_attack_1"
+      ]
+    },
+    "hel_walker_attack_2": {
+      "subtitle": "sounds.divinerelics.hel_walker_attack_1",
+      "sounds": [
+        "divinerelics:hel_walker_attack_2"
+      ]
+    },
+    "hel_walker_attack_3": {
+    "subtitle": "sounds.divinerelics.hel_walker_attack_1",
+    "sounds": [
+      "divinerelics:hel_walker_attack_3"
+    ]
+    },
+    "hel_walker_ambient_1": {
+      "subtitle": "sounds.divinerelics.hel_walker_ambient_1",
+      "sounds": [
+        "divinerelics:hel_walker_ambient_1"
+      ]
+    },
+    "hel_walker_ambient_2": {
+      "subtitle": "sounds.divinerelics.hel_walker_ambient_1",
+      "sounds": [
+        "divinerelics:hel_walker_ambient_2"
+      ]
+    },
+    "hel_walker_ambient_3": {
+      "subtitle": "sounds.divinerelics.hel_walker_ambient_1",
+      "sounds": [
+        "divinerelics:hel_walker_ambient_3"
+      ]
+    },
+    "hel_walker_ambient_4": {
+      "subtitle": "sounds.divinerelics.hel_walker_ambient_1",
+      "sounds": [
+        "divinerelics:hel_walker_ambient_4"
+      ]
+    },
+    "hel_walker_ambient_5": {
+      "subtitle": "sounds.divinerelics.hel_walker_ambient_1",
+      "sounds": [
+        "divinerelics:hel_walker_ambient_5"
+      ]
+    },
+    "hel_walker_ambient_6": {
+      "subtitle": "sounds.divinerelics.hel_walker_ambient_1",
+      "sounds": [
+        "divinerelics:hel_walker_ambient_6"
+      ]
+    },
+    "hel_walker_hit_1": {
+      "subtitle": "sounds.divinerelics.hel_walker_hit_1",
+      "sounds": [
+        "divinerelics:hel_walker_hit_1"
+      ]
+    },
+    "hel_walker_hit_2": {
+      "subtitle": "sounds.divinerelics.hel_walker_hit_1",
+      "sounds": [
+        "divinerelics:hel_walker_hit_2"
+      ]
+    },
+    "hel_walker_hit_3": {
+      "subtitle": "sounds.divinerelics.hel_walker_hit_1",
+      "sounds": [
+        "divinerelics:hel_walker_hit_3"
+      ]
+    },
+    "hel_walker_hit_4": {
+      "subtitle": "sounds.divinerelics.hel_walker_hit_1",
+      "sounds": [
+        "divinerelics:hel_walker_hit_4"
+      ]
+    },
+    "hel_walker_hit_5": {
+      "subtitle": "sounds.divinerelics.hel_walker_hit_1",
+      "sounds": [
+        "divinerelics:hel_walker_hit_5"
+      ]
+    },
+    "hel_walker_hit_6": {
+      "subtitle": "sounds.divinerelics.hel_walker_hit_1",
+      "sounds": [
+        "divinerelics:hel_walker_hit_6"
       ]
     },
     "thor_fight_music": {
@@ -228,6 +318,18 @@
       "subtitle": "sounds.divinerelics.thor_death_sound",
       "sounds": [
         "divinerelics:thor_death_sound"
+      ]
+    },
+    "harmony": {
+      "subtitle": "sounds.divinerelics.harmony",
+      "sounds": [
+        "divinerelics:harmony"
+      ]
+    },
+    "scape_theme": {
+      "subtitle": "sounds.divinerelics.scape_theme",
+      "sounds": [
+        "divinerelics:scape_theme"
       ]
     }
   }

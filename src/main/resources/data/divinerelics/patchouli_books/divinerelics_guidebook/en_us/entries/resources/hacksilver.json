@@ -5,7 +5,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(l)Hacksilver$() is the fundamental resource in this mod, serving as the primary currency for trading with the esteemed dwarven craftsmen, $(l:entities/huldra_brothers)Brok and Sindri$(). $(br2)This versatile metal can be discovered within the depths of overworld caves or hidden within the mod's dungeons. $(br2)Additionally, there exists a chance for Hacksilver to be obtained from the fallen $(l:entities/draugrs)Draugrs$(), making it a valuable and sought-after commodity in your adventures."
+      "text": "$(l)Hacksilver$() is the fundamental resource in this mod, serving as the primary currency for trading with the esteemed dwarven craftsmen, $(l:entities/huldra_brothers)Brok and Sindri$(). $(br2)This versatile metal can be discovered within the depths of overworld caves or hidden within the mod's dungeons. $(br2)Additionally, there exists a chance for Hacksilver to be obtained from fallen $(l:entities/draugrs)Draugrs$() and $(l:entities/hel_walkers)Hel Walkers$(), making it a valuable and sought-after commodity in your adventures."
     },
     {
       "type": "patchouli:image",

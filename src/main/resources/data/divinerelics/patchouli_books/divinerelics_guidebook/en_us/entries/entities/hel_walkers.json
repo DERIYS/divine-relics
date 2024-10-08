@@ -1,0 +1,19 @@
+{
+  "name": "Hel Walkers",
+  "icon": "divinerelics:hel_walker_spawn_egg",
+  "category": "divinerelics:entities",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Hel Walkers$() are undead warriors from Helheim, the realm of the dead. $(br2)These restless souls, unable to find peace due to the corruption of the Valkyries by Odin, have spilled over into Midgard, causing widespread desolation. $(br2)Hel Walkers are characterized by their ghastly blue and white coloration, covered in frost, with a terrifying, skeletal visage. $(br2)These undead warriors are relentless and aggressive, attacking with brute strength and savage frost magic that can freeze their enemies. They are very fast and are often found in $(l)snowy biomes$(), spreading the cold and despair of Helheim wherever they go."
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "divinerelics:textures/gui/entries/entities/hel_walkers.png"
+      ],
+      "border": true,
+      "text": "Some of them drop a small amount of $(l:resources/hacksilver)Hacksilver$() after death."
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 package com.deriys.divinerelics.items;
 
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.MotosignirParticleS2CPacket;
 import com.deriys.divinerelics.entities.entity.ThorEntity;
@@ -40,7 +41,7 @@ public class Motosignir extends Item {
             MobEffects.WEAKNESS
     };
 
-    public static final int EFFECTS_DURATION = 200;
+    public static final int EFFECTS_DURATION = DivineRelicsCommonConfig.MOTOSIGNIR_EFFECTS_DURATION.get();
     public static final int AMPLIFIER = 2;
 
     public Motosignir(Properties p_41383_) {
@@ -68,11 +69,12 @@ public class Motosignir extends Item {
         if (!level.isClientSide() && !player.isShiftKeyDown()) {
 
             releaseSoundWave(level, player, playerX, playerY, playerZ);
+            int cooldown = DivineRelicsCommonConfig.MOTOSIGNIR_COOLDOWN.get();
             if (hand == InteractionHand.MAIN_HAND) {
-                player.getCooldowns().addCooldown(this, 200);
+                player.getCooldowns().addCooldown(this, cooldown);
             }
             else {
-                player.getCooldowns().addCooldown(this, 400);
+                player.getCooldowns().addCooldown(this, cooldown * 2);
             }
 
             MotosignirParticleS2CPacket particlePacket = new MotosignirParticleS2CPacket(playerX, playerY, playerZ, viewVector.x, viewVector.z);
@@ -105,14 +107,16 @@ public class Motosignir extends Item {
         level.playSound(null, player.getOnPos(), DRSounds.MOTOSIGNIR_SOUND_WAVE.get(), SoundSource.PLAYERS,
                 3.0f, 1);
 
-        int radius = 10;
+        float radius = DivineRelicsCommonConfig.MOTOSIGNIR_RANGE.get();
+        float damage = DivineRelicsCommonConfig.MOTOSIGNIR_DAMAGE.get();
+        float force = DivineRelicsCommonConfig.MOTOSIGNIR_FORCE.get();
 
         AABB aabb = new AABB(playerX - radius, playerY - radius, playerZ - radius,
                 playerX + radius, playerY + radius, playerZ + radius);
 
         List<LivingEntity> entitiesInRadius = getEntitiesInArea(level, playerX, playerY, playerZ, radius);
 
-        hurtAndKnockbackEntites(entitiesInRadius, player, STUN_EFFECTS, 20f, 1f, AMPLIFIER, EFFECTS_DURATION);
+        hurtAndKnockbackEntites(entitiesInRadius, player, STUN_EFFECTS, damage, force, AMPLIFIER, EFFECTS_DURATION);
     }
 
     public static List<LivingEntity> getEntitiesInArea(Level level, double x, double y, double z, double radius) {

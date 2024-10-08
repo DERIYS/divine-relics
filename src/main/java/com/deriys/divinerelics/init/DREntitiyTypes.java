@@ -20,6 +20,12 @@ public class DREntitiyTypes {
                             .sized(0.7F, 1.8F)
                             .build(new ResourceLocation(DivineRelics.MODID, "draugr").toString()));
 
+    public static final RegistryObject<EntityType<HelWalkerEntity>> HEL_WALKER =
+            ENTITY_TYPES.register("hel_walker",
+                    () -> EntityType.Builder.of(HelWalkerEntity::new, MobCategory.MONSTER)
+                            .sized(0.7F, 1.8F)
+                            .build(new ResourceLocation(DivineRelics.MODID, "hel_walker").toString()));
+
     public static final RegistryObject<EntityType<BrokEntity>> BROK =
             ENTITY_TYPES.register("brok",
                     () -> EntityType.Builder.of(BrokEntity::new, MobCategory.CREATURE)

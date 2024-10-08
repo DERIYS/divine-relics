@@ -1,6 +1,7 @@
 package com.deriys.divinerelics.world.feature;
 
 import com.deriys.divinerelics.DivineRelics;
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.levelgen.VerticalAnchor;
 import net.minecraft.world.level.levelgen.placement.*;
@@ -16,17 +17,17 @@ public class DRPlacedFeatures {
 
     public static final RegistryObject<PlacedFeature> HACKSILVER_ORE_PLACED = PLACED_FEATURES.register("hacksilver_ore_placed",
             () -> new PlacedFeature(DRConfiguredFeatures.HACKSILVER_ORE.getHolder().get(),
-                    commonOrePlacement(6,
+                    commonOrePlacement(DivineRelicsCommonConfig.HACKSILVER_ORE_VEINS_PER_CHUNK.get(),
                             HeightRangePlacement.triangle(VerticalAnchor.aboveBottom(-80), VerticalAnchor.aboveBottom(80)))));
 
     public static final RegistryObject<PlacedFeature> SVARTALFHEIM_STEEL_ORE_PLACED = PLACED_FEATURES.register("svartalfheim_steel_ore_placed",
             () -> new PlacedFeature(DRConfiguredFeatures.SVARTALFHEIM_STEEL_ORE.getHolder().get(),
-                    rareOrePlacement(6,
+                    rareOrePlacement(DivineRelicsCommonConfig.SVARTALFHEIM_STEEL_ORE_VEINS_PER_CHUNK.get(),
                             HeightRangePlacement.triangle(VerticalAnchor.aboveBottom(-80), VerticalAnchor.aboveBottom(80)))));
 
     public static final RegistryObject<PlacedFeature> ASGARDIAN_STEEL_ORE_PLACED = PLACED_FEATURES.register("asgardian_steel_ore_placed",
             () -> new PlacedFeature(DRConfiguredFeatures.ASGARDIAN_STEEL_ORE.getHolder().get(),
-                    rareOrePlacement(3,
+                    rareOrePlacement(DivineRelicsCommonConfig.ASGARDIAN_STEEL_ORE_VEINS_PER_CHUNK.get(),
                             HeightRangePlacement.triangle(VerticalAnchor.aboveBottom(-80), VerticalAnchor.aboveBottom(80)))));
 
     public static List<PlacementModifier> orePlacement(PlacementModifier p_195347_, PlacementModifier p_195348_) {

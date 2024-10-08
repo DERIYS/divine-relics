@@ -1,6 +1,7 @@
 package com.deriys.divinerelics.entities.entity;
 
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.items.Motosignir;
@@ -38,13 +39,13 @@ import static com.deriys.divinerelics.items.HeimdallGauntlet.RAND;
 public class ThrownMjolnir extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
     private static final EntityDataAccessor<Boolean> SHOULD_RETURN;
-    public final float STRIKE_DAMAGE = 10f;
-    private final int COOLDOWN = 141;
     private ItemStack mjolnirItem;
     private boolean dealtDamage;
     private boolean hit;
-    public static int STRIKE_RADIUS = 5;
-    public static float STRIKE_FORCE = 1.0f;
+    public final float STRIKE_DAMAGE = DivineRelicsCommonConfig.THROWN_MJOLNIR_STRIKE_DAMAGE.get();
+    private final int COOLDOWN = DivineRelicsCommonConfig.MJOLNIR_THROW_COOLDOWN.get();
+    public static float STRIKE_RADIUS = DivineRelicsCommonConfig.THROWN_MJOLNIR_STRIKE_RADIUS.get();
+    public static float STRIKE_FORCE = DivineRelicsCommonConfig.THROWN_MJOLNIR_STRIKE_FORCE.get();
     public int clientSideReturnTridentTickCount;
     public boolean shouldReturn = false;
     public boolean relaxed = false;
@@ -102,7 +103,7 @@ public class ThrownMjolnir extends AbstractArrow {
                     this.yOld = this.getY();
                 }
 
-                double fact = 0.05 * 3;
+                double fact = 0.05 * DivineRelicsCommonConfig.THROWN_MJOLNIR_RETURNING_SPEED.get();
                 this.setDeltaMovement(this.getDeltaMovement().scale(0.95).add(vectorPM.normalize().scale(fact)));
                 if (this.clientSideReturnTridentTickCount == 0) {
                     this.playSound(DRSounds.MJOLNIR_RETURN.get(), 15.0F, 1.0F);
@@ -157,7 +158,7 @@ public class ThrownMjolnir extends AbstractArrow {
 
     protected void onHitEntity(EntityHitResult hitResult) {
         Entity entity = hitResult.getEntity();
-        float damage = 25.0F;
+        float damage = DivineRelicsCommonConfig.THROWN_MJOLNIR_DAMAGE.get();
         if (entity instanceof LivingEntity hitEntity) {
             damage += EnchantmentHelper.getDamageBonus(this.mjolnirItem, hitEntity.getMobType());
         }
@@ -189,6 +190,11 @@ public class ThrownMjolnir extends AbstractArrow {
         }
 
         this.playSound(soundEvent, volume, 1.0F);
+    }
+
+    @Override
+    public int getKnockback() {
+        return 3;
     }
 
     public static BlockPos getRandBlockPos(BlockPos blockPos) {
@@ -233,7 +239,8 @@ public class ThrownMjolnir extends AbstractArrow {
                 lightningCount++;
             }
         }
-        if (lightningCount < 4) { // if there were < 4 lightnings, shoot at random position within 5 meter radius
+        int maxLightnings = DivineRelicsCommonConfig.THROWN_MJOLNIR_LIGHNTING_COUNT.get();
+        if (lightningCount < maxLightnings) { // if there were < maxLightnings, shoot at random position within 5-meter radius
             for (int i = lightningCount; i < 4; i++) {
                 spawnLightning(level, getRandBlockPos(blockPos), owner);
             }
@@ -251,10 +258,14 @@ public class ThrownMjolnir extends AbstractArrow {
 
         if (!level.isClientSide) {
             boolean isBedrock = level.getBlockState(blockPos).getBlock() == Blocks.BEDROCK;
+            boolean isObsidian = level.getBlockState(blockPos).getBlock() == Blocks.OBSIDIAN;
             Entity owner = this.getOwner();
 
             if (owner instanceof LivingEntity livingEntity) {
                 if (!this.hit && !isBedrock) {
+                    if (isObsidian) {
+                        level.destroyBlock(blockPos, false);
+                    }
                     mjolnirHit(livingEntity, level, blockPos);
                     level.explode(null, this.damageSource, null, position.x, position.y, position.z, 2f, false, Explosion.BlockInteraction.DESTROY);
                     this.setDeltaMovement(prevMovement.scale(0.8f));
@@ -273,7 +284,7 @@ public class ThrownMjolnir extends AbstractArrow {
 
     private void mjolnirHit(LivingEntity owner, Level level, BlockPos blockPos) {
         ThrownMjolnir.spawnLightning(level, blockPos, owner);
-        onHitLighnting(level, this, blockPos, owner, this.damageSource, STRIKE_DAMAGE, STRIKE_FORCE, 5);
+        onHitLighnting(level, this, blockPos, owner, this.damageSource, STRIKE_DAMAGE, STRIKE_FORCE, STRIKE_RADIUS);
         if (owner instanceof Player player) {
             player.getCooldowns().addCooldown(this.mjolnirItem.getItem(), this.COOLDOWN);
         }

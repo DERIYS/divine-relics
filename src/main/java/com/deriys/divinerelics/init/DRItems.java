@@ -15,13 +15,13 @@ public class DRItems {
             DeferredRegister.create(ForgeRegistries.ITEMS, DivineRelics.MODID);
 
     public static final RegistryObject<Item> MOTOSIGNIR = ITEMS.register("motosignir",
-            () -> new Motosignir(new Item.Properties().fireResistant().tab(DRCreativeTab.MAINTAB)));
+            () -> new Motosignir(new Item.Properties().fireResistant().stacksTo(1).tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> HEIMDALL_GAUNTLET = ITEMS.register("heimdall_gauntlet",
             () -> new HeimdallGauntlet(new Item.Properties().fireResistant().tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> DRAUPNIR_RING = ITEMS.register("draupnir_ring",
-            () -> new Item(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
+            () -> new Item(new Item.Properties().stacksTo(1).fireResistant().stacksTo(1).tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> DRAUPNIR_SPEAR_BASE = ITEMS.register("draupnir_spear_base",
             () -> new Item(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> DRAUPNIR_SPEAR = ITEMS.register("draupnir_spear",
@@ -52,14 +52,8 @@ public class DRItems {
     public static final RegistryObject<Item> LEVIATHAN_AXE = ITEMS.register("leviathan_axe",
             () -> new LeviathanAxe(DRTiers.LEVIATHAN, 0, 0, new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
 
-    public static final RegistryObject<Item> THOR_FIGHT_MUSIC_DISC = ITEMS.register("thor_fight_music_disc",
-            () -> new RecordItem(6, DRSounds.THOR_FIGHT_MUSIC, new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).rarity(Rarity.RARE), 4013));
-
     public static final RegistryObject<Item> DIVINE_MEAD = ITEMS.register("divine_mead",
             () -> new DivineMead(new Item.Properties().tab(DRCreativeTab.MAINTAB).stacksTo(1).rarity(Rarity.EPIC)));
-
-    public static final RegistryObject<Item> DRAUGR_SPAWN_EGG = ITEMS.register("draugr_spawn_egg",
-            () -> new ForgeSpawnEggItem(DREntitiyTypes.DRAUGR, 0x7e9680, 0xc5d1c5, new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
 
     public static final RegistryObject<Item> HACKSILVER = ITEMS.register("hacksilver",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
@@ -103,10 +97,25 @@ public class DRItems {
             () -> new AxeItem(DRTiers.ASGARDIAN_STEEL_TIER, -4.0F, 0.0f, new Item.Properties().tab(DRCreativeTab.MAINTAB).rarity(Rarity.EPIC)));
 
     public static final RegistryObject<Item> PERFECT_ASGARDIAN_STEEL_INGOT = ITEMS.register("perfect_asgardian_steel_ingot",
-            () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+            () -> new Item(new Item.Properties().fireResistant().tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> DWARVEN_COMPASS = ITEMS.register("dwarven_compass",
             () -> new DwarvenCompass(new Item.Properties().tab(DRCreativeTab.MAINTAB).stacksTo(1)));
+
+    public static final RegistryObject<Item> THOR_FIGHT_MUSIC_DISC = ITEMS.register("thor_fight_music_disc",
+            () -> new RecordItem(6, DRSounds.THOR_FIGHT_MUSIC, new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).rarity(Rarity.RARE), 4013));
+
+    public static final RegistryObject<Item> HARMONY_MUSIC_DISK = ITEMS.register("harmony_music_disc",
+            () -> new RecordItem(6, DRSounds.HARMONY, new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).rarity(Rarity.RARE), 3760));
+
+    public static final RegistryObject<Item> SCAPE_THEME_MUSIC_DISK = ITEMS.register("scape_theme_music_disc",
+            () -> new RecordItem(6, DRSounds.SCAPE_THEME, new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).rarity(Rarity.RARE), 3920));
+
+    public static final RegistryObject<Item> DRAUGR_SPAWN_EGG = ITEMS.register("draugr_spawn_egg",
+            () -> new ForgeSpawnEggItem(DREntitiyTypes.DRAUGR, 0x77341A, 0xFA3F00, new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
+
+    public static final RegistryObject<Item> HEL_WALKER_SPAWN_EGG = ITEMS.register("hel_walker_spawn_egg",
+            () -> new ForgeSpawnEggItem(DREntitiyTypes.HEL_WALKER, 0x537196, 0x5dceff, new Item.Properties().tab(CreativeModeTab.TAB_MISC)));
 
     public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);

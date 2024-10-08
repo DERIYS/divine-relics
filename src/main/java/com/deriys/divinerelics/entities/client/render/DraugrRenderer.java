@@ -35,21 +35,3 @@ public class DraugrRenderer extends GeoEntityRenderer<DraugrEntity> {
         return super.getRenderType(animatable, partialTick, poseStack, bufferSource, buffer, packedLight, texture);
     }
 }
-
-
-
-//public class DraugrRenderer extends MobRenderer<DraugrEntity, DraugrModel<DraugrEntity>> {
-//    public DraugrRenderer(EntityRendererProvider.Context context) {
-//        super(context, new DraugrModel<>(context.bakeLayer(DRModelLayers.DRAUGR_LAYER)), 1f);
-//    }
-//
-//    @Override
-//    public ResourceLocation getTextureLocation(DraugrEntity p_114482_) {
-//        return new ResourceLocation(DivineRelics.MODID, "textures/entity/draugr.png");
-//    }
-//
-//    @Override
-//    public void render(DraugrEntity p_115455_, float p_115456_, float p_115457_, PoseStack p_115458_, MultiBufferSource p_115459_, int p_115460_) {
-//        super.render(p_115455_, p_115456_, p_115457_, p_115458_, p_115459_, p_115460_);
-//    }
-//}

@@ -8,6 +8,7 @@
   "item.divinerelics.leviathan_axe": "§9§lLeviathan Axe",
 
   "item.divinerelics.draugr_spawn_egg": "Draugr Spawn Egg",
+  "item.divinerelics.hel_walker_spawn_egg": "Hel Walker Spawn Egg",
 
   "item.divinerelics.divine_mead": "Divine Mead",
 
@@ -46,8 +47,14 @@
 
   "item.divinerelics.perfect_asgardian_steel_ingot": "§e§lPerfect Asgardian Steel Ingot",
 
-  "item.divinerelics.thor_fight_music_disc": "Thor Fight Music Disc",
+  "item.divinerelics.thor_fight_music_disc": "Music Disc",
   "item.divinerelics.thor_fight_music_disc.desc": "Bear McCreary - The Hammer of Thor",
+
+  "item.divinerelics.harmony_music_disc": "Music Disc",
+  "item.divinerelics.harmony_music_disc.desc": "Jagex - Harmony",
+
+  "item.divinerelics.scape_theme_music_disc": "Music Disc",
+  "item.divinerelics.scape_theme_music_disc.desc": "Jagex - Scape Theme",
 
   "block.divinerelics.hacksilver_ore": "Hacksilver Ore",
   "block.divinerelics.deepslate_hacksilver_ore": "Deepslate Hacksilver Ore",
@@ -61,6 +68,7 @@
   "block.divinerelics.obsidian_asgardian_steel_ore": "Obsidian Asgardian Steel Ore",
 
   "entity.divinerelics.draugr": "Draugr Warrior",
+  "entity.divinerelics.hel_walker": "Hel Walker",
   "entity.divinerelics.thor": "Thor",
   "entity.divinerelics.brok": "Brok",
   "entity.divinerelics.sindri": "Sindri",
@@ -74,12 +82,56 @@
   "effect.divinerelics.bifrost_protection": "Bifrost Protection",
 
   "sounds.divinerelics.motosignir_sound_wave": "Motosignir released its sound wave",
+
   "sounds.divinerelics.draupnir_spear_throwing": "Draupnir Spear is thrown",
   "sounds.divinerelics.draupnir_spear_landing": "Draupnir Spear has landed",
   "sounds.divinerelics.draupnir_spear_hit": "Hit with Draupnir Spear",
   "sounds.divinerelics.draupnir_spear_explosion_hit": "Summoned Draupnir Explosion",
   "sounds.divinerelics.draupnir_spear_explosion": "Draupnir Spear exploded",
 
-  "itemGroup.drmaintab": "Divine Relics",
-  "divinerelics.rootDesc": "Desc"
+  "sounds.divinerelics.mjolnir_ground_impact": "Mjölnir hits the ground",
+  "sounds.divinerelics.mjolnir_pierce": "Mjölnir pierces its target",
+  "sounds.divinerelics.mjolnir_return": "Mjölnir returns to its master",
+  "sounds.divinerelics.mjolnir_riptide": "Mjölnir launches its master",
+  "sounds.divinerelics.mjolnir_throw": "Mjölnir is thrown",
+
+  "sounds.divinerelics.guardian_shield_open": "Guardian Shield is opened",
+  "sounds.divinerelics.guardian_shield_parry": "Guardian Shield parry",
+
+  "sounds.divinerelics.leviathan_ground_impact": "Leviathan Axe hits the ground",
+  "sounds.divinerelics.leviathan_pierce": "Leviathan Axe pierces its target",
+  "sounds.divinerelics.leviathan_return": "Leviathan Axe returns to its master",
+  "sounds.divinerelics.leviathan_throw": "Leviathan Axe is thrown",
+
+  "sounds.divinerelics.draugr_attack": "Draugr attacks",
+  "sounds.divinerelics.draugr_ambient_1": "Draugr ambient sound",
+
+
+  "sounds.divinerelics.hel_walker_attack_1": "Hel Walker attacks",
+  "sounds.divinerelics.hel_walker_ambient_1": "Hel Walker ambient sound",
+
+  "sounds.divinerelics.hel_walker_hit_1": "Hel Walker is hit",
+
+  "sounds.divinerelics.thor_fight_music": "Bear McCreary - The Hammer of Thor",
+
+  "sounds.divinerelics.thor_melee_attack": "Thor's melee attack",
+  "sounds.divinerelics.thor_leg_attack": "Thor's leg attack",
+  "sounds.divinerelics.thor_clap_attack": "Thor's clap attack",
+  "sounds.divinerelics.thor_ground_attack": "Thor's ground attack",
+  "sounds.divinerelics.thor_mjolnir_throw_attack": "Thor throws the Mjölnir",
+
+  "sounds.divinerelics.thor_ambient_1": "\"Now show me this god-killer I've heard so much about!\"",
+  "sounds.divinerelics.thor_ambient_2": "\"Show me who you are!\"",
+  "sounds.divinerelics.thor_ambient_3": "\"You can do better.\"",
+  "sounds.divinerelics.thor_ambient_4": "\"Let me see the monster inside!\"",
+  "sounds.divinerelics.thor_ambient_5": "\"Now we're talking!\"",
+  "sounds.divinerelics.thor_ambient_6": "\"That all? You were finally showing me something.\"",
+  "sounds.divinerelics.thor_ambient_7": "\"Stop holding back!\"",
+  "sounds.divinerelics.thor_ambient_8": "\"You should be better than this!\"",
+  "sounds.divinerelics.thor_ambient_9": "\"Now we got us a fight.\"",
+
+  "sounds.divinerelics.harmony": "Jagex - Harmony",
+  "sounds.divinerelics.scape_theme": "Jagex - Scape Theme",
+
+  "itemGroup.drmaintab": "Divine Relics"
 }

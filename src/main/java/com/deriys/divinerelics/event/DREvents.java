@@ -9,8 +9,7 @@ import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpears;
 import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpearsProvider;
 import com.deriys.divinerelics.capabilities.teammates.Teammates;
 import com.deriys.divinerelics.capabilities.teammates.TeammatesProvider;
-import com.deriys.divinerelics.core.networking.DRMessages;
-import com.deriys.divinerelics.core.networking.packets.GauntletParticleS2CPacket;
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.entity.ThorEntity;
 import com.deriys.divinerelics.entities.entity.ThrownLeviathanAxe;
 import com.deriys.divinerelics.init.DREffects;
@@ -35,6 +34,7 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -75,12 +75,15 @@ public class DREvents {
             if (hurtEntity instanceof LivingEntity livingEntity) {
                 Level level = livingEntity.getLevel();
                 if (livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
-                    if (isValidAttacker(attacker, directAttacker) && !level.isClientSide) {
+                    if (attacker != null && isValidAttacker(attacker, directAttacker) && !level.isClientSide) {
                         Vec3 entityPos = livingEntity.position();
                         Vec3 attackerPos = attacker.position();
 
                         Vec2 attackVector = new Vec2((float) (entityPos.x - attackerPos.x), (float) (entityPos.z - attackerPos.z));
                         dodgeAttack(level, livingEntity, attackVector);
+                        if (!(attacker instanceof Player)) {
+                            level.playSound(null, new BlockPos(entityPos), SoundEvents.PLAYER_ATTACK_WEAK, SoundSource.PLAYERS, 1f, 1f);
+                        }
                         hurtEntity.lookAt(EntityAnchorArgument.Anchor.EYES, attacker.getEyePosition());
                         event.setCanceled(true);
                     }
@@ -90,11 +93,11 @@ public class DREvents {
             if (hurtEntity instanceof Player player && attacker instanceof LivingEntity livingAttacker) {
                 if (player.isBlocking() && player.getOffhandItem().getItem() == DRItems.GUARDIAN_SHIELD.get()) {
                     int ticksInUse = player.getTicksUsingItem();
-                    if (ticksInUse <= 12) {
+                    if (ticksInUse <= DivineRelicsCommonConfig.GUARDIAN_SHIELD_PARRY_WINDOW.get()) {
                         float amount = event.getAmount();
-                        float damage = (amount < 3)? 2: amount / 1.2f;
+                        float damage = (amount < 3)? 2: amount * 0.8f;
                         player.getLevel().playSound(null, player.getOnPos(), DRSounds.GUARDIAN_SHIELD_PARRY.get(), SoundSource.PLAYERS, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
-                        Motosignir.hurtAndKnockbackEntites(List.of(livingAttacker), player, Motosignir.STUN_EFFECTS, damage, Math.min(Math.log10(damage) / 2.5, 1.0f), 1, 100);
+                        Motosignir.hurtAndKnockbackEntites(List.of(livingAttacker), player, Motosignir.STUN_EFFECTS, damage, Math.min(Math.log10(damage) / 2.5, 1.5f), 1, 100);
                     }
                 }
             }
@@ -186,6 +189,9 @@ public class DREvents {
                     event.setCanceled(true);
                 }
             }
+            if (entity instanceof ItemEntity itemEntity && itemEntity.getItem().getItem() == DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get()) {
+                event.setCanceled(true);
+            }
         }
 
         @SubscribeEvent
@@ -262,6 +268,7 @@ public class DREvents {
         @SubscribeEvent
         public static void onEntityJoinWorld(EntityJoinLevelEvent event) {
             if (event.getEntity() instanceof ThorEntity thor && !thor.level.isClientSide && !thor.isSummoningComplete()) {
+                thor.setNoAi(true);
                 Level level = thor.level;
                 ServerLevel serverLevel = ((ServerLevel) level);
                 serverLevel.setWeatherParameters(0, 60000, true, true);
@@ -321,12 +328,10 @@ public class DREvents {
 
             hurtEntity.teleportTo(tpVector.x, tpVector.y, tpVector.z);
 
-            if (level instanceof ServerLevel) {
-                GauntletParticleS2CPacket packet = new GauntletParticleS2CPacket(entityX, entityY, entityZ, tpVector.x, tpVector.z);
-                DRMessages.sendToChunk(packet, level.getChunkAt(hurtEntity.blockPosition()));
-            }
-
-            level.playSound(null, entityX, entityY, entityZ, SoundEvents.ENDERMAN_TELEPORT, SoundSource.PLAYERS, 1f, 1f);
+//            if (level instanceof ServerLevel) {
+//                GauntletParticleS2CPacket packet = new GauntletParticleS2CPacket(entityX, entityY, entityZ, tpVector.x, tpVector.z);
+//                DRMessages.sendToChunk(packet, level.getChunkAt(hurtEntity.blockPosition()));
+//            }
         }
     }
 }

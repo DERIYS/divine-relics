@@ -6,6 +6,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
+import net.minecraft.data.BuiltinRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.biome.Biome;
@@ -88,14 +89,17 @@ public class NoWaterNearbyStructure extends Structure {
     }
 
     private static boolean isFarFromWaterBiomes(Structure.GenerationContext context, BlockPos pos) {
-        Set<Holder<Biome>> biomes = context.biomeSource().getBiomesWithin(pos.getX(), pos.getY(), pos.getZ(), 40, context.randomState().sampler());
+        Set<Holder<Biome>> biomes = context.biomeSource().getBiomesWithin(pos.getX(), pos.getY(), pos.getZ(), 50, context.randomState().sampler());
         for (Holder<Biome> biomeHolder : biomes) {
             Biome biome = biomeHolder.value();
+            System.out.println(BuiltinRegistries.BIOME.getKey(biome));
             ResourceLocation biomeName = context.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
             if (biomeName != null && WATER_BIOMES.contains(biomeName.toString())) {
+                System.out.println(false);
                 return false;
             }
         }
+        System.out.println(true);
         return true;
     }
 

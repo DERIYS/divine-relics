@@ -22,6 +22,39 @@ public class DRSounds {
     public static final RegistryObject<SoundEvent> DRAUGR_AMBIENT_3 =
             registerSoundEvent("draugr_ambient_3");
 
+    public static final RegistryObject<SoundEvent> HEL_WALKER_ATTACK_1 =
+            registerSoundEvent("hel_walker_attack_1");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_ATTACK_2 =
+            registerSoundEvent("hel_walker_attack_2");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_ATTACK_3 =
+            registerSoundEvent("hel_walker_attack_3");
+
+    public static final RegistryObject<SoundEvent> HEL_WALKER_AMBIENT_1 =
+            registerSoundEvent("hel_walker_ambient_1");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_AMBIENT_2 =
+            registerSoundEvent("hel_walker_ambient_2");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_AMBIENT_3 =
+            registerSoundEvent("hel_walker_ambient_3");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_AMBIENT_4 =
+            registerSoundEvent("hel_walker_ambient_4");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_AMBIENT_5 =
+            registerSoundEvent("hel_walker_ambient_5");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_AMBIENT_6 =
+            registerSoundEvent("hel_walker_ambient_6");
+
+    public static final RegistryObject<SoundEvent> HEL_WALKER_HIT_1 =
+            registerSoundEvent("hel_walker_hit_1");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_HIT_2 =
+            registerSoundEvent("hel_walker_hit_2");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_HIT_3 =
+            registerSoundEvent("hel_walker_hit_3");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_HIT_4 =
+            registerSoundEvent("hel_walker_hit_4");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_HIT_5 =
+            registerSoundEvent("hel_walker_hit_5");
+    public static final RegistryObject<SoundEvent> HEL_WALKER_HIT_6 =
+            registerSoundEvent("hel_walker_hit_6");
+
     public static final RegistryObject<SoundEvent> THOR_FIGHT_MUSIC =
             registerSoundEvent("thor_fight_music");
     public static final RegistryObject<SoundEvent> THOR_MELEE_ATTACK =
@@ -95,6 +128,12 @@ public class DRSounds {
             registerSoundEvent("leviathan_return");
     public static final RegistryObject<SoundEvent> LEVIATHAN_AXE_THROW =
             registerSoundEvent("leviathan_throw");
+
+    public static final RegistryObject<SoundEvent> HARMONY =
+            registerSoundEvent("harmony");
+
+    public static final RegistryObject<SoundEvent> SCAPE_THEME =
+            registerSoundEvent("scape_theme");
 
     public static RegistryObject<SoundEvent> registerSoundEvent(String name) {
         return SOUND_EVENTS.register(name, () -> new SoundEvent(new ResourceLocation(DivineRelics.MODID, name)));

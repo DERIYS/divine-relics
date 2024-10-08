@@ -1,11 +1,11 @@
 package com.deriys.divinerelics.items;
 
+import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
@@ -21,8 +21,6 @@ import java.util.List;
 import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 
 public class GuardianShield extends ShieldItem {
-
-
     public static final int EFFECTIVE_BLOCK_DELAY = 5;
     public static final float MINIMUM_DURABILITY_DAMAGE = 3.0F;
     public static final String TAG_BASE_COLOR = "Base";
@@ -58,7 +56,7 @@ public class GuardianShield extends ShieldItem {
 
     @Override
     public boolean isValidRepairItem(ItemStack p_43091_, ItemStack p_43092_) {
-        return p_43092_.is(ItemTags.PLANKS) || super.isValidRepairItem(p_43091_, p_43092_);
+        return p_43092_.is(DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get());
     }
 
     @Override

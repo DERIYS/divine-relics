@@ -1,0 +1,10 @@
+{
+  "type": "forge:add_spawns",
+  "biomes": "#forge:is_snowy",
+  "spawners": {
+    "type": "divinerelics:hel_walker",
+    "weight": 90,
+    "minCount": 2,
+    "maxCount": 6
+  }
+}

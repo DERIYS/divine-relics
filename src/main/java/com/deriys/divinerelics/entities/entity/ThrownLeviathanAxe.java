@@ -1,6 +1,7 @@
 package com.deriys.divinerelics.entities.entity;
 
 import com.deriys.divinerelics.capabilities.leviathan.LeviathanBindingProvider;
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
@@ -11,7 +12,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -26,6 +26,8 @@ import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 
+import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
+
 public class ThrownLeviathanAxe extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
     private static final EntityDataAccessor<Boolean> SHOULD_RETURN;
@@ -36,7 +38,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
     public boolean shouldReturn = false;
     public boolean relaxed = false;
     public DamageSource damageSource = DamageSource.trident(this, (Entity)(this.getOwner() == null ? this : this.getOwner()));
-    public final AnimationState throwingAnimationState = new AnimationState();
+    public final int COOLDOWN = DivineRelicsCommonConfig.LEVIATHAN_AXE_THROW_COOLDOWN.get();
 
     public ThrownLeviathanAxe(EntityType<? extends ThrownLeviathanAxe> entityType, Level level) {
         super(entityType, level);
@@ -145,7 +147,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
 
     protected void onHitEntity(EntityHitResult hitResult) {
         Entity entity = hitResult.getEntity();
-        float damage = 19.0F;
+        float damage = DivineRelicsCommonConfig.LEVIATHAN_AXE_DAMAGE.get();
         if (entity instanceof LivingEntity hitEntity) {
             damage += EnchantmentHelper.getDamageBonus(this.leviathanItem, hitEntity.getMobType());
         }
@@ -155,8 +157,11 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         this.dealtDamage = true;
         SoundEvent soundEvent = DRSounds.LEVIATHAN_AXE_IMPACT.get();
         if (entity.hurt(this.damageSource, damage)) {
+            if (owner instanceof Player player) {
+                player.getCooldowns().addCooldown(this.leviathanItem.getItem(), this.COOLDOWN);
+            }
             if (entity instanceof LivingEntity livingEntity && livingEntity.isAlive()) {
-                livingEntity.setTicksFrozen(400);
+                livingEntity.setTicksFrozen(DivineRelicsCommonConfig.THROWN_LEVIATHAN_FROZEN_TICKS_HIT.get());
             }
             volume = 5.0F;
             if (entity.getType() == EntityType.ENDERMAN) {
@@ -172,7 +177,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
             }
         }
         this.setDeltaMovement(this.getDeltaMovement().multiply(-0.01, -0.1, -0.01));
-        this.playSound(soundEvent, volume, 2.0F);
+        this.playSound(soundEvent, volume, RAND.nextFloat() * 0.15F + 0.925F);
     }
 
     @Override

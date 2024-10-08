@@ -1,5 +1,6 @@
 package com.deriys.divinerelics.items;
 
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.init.DREffects;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -22,14 +23,12 @@ import static com.deriys.divinerelics.items.Motosignir.gainMobEffects;
 public class HeimdallGauntlet extends Item {
 
     public static final Random RAND = new Random();
-    public static final double VECTOR_ANGLE_CONSTANT = 3 * Math.PI / 2 - Math.PI / 4;
     private final MobEffect[] EFFECTS = {
             DREffects.BIFROST_PROTECTION.get(),
             MobEffects.MOVEMENT_SPEED
     };
 
-    private final int EFFECTS_DURATION = 300;
-    private final int AMPLIFIER = 0;
+    private final int EFFECTS_DURATION = DivineRelicsCommonConfig.HEIMDALL_GAUNTLET_DURATION.get();
 
     public HeimdallGauntlet(Properties p_41383_) {
         super(p_41383_);
@@ -47,12 +46,13 @@ public class HeimdallGauntlet extends Item {
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
         if (!level.isClientSide()) {
-            gainMobEffects(player, EFFECTS, EFFECTS_DURATION, AMPLIFIER);
+            gainMobEffects(player, EFFECTS, EFFECTS_DURATION, 0);
+            int cooldown = DivineRelicsCommonConfig.HEIMDALL_GAUNTLET_COOLDOWN.get();
             if (interactionHand == InteractionHand.MAIN_HAND) {
-                player.getCooldowns().addCooldown(this, 1200);
+                player.getCooldowns().addCooldown(this, cooldown);
             }
             else {
-                player.getCooldowns().addCooldown(this, 1400);
+                player.getCooldowns().addCooldown(this, cooldown + 200);
             }
         }
         return InteractionResultHolder.success(player.getItemInHand(interactionHand));

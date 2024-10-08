@@ -1,6 +1,7 @@
 package com.deriys.divinerelics.items;
 
 import com.deriys.divinerelics.capabilities.leviathan.LeviathanBindingProvider;
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.entity.ThrownLeviathanAxe;
 import com.deriys.divinerelics.init.DRSounds;
 import com.google.common.collect.ImmutableMultimap;
@@ -31,16 +32,18 @@ import static com.deriys.divinerelics.event.DREvents.ForgeEvents.bindItemToEntit
 import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
 
 public class LeviathanAxe extends AxeItem {
-    public static final int THROW_THRESHOLD_TIME = 10;
-    public static final float BASE_DAMAGE = 18.0F;
-    public static final float SHOOT_POWER = 3F;
+    public static final int THROW_THRESHOLD_TIME = DivineRelicsCommonConfig.LEVIATHAN_AXE_THROW_THRESHOLD.get();
+    public static final float BASE_DAMAGE = DivineRelicsCommonConfig.LEVIATHAN_AXE_DAMAGE.get();
+    public static final float BASE_ATTACK_SPEED = DivineRelicsCommonConfig.LEVIATHAN_AXE_ATTACK_SPEED.get();
+    public static final float SHOOT_POWER = DivineRelicsCommonConfig.LEVIATHAN_AXE_SHOOT_POWER.get();
+    public static final int FREEZE_TIME = DivineRelicsCommonConfig.LEVIATHAN_AXE_FREEZE_TIME_HIT.get();
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     public LeviathanAxe(Tier p_40521_, float p_40522_, float p_40523_, Properties p_40524_) {
         super(p_40521_, p_40522_, p_40523_, p_40524_);
         ImmutableMultimap.Builder<Attribute, AttributeModifier> $$1 = ImmutableMultimap.builder();
         $$1.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", BASE_DAMAGE, AttributeModifier.Operation.ADDITION));
-        $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -2.4000000953674316, AttributeModifier.Operation.ADDITION));
+        $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", BASE_ATTACK_SPEED, AttributeModifier.Operation.ADDITION));
         this.defaultModifiers = $$1.build();
     }
 
@@ -100,8 +103,10 @@ public class LeviathanAxe extends AxeItem {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
-        if (entity instanceof LivingEntity livingEntity && !player.getLevel().isClientSide) {
-            livingEntity.setTicksFrozen(livingEntity.getTicksFrozen() + 60);
+        if (entity instanceof LivingEntity livingEntity && !player.getLevel().isClientSide && entity.isAlive()) {
+            if (entity instanceof Player && !player.getAbilities().instabuild) {
+                livingEntity.setTicksFrozen(livingEntity.getTicksFrozen() + FREEZE_TIME);
+            }
         }
         return super.onLeftClickEntity(stack, player, entity);
     }

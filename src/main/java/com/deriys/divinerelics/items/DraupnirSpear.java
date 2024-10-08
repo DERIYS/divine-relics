@@ -1,6 +1,7 @@
 package com.deriys.divinerelics.items;
 
 import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpearsProvider;
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.SpearExplosionParticleS2CPacket;
 import com.deriys.divinerelics.core.networking.packets.StuckSpearsS2CPacket;
@@ -48,22 +49,23 @@ import static com.deriys.divinerelics.event.DREvents.ForgeEvents.bindItemToEntit
 import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
 
 public class DraupnirSpear extends SwordItem {
-    public static final int THROW_THRESHOLD_TIME = 8;
-    public static final float BASE_DAMAGE = 10.0F;
-    public static final float SHOOT_POWER = 3.5F;
+    public static final int THROW_THRESHOLD_TIME = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_THROW_THRESHOLD.get();
+    public static final float BASE_DAMAGE = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_DAMAGE.get();
+    public static final float BASE_ATTACK_SPEED = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_ATTACK_SPEED.get();
+    public static final float SHOOT_POWER = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_SHOOT_POWER.get();
+
     public static final Random RAND = new Random();
     private static final int DELAY_TICKS_THRESHOLD = 1;
-    private static final double EXPLOSION_RADIUS = 4.0F;
-    private static final float EXPLOSION_DAMAGE = 9.0F;
-    private static final int THROWN_SPEARS_THRESHOLD = 5;
-    public static final float RANDOM_SOUND_PITCH = RAND.nextFloat() * 0.1F + 0.95F;
+    private static final double EXPLOSION_RADIUS = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_EXPLOSION_RADIUS.get();
+    private static final float EXPLOSION_DAMAGE = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_EXPLOSION_DAMAGE.get();
+    private static final int THROWN_SPEARS_THRESHOLD = DivineRelicsCommonConfig.DRAUPNIR_SPEARS_COUNT.get();
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     public DraupnirSpear(Tier p_40521_, int p_40522_, float p_40523_, Properties p_40524_) {
         super(p_40521_, p_40522_, p_40523_, p_40524_);
         ImmutableMultimap.Builder<Attribute, AttributeModifier> $$1 = ImmutableMultimap.builder();
         $$1.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", BASE_DAMAGE, AttributeModifier.Operation.ADDITION));
-        $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -2.0000000953674316, AttributeModifier.Operation.ADDITION));
+        $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", BASE_ATTACK_SPEED, AttributeModifier.Operation.ADDITION));
         this.defaultModifiers = $$1.build();
     }
 

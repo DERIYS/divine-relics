@@ -1,4 +1,4 @@
-package com.deriys.divinerelics.dwarfs;
+package com.deriys.divinerelics.init;
 
 import com.deriys.divinerelics.DivineRelics;
 import com.google.common.collect.ImmutableSet;
@@ -19,7 +19,7 @@ public class DRDwarfs {
                     SoundEvents.VILLAGER_WORK_ARMORER));
 
     public static final RegistryObject<VillagerProfession> SINDRI = DWARVEN_PROFESSIONS.register("sindri_master",
-            () -> new VillagerProfession("brok_master", x -> true,
+            () -> new VillagerProfession("sindri_master", x -> true,
                     x -> true, ImmutableSet.of(), ImmutableSet.of(),
                     SoundEvents.VILLAGER_WORK_ARMORER));
 

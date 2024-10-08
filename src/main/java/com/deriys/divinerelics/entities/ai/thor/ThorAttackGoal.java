@@ -1,5 +1,6 @@
 package com.deriys.divinerelics.entities.ai.thor;
 
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.entity.ThorEntity;
 import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
 import com.deriys.divinerelics.init.DRItems;
@@ -23,6 +24,14 @@ public class ThorAttackGoal extends MeleeAttackGoal {
     private int ticksUntilNextAttack = -1;
     private boolean shouldCountTillNextAttack = false;
     private ThorAttackState lastAttack = ThorAttackState.NONE;
+
+    public static float CLAP_ATTACK_DAMAGE = DivineRelicsCommonConfig.THOR_CLAP_DAMAGE.get();
+    public static float CLAP_ATTACK_FORCE = DivineRelicsCommonConfig.THOR_CLAP_FORCE.get();
+    public static float CLAP_ATTACK_RADUIS = DivineRelicsCommonConfig.THOR_CLAP_RADIUS.get();
+
+    public static float GROUND_ATTACK_DAMAGE = DivineRelicsCommonConfig.THOR_GROUND_DAMAGE.get();
+    public static float GROUND_ATTACK_FORCE = DivineRelicsCommonConfig.THOR_GROUND_FORCE.get();
+    public static float GROUND_ATTACK_RADUIS = DivineRelicsCommonConfig.THOR_GROUND_RADIUS.get();
 
 
     public ThorAttackGoal(PathfinderMob pathfinderMob, double pSpeedModifier, boolean pFollowingTargetEvenIfNotSeen) {
@@ -168,9 +177,9 @@ public class ThorAttackGoal extends MeleeAttackGoal {
         ThorEntity thor = this.entity;
         ThorAttackState state = thor.getAttackState();
         if (performsAttack(thor, 24, ThorAttackState.CLAP_ATTACK)) {
-            onHitLighnting(thor.level, thor, thor.getOnPos(), thor, thor.thorDamageSource, 7f, 3.5f, 6);
+            onHitLighnting(thor.level, thor, thor.getOnPos(), thor, thor.thorDamageSource, CLAP_ATTACK_DAMAGE, CLAP_ATTACK_FORCE, CLAP_ATTACK_RADUIS);
         } else if (performsAttack(thor, 25, ThorAttackState.GROUND_ATTACK)) {
-            onHitLighnting(thor.level, thor, thor.getOnPos(), thor, thor.thorDamageSource, 17f, 5f, 8);
+            onHitLighnting(thor.level, thor, thor.getOnPos(), thor, thor.thorDamageSource, GROUND_ATTACK_DAMAGE, GROUND_ATTACK_FORCE, GROUND_ATTACK_RADUIS);
         }
 
         if(!thor.level.isClientSide && shouldCountTillNextAttack && this.ticksUntilNextAttack > 0) {
@@ -191,6 +200,7 @@ public class ThorAttackGoal extends MeleeAttackGoal {
 
     @Override
     public void stop() {
+        System.out.println("stopping thor goal");
         entity.setAttacking(false);
         entity.setAttackState(ThorAttackState.NONE); // to prevent mjolnir throw spamming
         super.stop();

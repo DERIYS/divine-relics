@@ -29,7 +29,7 @@ public class DRBlocks {
 
     public static final RegistryObject<Block> HACKSILVER_BLOCK = registerBlock("hacksilver_block",
             () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
-                    .strength(4f).requiresCorrectToolForDrops().sound(SoundType.DEEPSLATE)), DRCreativeTab.MAINTAB);
+                    .strength(4f).requiresCorrectToolForDrops().sound(SoundType.METAL)), DRCreativeTab.MAINTAB);
 
     public static final RegistryObject<Block> SVARTALFHEIM_STEEL_ORE = registerBlock("svartalfheim_steel_ore",
             () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
@@ -49,7 +49,7 @@ public class DRBlocks {
 
     public static final RegistryObject<Block> OBSIDIAN_ASGARDIAN_STEEL_ORE = registerBlock("obsidian_asgardian_steel_ore",
             () -> new Block(BlockBehaviour.Properties.of(Material.STONE)
-                    .strength(8f).requiresCorrectToolForDrops()), DRCreativeTab.MAINTAB);
+                    .strength(8f).requiresCorrectToolForDrops().sound(SoundType.ANCIENT_DEBRIS)), DRCreativeTab.MAINTAB);
 
     private static <T extends Block> RegistryObject<T> registerBlock(String name, Supplier<T> block, CreativeModeTab tab) {
         RegistryObject<T> toReturn = BLOCKS.register(name, block);

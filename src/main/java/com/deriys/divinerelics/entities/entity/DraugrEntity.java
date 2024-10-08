@@ -1,5 +1,6 @@
 package com.deriys.divinerelics.entities.entity;
 
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.ai.draugr.DraugrAttackGoal;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
@@ -43,11 +44,17 @@ import static com.deriys.divinerelics.items.HeimdallGauntlet.RAND;
 
 public class DraugrEntity extends Monster implements IAnimatable {
     private static final AttributeModifier SLOW_SPEED_MODIFIER = new AttributeModifier("SlowSpeed", -0.3, AttributeModifier.Operation.MULTIPLY_BASE);
-    private static final AttributeModifier FAST_SPEED_MODIFIER = new AttributeModifier("FastSpeed", 0.5, AttributeModifier.Operation.MULTIPLY_BASE);
+    private static final AttributeModifier FAST_SPEED_MODIFIER = new AttributeModifier("FastSpeed", DivineRelicsCommonConfig.DRAUGR_SPEED_MODIFIER.get(), AttributeModifier.Operation.MULTIPLY_BASE);
     private static final EntityDataAccessor<Boolean> ATTACKING =
             SynchedEntityData.defineId(DraugrEntity.class, EntityDataSerializers.BOOLEAN);
     public int attackingTicks = 0;
     private AnimationFactory factory = GeckoLibUtil.createFactory(this);
+
+    private SoundEvent[] ambientSounds = {
+            DRSounds.DRAUGR_AMBIENT_1.get(),
+            DRSounds.DRAUGR_AMBIENT_2.get(),
+            DRSounds.DRAUGR_AMBIENT_3.get(),
+    };
 
     public DraugrEntity(EntityType<? extends DraugrEntity> entityType, Level level) {
         super(entityType, level);
@@ -92,16 +99,17 @@ public class DraugrEntity extends Monster implements IAnimatable {
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this)).setAlertOthers(DraugrEntity.class));
         this.targetSelector.addGoal(2, new NearestAttackableTargetGoal<>(this, Player.class, true));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Villager.class, true));
+        this.goalSelector.addGoal(4, new FloatGoal(this));
     }
 
     public static AttributeSupplier.Builder createAttributes() {
         return Monster.createMonsterAttributes()
-                .add(Attributes.FOLLOW_RANGE, 35.0D)
-                .add(Attributes.MAX_HEALTH, 30.0D)
-                .add(Attributes.KNOCKBACK_RESISTANCE, 0.5f)
+                .add(Attributes.FOLLOW_RANGE, DivineRelicsCommonConfig.DRAUGR_FOLLOW_RANGE.get())
+                .add(Attributes.MAX_HEALTH, DivineRelicsCommonConfig.DRAUGR_HP.get())
+                .add(Attributes.KNOCKBACK_RESISTANCE, DivineRelicsCommonConfig.DRAUGR_KB_RESISTANCE.get())
                 .add(Attributes.MOVEMENT_SPEED, 0.22F)
-                .add(Attributes.ATTACK_DAMAGE, 9.0D)
-                .add(Attributes.ARMOR, 9.0D)
+                .add(Attributes.ATTACK_DAMAGE, DivineRelicsCommonConfig.DRAUGR_DAMAGE.get())
+                .add(Attributes.ARMOR, DivineRelicsCommonConfig.DRAUGR_ARMOR.get())
                 .add(Attributes.SPAWN_REINFORCEMENTS_CHANCE);
     }
 
@@ -158,12 +166,8 @@ public class DraugrEntity extends Monster implements IAnimatable {
     @Nullable
     @Override
     protected SoundEvent getAmbientSound() {
-        int rand = RAND.nextInt(1, 4);
-        return switch (rand) {
-            case 1 -> DRSounds.DRAUGR_AMBIENT_1.get();
-            case 2 -> DRSounds.DRAUGR_AMBIENT_2.get();
-            default -> DRSounds.DRAUGR_AMBIENT_3.get();
-        };
+        return this.ambientSounds[RAND.nextInt(0, 3)];
+
     }
 
     @Override
@@ -185,6 +189,6 @@ public class DraugrEntity extends Monster implements IAnimatable {
     }
 
     public static boolean canSpawn(EntityType<DraugrEntity> draugrEntityEntityType, ServerLevelAccessor serverLevelAccessor, MobSpawnType mobSpawnType, BlockPos blockPos, RandomSource randomSource) {
-        return checkMobSpawnRules(draugrEntityEntityType, serverLevelAccessor, mobSpawnType, blockPos, randomSource) && blockPos.getY() > 60 && serverLevelAccessor.getDifficulty() != Difficulty.PEACEFUL;
+        return checkMobSpawnRules(draugrEntityEntityType, serverLevelAccessor, mobSpawnType, blockPos, randomSource) && serverLevelAccessor.getDifficulty() != Difficulty.PEACEFUL;
     }
 }

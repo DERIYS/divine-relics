@@ -1,6 +1,7 @@
 package com.deriys.divinerelics.entities.entity;
 
-import com.deriys.divinerelics.dwarfs.DRDwarfs;
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
+import com.deriys.divinerelics.init.DRDwarfs;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
@@ -34,7 +35,7 @@ public class SindriEntity extends Villager implements IAnimatable {
     private AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     private long lastRestockTime = 0;
-    private static final int RESTOCK_INTERVAL = 600;
+    private static final int RESTOCK_INTERVAL = DivineRelicsCommonConfig.BROK_AND_SINDRI_RESTOCK_TIME.get();
 
     public SindriEntity(EntityType<? extends Villager> p_35381_, Level p_35382_) {
         super(p_35381_, p_35382_);
@@ -119,6 +120,7 @@ public class SindriEntity extends Villager implements IAnimatable {
         this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.0D, false));
         this.targetSelector.addGoal(1, (new HurtByTargetGoal(this)).setAlertOthers(SindriEntity.class));
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
+        this.goalSelector.addGoal(4, new FloatGoal(this));
         this.addBehaviourGoals();
     }
 

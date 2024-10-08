@@ -1,6 +1,7 @@
 package com.deriys.divinerelics.items;
 
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
 import com.deriys.divinerelics.init.DRSounds;
 import com.google.common.collect.ImmutableMultimap;
@@ -36,16 +37,18 @@ import static com.deriys.divinerelics.event.DREvents.ForgeEvents.bindItemToEntit
 import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
 
 public class Mjolnir extends AxeItem {
-    public static final int THROW_THRESHOLD_TIME = 13;
-    public static final float BASE_DAMAGE = 25.0F;
-    public static final float SHOOT_POWER = 3.8F;
+    public static final int THROW_THRESHOLD_TIME = DivineRelicsCommonConfig.MJOLNIR_THROW_THRESHOLD.get();
+    public static final float BASE_DAMAGE = DivineRelicsCommonConfig.MJOLNIR_DAMAGE.get();
+    public static final float BASE_ATTACK_SPEED = DivineRelicsCommonConfig.MJOLNIR_ATTACK_SPEED.get();
+    public static final float SHOOT_POWER = DivineRelicsCommonConfig.MJOLNIR_SHOOT_POWER.get();
+    private static final int RIPTIDE_COOLDOWN = DivineRelicsCommonConfig.MJOLNIR_RIPTIDE_COOLDOWN.get();
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
     public Mjolnir(Tier p_40521_, float p_40522_, float p_40523_, Properties p_40524_) {
         super(p_40521_, p_40522_, p_40523_, p_40524_);
         ImmutableMultimap.Builder<Attribute, AttributeModifier> $$1 = ImmutableMultimap.builder();
         $$1.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(BASE_ATTACK_DAMAGE_UUID, "Tool modifier", BASE_DAMAGE, AttributeModifier.Operation.ADDITION));
-        $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", -3.2500000953674316, AttributeModifier.Operation.ADDITION));
+        $$1.put(Attributes.ATTACK_SPEED, new AttributeModifier(BASE_ATTACK_SPEED_UUID, "Tool modifier", BASE_ATTACK_SPEED, AttributeModifier.Operation.ADDITION));
         this.defaultModifiers = $$1.build();
     }
 
@@ -66,7 +69,7 @@ public class Mjolnir extends AxeItem {
             int ticks = this.getUseDuration(itemStack) - use_ticks;
             if (ticks >= THROW_THRESHOLD_TIME) {
                 if (!player.isShiftKeyDown() && !level.isClientSide) {
-                    // adding throwed mjolnir
+                    // Adding thrown Mjölnir
                     ThrownMjolnir thrownMjolnir = new ThrownMjolnir(level, player, itemStack);
                     thrownMjolnir.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, SHOOT_POWER, 1.0F);
                     if (player.getAbilities().instabuild) {
@@ -75,7 +78,7 @@ public class Mjolnir extends AxeItem {
                     thrownMjolnir.setNoGravity(true);
                     level.addFreshEntity(thrownMjolnir);
 
-                    // bind thrown mjolnir to the player
+                    // Binding thrown Mjölnir to the player
                     player.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(binding -> {
                         binding.addMjolnir(thrownMjolnir.getUUID().toString());
                     });
@@ -87,7 +90,7 @@ public class Mjolnir extends AxeItem {
                     }
 
                 } else if (player.isShiftKeyDown() && !player.isFallFlying()) { // riptide
-                    player.getCooldowns().addCooldown(itemStack.getItem(), 30);
+                    player.getCooldowns().addCooldown(itemStack.getItem(), RIPTIDE_COOLDOWN);
                     if (!isRiptideFlying(itemStack)) {
                         setRiptideFlying(itemStack, true);
                     }

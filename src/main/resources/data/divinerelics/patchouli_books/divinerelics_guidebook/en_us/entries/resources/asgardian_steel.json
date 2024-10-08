@@ -5,7 +5,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(l)Asgardian Steel$(), also known as the Gold of the Aesir, is a unique extraterrestrial material of incredible hardness and strength. $(br2)In ancient times, it descended to the Overworld through fallen celestial bodies, arriving from Asgard. $(br2)The extraction and processing of this extraordinary metal were entrusted to the finest dwarven craftsmen, who wielded $(l:resources/svartalfheim_steel)Svartalfheim Steel$() tools, for only this enchanted steel could breach the magical barrier encasing the Gold of the Aesir. $(br2)Almost impossible to find in mere caves, this rare metal can only be discovered at the crash sites of Asgardian asteroids, where the remnants of celestial power still linger."
+      "text": "$(l)Asgardian Steel$(), also known as the Gold of the Aesir, is a unique extraterrestrial material of incredible hardness and strength. $(br2)In ancient times, it descended to the Overworld through $(l:structures/asgardian_craters)fallen celestial bodies$(), arriving from Asgard. $(br2)The extraction and processing of this extraordinary metal were entrusted to the finest dwarven craftsmen, who wielded $(l:resources/svartalfheim_steel)Svartalfheim Steel$() tools, for only this enchanted steel could breach the magical barrier encasing the Gold of the Aesir. $(br2)Almost impossible to find in mere caves, this rare metal can only be discovered at the crash sites of Asgardian asteroids, where the remnants of celestial power still linger."
     },
     {
       "type": "patchouli:image",
@@ -19,7 +19,7 @@
       "type": "patchouli:crafting",
       "advancement": "divinerelics:svartalfheim_steel_tier",
       "recipe": "divinerelics:raw_asgardian_steel",
-      "text": "$(br)Due to its high refractoriness, hardness, and durability, the player lacks the skills and abilities to properly process this legendary metal. Thus, the only possible source of obtaining ingots is through trading with $(l:entities/huldra_brothers)Brok and Sindri$(). $(br2)To do this, you must first have $(l)Raw Asgardian Steel$() which you can craft from nine $(l)Asgardian Steel Nuggets$()."
+      "text": "$(br)Due to its high refractoriness, hardness, and durability, the player lacks the skills and abilities to properly process this legendary metal. Thus, the only possible source of obtaining ingots is through trading with $(l:entities/huldra_brothers)Brok and Sindri$(). $(br2)To do this, you must first have $(l)Raw Asgardian Steel$(), which you can craft from nine $(l)Asgardian Steel Nuggets$()."
     }
   ]
 }

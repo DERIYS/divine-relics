@@ -1,6 +1,7 @@
 package com.deriys.divinerelics.entities.entity;
 
 import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpearsProvider;
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.SpearParticleS2CPacket;
 import com.deriys.divinerelics.core.networking.packets.StuckSpearsS2CPacket;
@@ -39,6 +40,7 @@ import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 
 public class ThrownDraupnirSpear extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
+    private static final float SPEAR_DAMAGE = DivineRelicsCommonConfig.THROWN_DRAUPNIR_SPEAR_DAMAGE.get();
     private double throwerX;
     private double throwerY;
     private double throwerZ;
@@ -124,7 +126,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
 
     protected void onHitEntity(EntityHitResult hitResult) {
         Entity hurtEntity = hitResult.getEntity();
-        float damage = 7.0F;
+        float damage = SPEAR_DAMAGE;
         if (hurtEntity instanceof LivingEntity livingEntity) {
             damage += EnchantmentHelper.getDamageBonus(this.spearItem, livingEntity.getMobType());
         }
@@ -161,8 +163,6 @@ public class ThrownDraupnirSpear extends AbstractArrow {
                         double zOffset = RAND.nextDouble() * hurtEntityWidth * 0.3 - hurtEntityWidth * 0.15;
 
                         cap.addSpear(new Vec3(xOffset, yOffset, zOffset), RAND.nextFloat() * 10 - 5, angleBetweenVectors < 90);
-
-                        // this.getOwner().sendSystemMessage(Component.literal("x: " + xOffset + "; y: " + yOffset + "; z: " + zOffset + "; angle: " + angleBetweenVectors));
 
                         DRMessages.sendToAllPlayers(new StuckSpearsS2CPacket(hurtEntity.getId(), cap.getSpears()));
                     });
