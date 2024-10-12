@@ -365,6 +365,10 @@ public class ThorEntity extends Monster implements IAnimatable {
         if (RAND.nextFloat() < 0.1) {
             this.spawnAtLocation(new ItemStack(DRItems.ASGARDIAN_STEEL_NUGGET.get(), RAND.nextInt(3, 7)));
         }
+
+        if (RAND.nextFloat() < 0.02) {
+            this.spawnAtLocation(new ItemStack(DRItems.THOR_FIGHT_MUSIC_DISC.get()));
+        }
         super.die(damageSource);
         this.bossEvent.setVisible(false);
 

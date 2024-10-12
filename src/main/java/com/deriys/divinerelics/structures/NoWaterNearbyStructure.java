@@ -1,5 +1,6 @@
 package com.deriys.divinerelics.structures;
 
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.init.DRStructures;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -28,7 +29,7 @@ public class NoWaterNearbyStructure extends Structure {
             instance.group(NoWaterNearbyStructure.settingsCodec(instance),
                     StructureTemplatePool.CODEC.fieldOf("start_pool").forGetter(structure -> structure.startPool),
                     ResourceLocation.CODEC.optionalFieldOf("start_jigsaw_name").forGetter(structure -> structure.startJigsawName),
-                    Codec.intRange(0, 30).fieldOf("size").forGetter(structure -> structure.size),
+                    Codec.intRange(0, 7).fieldOf("size").forGetter(structure -> structure.size),
                     HeightProvider.CODEC.fieldOf("start_height").forGetter(structure -> structure.startHeight),
                     Heightmap.Types.CODEC.optionalFieldOf("project_start_to_heightmap").forGetter(structure -> structure.projectStartToHeightmap),
                     Codec.intRange(1, 128).fieldOf("max_distance_from_center").forGetter(structure -> structure.maxDistanceFromCenter)
@@ -80,16 +81,22 @@ public class NoWaterNearbyStructure extends Structure {
         ChunkPos chunkPos = context.chunkPos();
         BlockPos blockPos = new BlockPos(chunkPos.getMinBlockX(), 0, chunkPos.getMinBlockZ());
 
+//        return context.chunkGenerator().getFirstOccupiedHeight(
+//                chunkPos.getMinBlockX(),
+//                chunkPos.getMinBlockZ(),
+//                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
+//                context.heightAccessor(),
+//                context.randomState()) < 90 && !isFarFromWaterBiomes(context, blockPos);
         return context.chunkGenerator().getFirstOccupiedHeight(
                 chunkPos.getMinBlockX(),
                 chunkPos.getMinBlockZ(),
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 context.heightAccessor(),
-                context.randomState()) < 90 && !isFarFromWaterBiomes(context, blockPos);
+                context.randomState()) < 90;
     }
 
     private static boolean isFarFromWaterBiomes(Structure.GenerationContext context, BlockPos pos) {
-        Set<Holder<Biome>> biomes = context.biomeSource().getBiomesWithin(pos.getX(), pos.getY(), pos.getZ(), 50, context.randomState().sampler());
+        Set<Holder<Biome>> biomes = context.biomeSource().getBiomesWithin(pos.getX(), pos.getY(), pos.getZ(), DivineRelicsCommonConfig.NO_WATER_NEARBY_DISTANCE.get(), context.randomState().sampler());
         for (Holder<Biome> biomeHolder : biomes) {
             Biome biome = biomeHolder.value();
             System.out.println(BuiltinRegistries.BIOME.getKey(biome));
@@ -105,6 +112,11 @@ public class NoWaterNearbyStructure extends Structure {
 
     @Override
     public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext context) {
+//        if (DivineRelicsCommonConfig.NO_WATER_NEARBY_USE.get()) {
+//            if (!NoWaterNearbyStructure.extraSpawningChecks(context)) {
+//                return Optional.empty();
+//            }
+//        }
 
         if (!NoWaterNearbyStructure.extraSpawningChecks(context)) {
             return Optional.empty();

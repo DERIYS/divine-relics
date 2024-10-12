@@ -4,6 +4,7 @@ import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.ai.draugr.DraugrAttackGoal;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
+import com.deriys.divinerelics.items.DraupnirSpear;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -45,6 +46,8 @@ import static com.deriys.divinerelics.items.HeimdallGauntlet.RAND;
 public class DraugrEntity extends Monster implements IAnimatable {
     private static final AttributeModifier SLOW_SPEED_MODIFIER = new AttributeModifier("SlowSpeed", -0.3, AttributeModifier.Operation.MULTIPLY_BASE);
     private static final AttributeModifier FAST_SPEED_MODIFIER = new AttributeModifier("FastSpeed", DivineRelicsCommonConfig.DRAUGR_SPEED_MODIFIER.get(), AttributeModifier.Operation.MULTIPLY_BASE);
+
+    public static final int BURNING_TIME = DivineRelicsCommonConfig.DRAUGR_BURNING_TIME.get();
     private static final EntityDataAccessor<Boolean> ATTACKING =
             SynchedEntityData.defineId(DraugrEntity.class, EntityDataSerializers.BOOLEAN);
     public int attackingTicks = 0;
@@ -171,6 +174,11 @@ public class DraugrEntity extends Monster implements IAnimatable {
     }
 
     @Override
+    public float getVoicePitch() {
+        return DraupnirSpear.getRandomPitch();
+    }
+
+    @Override
     protected SoundEvent getDeathSound() {
         return SoundEvents.SKELETON_DEATH;
     }
@@ -179,6 +187,9 @@ public class DraugrEntity extends Monster implements IAnimatable {
     public void die(DamageSource p_21014_) {
         if (RAND.nextFloat() > 0.5f) {
             this.spawnAtLocation(new ItemStack(DRItems.HACKSILVER.get(), RAND.nextInt(0, 2)));
+        }
+        if (RAND.nextFloat() < 0.01f) {
+            this.spawnAtLocation(new ItemStack(DRItems.SCAPE_THEME_MUSIC_DISK.get()));
         }
         super.die(p_21014_);
     }

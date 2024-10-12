@@ -68,7 +68,7 @@ public class DRForgeEventBusEvents {
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.HACKSILVER.get(), 9),
-                    new ItemStack(DRItems.COMPRESSED_HACKSILVER.get(), 4),4,2,0.0F));
+                    new ItemStack(DRItems.COMPRESSED_HACKSILVER.get(), 4),5,2,0.0F));
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.HACKSILVER_INGOT.get(), 16),
@@ -78,11 +78,11 @@ public class DRForgeEventBusEvents {
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.HACKSILVER_INGOT.get(), 8),
-                    new ItemStack(DRItems.SVARTALFHEIM_STEEL_NUGGET.get(), 2),4,5,0.02F));
+                    new ItemStack(DRItems.SVARTALFHEIM_STEEL_NUGGET.get(), 2),4,9,0.02F));
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.SVARTALFHEIM_STEEL_NUGGET.get(), 18),
-                    new ItemStack(DRItems.RAW_SVARTALFHEIM_STEEL.get(), 3),4,8,0.02F));
+                    new ItemStack(DRItems.RAW_SVARTALFHEIM_STEEL.get(), 3),4,9,0.02F));
 
             villagerLevel = 3;
 
@@ -125,7 +125,7 @@ public class DRForgeEventBusEvents {
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.COMPRESSED_HACKSILVER.get(), 8),
-                    new ItemStack(DRItems.HACKSILVER_INGOT.get(), 9),3,2,0.0F));
+                    new ItemStack(DRItems.HACKSILVER_INGOT.get(), 9),5,2,0.0F));
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRBlocks.HACKSILVER_BLOCK.get(), 2),
@@ -135,11 +135,11 @@ public class DRForgeEventBusEvents {
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRBlocks.HACKSILVER_BLOCK.get(), 1),
-                    new ItemStack(DRItems.SVARTALFHEIM_STEEL_NUGGET.get(), 2),5,5,0.02F));
+                    new ItemStack(DRItems.SVARTALFHEIM_STEEL_NUGGET.get(), 2),5,9,0.02F));
 
             trades.get(villagerLevel).add((trader, rand) -> new MerchantOffer(
                     new ItemStack(DRItems.RAW_SVARTALFHEIM_STEEL.get(), 4),
-                    new ItemStack(DRItems.SVARTALFHEIM_STEEL_INGOT.get(), 5),4,8,0.02F));
+                    new ItemStack(DRItems.SVARTALFHEIM_STEEL_INGOT.get(), 5),4,9,0.02F));
 
             villagerLevel = 3;
 

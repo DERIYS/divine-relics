@@ -1,6 +1,5 @@
-package com.deriys.divinerelics.util;
+package com.deriys.divinerelics.init;
 
-import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.items.DwarvenCompass;
 import net.minecraft.client.renderer.item.CompassItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;

@@ -40,6 +40,7 @@ public class SindriEntity extends Villager implements IAnimatable {
     public SindriEntity(EntityType<? extends Villager> p_35381_, Level p_35382_) {
         super(p_35381_, p_35382_);
         this.setVillagerData(this.getVillagerData().setProfession(DRDwarfs.SINDRI.get()));
+        this.lastRestockTime = this.level.getGameTime();
     }
 
     @Override

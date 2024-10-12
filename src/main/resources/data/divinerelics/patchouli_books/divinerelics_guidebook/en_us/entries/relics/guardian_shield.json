@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:text",
-      "text": "$(l)The Guardian Shield$() is the legendary aegis of Kratos, a steadfast companion throughout his perilous journey across the Nordic realms. $(br2)This marvel of engineering is so compact that even the most seasoned adversary may not immediately discern its presence. At the opportune moment, the shield cam be unfurled, offering unparalleled protection against any threat, be it magical or physical. $(br2)$(l)Abilities:$()$(li)$(l)Instant Opening:$() Unleash the shield in a heartbeat, catching foes off guard.$(li)$(l)Parry Mechanics:$() Masterfully block an attack just before impact, redirecting the enemy’s force back upon them.$(li)$(l)Impact Absorption:$() When descending from great heights, direct the shield towards the ground and open it to negate fall damage."
+      "text": "$(l)The Guardian Shield$() is the legendary aegis of Kratos, a steadfast companion throughout his perilous journey across the Nordic realms. $(br2)This marvel of engineering is so compact that even the most seasoned adversary may not immediately discern its presence. At the opportune moment, the shield can be unfurled, offering unparalleled protection against any threat, be it magical or physical. $(br2)$(l)Abilities:$()$(li)$(l)Instant Opening:$() Unleash the shield in a heartbeat, catching foes off guard.$(li)$(l)Parry Mechanics:$() Masterfully block an attack just before impact, redirecting the enemy’s force back upon them.$(li)$(l)Impact Absorption:$() When descending from great heights, direct the shield towards the ground and open it to negate fall damage."
     },
     {
       "type": "patchouli:spotlight",

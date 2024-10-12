@@ -5,7 +5,7 @@ import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.init.DRDwarfs;
 import com.deriys.divinerelics.entities.client.render.*;
 import com.deriys.divinerelics.init.*;
-import com.deriys.divinerelics.util.DRItemProperties;
+import com.deriys.divinerelics.init.DRItemProperties;
 import com.deriys.divinerelics.world.feature.DRConfiguredFeatures;
 import com.deriys.divinerelics.world.feature.DRPlacedFeatures;
 import net.minecraft.client.renderer.entity.EntityRenderers;

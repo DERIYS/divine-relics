@@ -1,0 +1,19 @@
+{
+  "name": "Draugr",
+  "icon": "divinerelics:draugr_spawn_egg",
+  "category": "divinerelics:entities",
+  "pages": [
+    {
+      "type": "patchouli:text",
+      "text": "$(l)Draugr$(), the fearsome undead warriors of ancient lore, are beings of relentless fury and unyielding strength. $(br2)Once proud warriors who fell in battle, they refused the call of the Valkyries and were condemned to roam Midgard as husks of their former selves. $(br2)$(l)Draugr$() haunt the taiga regions, their eyes burning with unholy fire. These undead beings retain their physical prowess and wield their weapons with deadly precision. $(br2)They haunt in small groups, attacking any who dare disturb their slumber. Adventurers in the taiga must be vigilant, for the $(l)Draugr’s$() wrath is swift and merciless."
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "divinerelics:textures/gui/entries/entities/draugr.png"
+      ],
+      "border": true,
+      "text": "Some of them drop a small amount of $(l:resources/hacksilver)Hacksilver$() after death."
+    }
+  ]
+}

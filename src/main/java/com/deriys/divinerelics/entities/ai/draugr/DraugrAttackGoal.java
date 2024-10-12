@@ -7,6 +7,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
+import net.minecraft.world.entity.player.Player;
 
 import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 
@@ -78,7 +79,13 @@ public class DraugrAttackGoal extends MeleeAttackGoal {
 
     protected void performAttack(LivingEntity pEnemy) {
         this.mob.swing(InteractionHand.MAIN_HAND);
-        this.mob.doHurtTarget(pEnemy);
+        if (this.mob.doHurtTarget(pEnemy)) {
+            if (pEnemy.isAlive()) {
+                if (pEnemy instanceof Player player && !player.getAbilities().instabuild) {
+                    pEnemy.setRemainingFireTicks(pEnemy.getRemainingFireTicks() + DraugrEntity.BURNING_TIME);
+                }
+            }
+        }
     }
 
     @Override

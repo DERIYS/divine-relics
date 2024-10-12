@@ -52,6 +52,7 @@ public class DivineRelicsCommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Float> DRAUGR_HP;
     public static final ForgeConfigSpec.ConfigValue<Float> DRAUGR_ARMOR;
     public static final ForgeConfigSpec.ConfigValue<Float> DRAUGR_DAMAGE;
+    public static final ForgeConfigSpec.ConfigValue<Integer> DRAUGR_BURNING_TIME;
     public static final ForgeConfigSpec.ConfigValue<Float> DRAUGR_KB_RESISTANCE;
     public static final ForgeConfigSpec.ConfigValue<Float> DRAUGR_FOLLOW_RANGE;
     public static final ForgeConfigSpec.ConfigValue<Float> DRAUGR_SPEED_MODIFIER;
@@ -78,12 +79,18 @@ public class DivineRelicsCommonConfig {
     public static final ForgeConfigSpec.ConfigValue<Float> THOR_GROUND_RADIUS;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> BROK_AND_SINDRI_RESTOCK_TIME;
+
     public static final ForgeConfigSpec.ConfigValue<Integer> HACKSILVER_ORE_VEINS_PER_CHUNK;
     public static final ForgeConfigSpec.ConfigValue<Integer> HACKSILVER_ORE_VEIN_SIZE;
+
     public static final ForgeConfigSpec.ConfigValue<Integer> SVARTALFHEIM_STEEL_ORE_VEINS_PER_CHUNK;
     public static final ForgeConfigSpec.ConfigValue<Integer> SVARTALFHEIM_STEEL_ORE_VEIN_SIZE;
+
     public static final ForgeConfigSpec.ConfigValue<Integer> ASGARDIAN_STEEL_ORE_VEIN_SIZE;
     public static final ForgeConfigSpec.ConfigValue<Integer> ASGARDIAN_STEEL_ORE_VEINS_PER_CHUNK;
+
+    public static final ForgeConfigSpec.ConfigValue<Boolean> NO_WATER_NEARBY_USE;
+    public static final ForgeConfigSpec.ConfigValue<Integer> NO_WATER_NEARBY_DISTANCE;
 
 
     static {
@@ -176,6 +183,8 @@ public class DivineRelicsCommonConfig {
                 .define("Draugr KB Resistance", 0.35f);
         DRAUGR_DAMAGE = BUILDER.comment("Draugr Melee Damage")
                 .define("Draugr Damage", 7.0f);
+        DRAUGR_BURNING_TIME = BUILDER.comment("How many burning ticks will be added to a draugr's target on hit")
+                .define("Draugr Burning Time", 60);
         DRAUGR_FOLLOW_RANGE = BUILDER.comment("How far a draugr can see its target")
                 .define("Draugr Follow Range", 35.0f);
         DRAUGR_SPEED_MODIFIER = BUILDER.comment("How fast draugr will follow you")
@@ -189,7 +198,7 @@ public class DivineRelicsCommonConfig {
                 .define("Hel Walker KB Resistance", 0.35f);
         HEL_WALKER_DAMAGE = BUILDER.comment("Hel Walker Melee Damage")
                 .define("Hel Walker Damage", 7.0f);
-        HEL_WALKER_FREEZING_TIME = BUILDER.comment("How much frozen ticks will be added to a hel walker's target on hit")
+        HEL_WALKER_FREEZING_TIME = BUILDER.comment("How many frozen ticks will be added to a hel walker's target on hit")
                 .define("Hel Walker Freeing Time", 80);
         HEL_WALKER_FOLLOW_RANGE = BUILDER.comment("How far a Hel Walker can see its target")
                 .define("Hel Walker Follow Range", 35.0f);
@@ -225,7 +234,7 @@ public class DivineRelicsCommonConfig {
                 .define("Restock time", 18000);
 
         HACKSILVER_ORE_VEINS_PER_CHUNK = BUILDER.comment("How many Hacksilver Ore Veins spawns in one chunk (this uses commonOrePlacement")
-                .define("Hacksilver Veins", 7);
+                .define("Hacksilver Veins", 8);
         HACKSILVER_ORE_VEIN_SIZE = BUILDER.comment("How many Hacksilver Ore blocks spawn in one vein")
                 .define("Hacksilver Vein Size", 7);
 
@@ -238,6 +247,12 @@ public class DivineRelicsCommonConfig {
                 .define("Asgardian Steel Veins", 3);
         ASGARDIAN_STEEL_ORE_VEIN_SIZE = BUILDER.comment("How many Asgardian Steel Ore blocks spawn in one vein")
                 .define("Asgardian Steel Vein Size", 7);
+
+        NO_WATER_NEARBY_USE = BUILDER.comment("Whether the structures are going to use NoWaterNearby type of structure to avoid spawning near or in the water. Results in a significantly slower generation speed.")
+                .define("Use NoWaterNearby structure type", false);
+
+        NO_WATER_NEARBY_DISTANCE = BUILDER.comment("The minimum distance from the structure to the nearest water biome in blocks. Used only if the NoWaterNearby flag is true. The bigger the value the slower is the generation.")
+                .define("NoWaterNearby Distance", 40);
 
         BUILDER.pop();
         SPEC = BUILDER.build();

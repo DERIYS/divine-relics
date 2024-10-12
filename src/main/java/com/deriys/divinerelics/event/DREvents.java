@@ -10,17 +10,12 @@ import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpearsProvider;
 import com.deriys.divinerelics.capabilities.teammates.Teammates;
 import com.deriys.divinerelics.capabilities.teammates.TeammatesProvider;
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
-import com.deriys.divinerelics.entities.entity.ThorEntity;
-import com.deriys.divinerelics.entities.entity.ThrownLeviathanAxe;
-import com.deriys.divinerelics.init.DREffects;
-import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
-import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
-import com.deriys.divinerelics.init.DRItems;
+import com.deriys.divinerelics.entities.entity.*;
+import com.deriys.divinerelics.init.*;
 import com.deriys.divinerelics.items.DraupnirSpear;
 import com.deriys.divinerelics.items.LeviathanAxe;
 import com.deriys.divinerelics.items.Mjolnir;
 import com.deriys.divinerelics.items.Motosignir;
-import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -35,6 +30,8 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.ZombieVillager;
+import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -267,7 +264,8 @@ public class DREvents {
 
         @SubscribeEvent
         public static void onEntityJoinWorld(EntityJoinLevelEvent event) {
-            if (event.getEntity() instanceof ThorEntity thor && !thor.level.isClientSide && !thor.isSummoningComplete()) {
+            Entity entity = event.getEntity();
+            if (entity instanceof ThorEntity thor && !thor.level.isClientSide && !thor.isSummoningComplete()) {
                 thor.setNoAi(true);
                 Level level = thor.level;
                 ServerLevel serverLevel = ((ServerLevel) level);
@@ -275,6 +273,13 @@ public class DREvents {
                 ItemStack musicDisc = new ItemStack(DRItems.THOR_FIGHT_MUSIC_DISC.get());
                 BlockPos onPos = thor.getOnPos();
                 level.levelEvent(null, 1010, onPos, Item.getId(musicDisc.getItem()));
+            }
+
+            if (entity instanceof ZombieVillager zombieVillager) {
+                VillagerProfession profession = zombieVillager.getVillagerData().getProfession();
+                if (profession == DRDwarfs.BROK.get() || profession == DRDwarfs.SINDRI.get()) {
+                    event.setCanceled(true);
+                }
             }
         }
 

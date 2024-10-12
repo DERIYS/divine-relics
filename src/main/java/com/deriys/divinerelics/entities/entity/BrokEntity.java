@@ -42,6 +42,7 @@ public class BrokEntity extends Villager implements IAnimatable {
     public BrokEntity(EntityType<? extends Villager> p_35381_, Level p_35382_) {
         super(p_35381_, p_35382_);
         this.setVillagerData(this.getVillagerData().setProfession(DRDwarfs.BROK.get()).setLevel(1));
+        this.lastRestockTime = this.level.getGameTime();
     }
 
     @Override

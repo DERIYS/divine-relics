@@ -69,6 +69,10 @@ public class DraupnirSpear extends SwordItem {
         this.defaultModifiers = $$1.build();
     }
 
+    public static float getRandomPitch() {
+        return RAND.nextFloat() * 0.1F + 0.95F;
+    }
+
     public boolean canAttackBlock(BlockState blockState, Level level, BlockPos blockPos, Player player) {
         return !player.isCreative();
     }
@@ -153,7 +157,7 @@ public class DraupnirSpear extends SwordItem {
             return InteractionResultHolder.pass(itemStack);
         } else if (delayTicks == 0 || isShiftDown){
             BlockPos playerOnPos = player.getOnPos();
-            level.playSound(null, playerOnPos, DRSounds.DRAUPNIR_SPEAR_EXPLOSION_HIT.get(), SoundSource.PLAYERS, 2.0F, RAND.nextFloat() * 0.1F + 0.95F);
+            level.playSound(null, playerOnPos, DRSounds.DRAUPNIR_SPEAR_EXPLOSION_HIT.get(), SoundSource.PLAYERS, 2.0F, getRandomPitch());
             setDelayTicks(itemStack, 10);
             setExplosionState(itemStack, true);
             if (!level.isClientSide) {
@@ -233,7 +237,7 @@ public class DraupnirSpear extends SwordItem {
 
         Motosignir.hurtAndKnockbackEntites(entitiesInArea, player, spear, damageSource, EXPLOSION_DAMAGE, 0.2f);
 
-        level.playSound(null, spear.getOnPos(), DRSounds.DRAUPNIR_SPEAR_EXPLOSION.get(), SoundSource.PLAYERS, 2.0F, RAND.nextFloat() * 0.1F + 0.95F);
+        level.playSound(null, spear.getOnPos(), DRSounds.DRAUPNIR_SPEAR_EXPLOSION.get(), SoundSource.PLAYERS, 2.0F, getRandomPitch());
 
         sendExplosionPacket(level, spearX, spearY, spearZ, 1.5F, 0, 20);
     }
@@ -271,7 +275,7 @@ public class DraupnirSpear extends SwordItem {
                     setThrownCount(itemStack, ++thrownCount);
 
                     level.addFreshEntity(thrownSpear);
-                    level.playSound(null, thrownSpear, DRSounds.DRAUPNIR_SPEAR_THROWING.get(), SoundSource.PLAYERS, 1.0F, RAND.nextFloat() * 0.1F + 0.95F);
+                    level.playSound(null, thrownSpear, DRSounds.DRAUPNIR_SPEAR_THROWING.get(), SoundSource.PLAYERS, 1.0F, getRandomPitch());
                 }
             }
         }
@@ -291,7 +295,7 @@ public class DraupnirSpear extends SwordItem {
         double length = (entity.position().subtract(player.position())).length();
         double distanceModification = (length > 3F) ? 1.0F: length / 3.5F;
         double speed = 0.7F * distanceModification;
-        player.getLevel().playSound(null, player.getOnPos(), DRSounds.DRAUPNIR_SPEAR_HIT.get(), SoundSource.PLAYERS, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
+        player.getLevel().playSound(null, player.getOnPos(), DRSounds.DRAUPNIR_SPEAR_HIT.get(), SoundSource.PLAYERS, 1.0f, getRandomPitch());
         player.setDeltaMovement(new Vec3(lookVec.x * speed, 0, lookVec.z * speed));
         entity.invulnerableTime = 9;
         return false;

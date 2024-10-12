@@ -1,7 +1,6 @@
 package com.deriys.divinerelics.init;
 
 import com.deriys.divinerelics.DivineRelics;
-import com.deriys.divinerelics.util.DRTags;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.Tiers;

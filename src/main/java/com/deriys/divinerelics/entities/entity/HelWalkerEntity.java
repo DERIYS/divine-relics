@@ -4,6 +4,7 @@ import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.ai.hel_walker.HelWalkerAttackGoal;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
+import com.deriys.divinerelics.items.DraupnirSpear;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -180,9 +181,18 @@ public class HelWalkerEntity extends Monster implements IAnimatable {
     }
 
     @Override
+    public float getVoicePitch() {
+        return DraupnirSpear.getRandomPitch();
+    }
+
+    @Override
     public void die(DamageSource damageSource) {
         if (RAND.nextFloat() > 0.5f) {
             this.spawnAtLocation(new ItemStack(DRItems.HACKSILVER.get(), RAND.nextInt(0, 3)));
+        }
+
+        if (RAND.nextFloat() < 0.02f) {
+            this.spawnAtLocation(new ItemStack(DRItems.HARMONY_MUSIC_DISK.get()));
         }
         super.die(damageSource);
     }
