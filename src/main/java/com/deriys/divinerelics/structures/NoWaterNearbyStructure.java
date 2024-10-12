@@ -81,18 +81,17 @@ public class NoWaterNearbyStructure extends Structure {
         ChunkPos chunkPos = context.chunkPos();
         BlockPos blockPos = new BlockPos(chunkPos.getMinBlockX(), 0, chunkPos.getMinBlockZ());
 
-//        return context.chunkGenerator().getFirstOccupiedHeight(
-//                chunkPos.getMinBlockX(),
-//                chunkPos.getMinBlockZ(),
-//                Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
-//                context.heightAccessor(),
-//                context.randomState()) < 90 && !isFarFromWaterBiomes(context, blockPos);
+        boolean isFarFromWater = true;
+        if (DivineRelicsCommonConfig.NO_WATER_NEARBY_USE.get()) {
+            isFarFromWater = isFarFromWaterBiomes(context, blockPos);
+        }
+
         return context.chunkGenerator().getFirstOccupiedHeight(
                 chunkPos.getMinBlockX(),
                 chunkPos.getMinBlockZ(),
                 Heightmap.Types.MOTION_BLOCKING_NO_LEAVES,
                 context.heightAccessor(),
-                context.randomState()) < 90;
+                context.randomState()) < 90 && isFarFromWater;
     }
 
     private static boolean isFarFromWaterBiomes(Structure.GenerationContext context, BlockPos pos) {
@@ -102,21 +101,14 @@ public class NoWaterNearbyStructure extends Structure {
             System.out.println(BuiltinRegistries.BIOME.getKey(biome));
             ResourceLocation biomeName = context.registryAccess().registryOrThrow(Registry.BIOME_REGISTRY).getKey(biome);
             if (biomeName != null && WATER_BIOMES.contains(biomeName.toString())) {
-                System.out.println(false);
                 return false;
             }
         }
-        System.out.println(true);
         return true;
     }
 
     @Override
     public Optional<Structure.GenerationStub> findGenerationPoint(Structure.GenerationContext context) {
-//        if (DivineRelicsCommonConfig.NO_WATER_NEARBY_USE.get()) {
-//            if (!NoWaterNearbyStructure.extraSpawningChecks(context)) {
-//                return Optional.empty();
-//            }
-//        }
 
         if (!NoWaterNearbyStructure.extraSpawningChecks(context)) {
             return Optional.empty();
