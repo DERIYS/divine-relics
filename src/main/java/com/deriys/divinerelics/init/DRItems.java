@@ -18,7 +18,7 @@ public class DRItems {
             () -> new Motosignir(new Item.Properties().fireResistant().stacksTo(1).tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> HEIMDALL_GAUNTLET = ITEMS.register("heimdall_gauntlet",
-            () -> new HeimdallGauntlet(new Item.Properties().fireResistant().tab(DRCreativeTab.MAINTAB)));
+            () -> new HeimdallGauntlet(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> DRAUPNIR_RING = ITEMS.register("draupnir_ring",
             () -> new Item(new Item.Properties().stacksTo(1).fireResistant().stacksTo(1).tab(DRCreativeTab.MAINTAB)));
@@ -103,7 +103,7 @@ public class DRItems {
             () -> new DwarvenCompass(new Item.Properties().tab(DRCreativeTab.MAINTAB).stacksTo(1)));
 
     public static final RegistryObject<Item> THOR_FIGHT_MUSIC_DISC = ITEMS.register("thor_fight_music_disc",
-            () -> new RecordItem(6, DRSounds.THOR_FIGHT_MUSIC, new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).rarity(Rarity.RARE), 4013));
+            () -> new RecordItem(6, DRSounds.THOR_FIGHT_MUSIC, new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).rarity(Rarity.RARE), 9618));
 
     public static final RegistryObject<Item> HARMONY_MUSIC_DISK = ITEMS.register("harmony_music_disc",
             () -> new RecordItem(6, DRSounds.HARMONY, new Item.Properties().tab(CreativeModeTab.TAB_MISC).stacksTo(1).rarity(Rarity.RARE), 3760));

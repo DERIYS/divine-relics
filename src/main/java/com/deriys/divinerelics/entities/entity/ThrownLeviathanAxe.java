@@ -34,6 +34,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
     private ItemStack leviathanItem;
     public boolean dealtDamage;
     public boolean isOnGround = false;
+    public int rotationDirection = 1;
     public int clientSideReturnTridentTickCount;
     public boolean shouldReturn = false;
     public boolean relaxed = false;
@@ -155,6 +156,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         Entity owner = this.getOwner();
         float volume = 1.0F;
         this.dealtDamage = true;
+        this.rotationDirection *= -1;
         SoundEvent soundEvent = DRSounds.LEVIATHAN_AXE_IMPACT.get();
         if (entity.hurt(this.damageSource, damage)) {
             if (owner instanceof Player player) {
@@ -219,12 +221,14 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         }
 
         this.dealtDamage = p_37578_.getBoolean("DealtDamage");
+        this.rotationDirection = p_37578_.getInt("RotationDirection");
     }
 
     public void addAdditionalSaveData(CompoundTag p_37582_) {
         super.addAdditionalSaveData(p_37582_);
         p_37582_.put("Leviathan", this.leviathanItem.save(new CompoundTag()));
         p_37582_.putBoolean("DealtDamage", this.dealtDamage);
+        this.rotationDirection = p_37582_.getInt("RotationDirection");
     }
 
     public void tickDespawn() {

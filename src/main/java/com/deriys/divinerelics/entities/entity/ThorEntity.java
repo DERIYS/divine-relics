@@ -1,16 +1,22 @@
 package com.deriys.divinerelics.entities.entity;
 
+import com.deriys.divinerelics.capabilities.thor.FightsThorProvider;
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
+import com.deriys.divinerelics.core.networking.DRMessages;
+import com.deriys.divinerelics.core.networking.packets.ThorPlayMusicS2CPacket;
+import com.deriys.divinerelics.core.networking.packets.ThorStopMusicS2CPacket;
 import com.deriys.divinerelics.entities.ai.thor.FireIgnoringPathNavigation;
 import com.deriys.divinerelics.entities.ai.thor.ThorAttackGoal;
 import com.deriys.divinerelics.entities.ai.thor.ThorAttackState;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
+import com.deriys.divinerelics.items.Motosignir;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.game.ClientboundStopSoundPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -36,6 +42,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -63,6 +70,7 @@ import static com.deriys.divinerelics.entities.entity.ThrownMjolnir.*;
 import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 
 public class ThorEntity extends Monster implements IAnimatable {
+    public static final int INTRO_MUSIC_DURATION = 549;
     private AnimationFactory factory = GeckoLibUtil.createFactory(this);
     private static final AttributeModifier SLOW_SPEED_MODIFIER = new AttributeModifier("SlowSpeed", 0, AttributeModifier.Operation.MULTIPLY_BASE);
     private static final AttributeModifier FAST_SPEED_MODIFIER = new AttributeModifier("FastSpeed", DivineRelicsCommonConfig.THOR_SPEED_MODIFIER.get(), AttributeModifier.Operation.MULTIPLY_BASE);
@@ -109,6 +117,10 @@ public class ThorEntity extends Monster implements IAnimatable {
             DRSounds.THOR_AMBIENT_8.get(),
             DRSounds.THOR_AMBIENT_9.get(),
     };
+    private List<UUID> needMusicReplay = new ArrayList<>();
+    private List<UUID> initialPlayersNearby = new ArrayList<>();
+
+    private int musicTick = 0;
 
     public ThorEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -218,6 +230,7 @@ public class ThorEntity extends Monster implements IAnimatable {
 
     @Override
     public void tick() {
+
         float bossBarProgress = this.getHealth() / this.getMaxHealth();
         if (this.bossEvent.getProgress() != bossBarProgress){
             this.bossEvent.setProgress(bossBarProgress);
@@ -240,6 +253,22 @@ public class ThorEntity extends Monster implements IAnimatable {
                 if (this.isAlive() && this.random.nextInt(1000) < this.ambientSoundInterval++) {
                     this.resetAmbientInterval();
                     this.playSound(AMBIENT_SOUNDS[++this.ambientSoundCount % 9], this.getSoundVolume(), this.getVoicePitch());
+                }
+            }
+
+            if (this.tickCount >= INTRO_MUSIC_DURATION && !this.needMusicReplay.isEmpty()) {
+                ServerLevel serverLevel = (ServerLevel) level;
+                List<UUID> copyList = List.copyOf(this.needMusicReplay);
+                for (UUID playerUUID: copyList) {
+                    if (serverLevel.getEntity(playerUUID) instanceof ServerPlayer player) {
+                        stopSoundForPlayer(player, DRSounds.THOR_FIGHT_MUSIC.get(), SoundSource.RECORDS);
+                        stopSoundForPlayer(player, DRSounds.THOR_FIGHT_MUSIC_LOOP.get(), SoundSource.RECORDS);
+                        playSoundForPlayer(player, DRSounds.THOR_FIGHT_MUSIC_LOOP.get(), this.getOnPos());
+                        if (!initialPlayersNearby.contains(playerUUID)) {
+                            this.addInitialPlayersNearby(player);
+                        }
+                        this.needMusicReplay.remove(playerUUID);
+                    }
                 }
             }
         }
@@ -318,6 +347,18 @@ public class ThorEntity extends Monster implements IAnimatable {
             this.thrownMjolnirUUID = compoundTag.getUUID("ThrownMjolnirUUID");
         }
         this.setWaitsForMjolnir(compoundTag.getBoolean("WaitsForMjolnir"));
+
+        ListTag needMusicReplayList = compoundTag.getList("NeedMusicReplay", 8);
+        this.needMusicReplay = new ArrayList<>();
+        for (int i = 0; i < needMusicReplayList.size(); i++) {
+            this.needMusicReplay.add(UUID.fromString(needMusicReplayList.getString(i)));
+        }
+
+        ListTag initialPlayerNearbyList = compoundTag.getList("initialPlayersNearby", 8);
+        this.initialPlayersNearby = new ArrayList<>();
+        for (int i = 0; i < initialPlayerNearbyList.size(); i++) {
+            this.initialPlayersNearby.add(UUID.fromString(initialPlayerNearbyList.getString(i)));
+        }
     }
 
     @Override
@@ -334,7 +375,20 @@ public class ThorEntity extends Monster implements IAnimatable {
         if (this.thrownMjolnirUUID != null) {
             compoundTag.putUUID("ThrownMjolnirUUID", this.thrownMjolnirUUID);
         }
+        ListTag needMusicReplayList = new ListTag();
+        for (UUID uuid : this.needMusicReplay) {
+            needMusicReplayList.add(StringTag.valueOf(uuid.toString()));
+        }
+        compoundTag.put("NeedMusicReplay", needMusicReplayList);
+        ListTag initialPlayersNearbyList = new ListTag();
+        for (UUID uuid : this.initialPlayersNearby) {
+            initialPlayersNearbyList.add(StringTag.valueOf(uuid.toString()));
+        }
+        compoundTag.put("initialPlayersNearby", initialPlayersNearbyList);
     }
+
+    @Override
+    public void checkDespawn() { }
 
     @Override
     public void startSeenByPlayer(@NotNull ServerPlayer serverPlayer) {
@@ -344,10 +398,25 @@ public class ThorEntity extends Monster implements IAnimatable {
         } else {
             this.bossEvent.addPlayer(serverPlayer);
         }
-    }
 
-    @Override
-    public void checkDespawn() { }
+        UUID playerUUID = serverPlayer.getUUID();
+        boolean containsInInitialList = this.initialPlayersNearby.contains(playerUUID);
+        if (!containsInInitialList && !this.needMusicReplay.contains(playerUUID)) { // if the player sees thor for the first time (should be after the summoning is complete)
+            this.needMusicReplay.add(playerUUID);
+        } else if (containsInInitialList && !this.needMusicReplay.contains(playerUUID)) { // if the player saw thor, died and spawned far away, logged out and now sees him again
+            serverPlayer.getCapability(FightsThorProvider.FIGHTS_THOR).ifPresent(fightsThor -> {
+                List<String> thorList = fightsThor.getThorList();
+                if (!thorList.isEmpty()) {
+                    for (String thorStringUUID: thorList) {
+                        if (UUID.fromString(thorStringUUID).equals(this.getUUID()) && fightsThor.hasLoggedOut()) {
+                            this.needMusicReplay.add(playerUUID);
+                            fightsThor.setHasLoggedOut(false);
+                        }
+                    }
+                }
+            });
+        }
+    }
 
     @Override
     public void stopSeenByPlayer(@NotNull ServerPlayer serverPlayer) {
@@ -355,27 +424,79 @@ public class ThorEntity extends Monster implements IAnimatable {
         this.bossEvent.removePlayer(serverPlayer);
     }
 
-    private void stopPlayingBossMusic() {
-        ((ServerLevel) this.level).getServer().getPlayerList().broadcast(null, this.blockPosition().getX(), this.blockPosition().getY(), this.blockPosition().getZ(), 50, this.level.dimension(), new ClientboundStopSoundPacket(DRSounds.THOR_FIGHT_MUSIC.get().getLocation(), SoundSource.RECORDS));
+    public void startPlayingBossMusic() {
+        List<Player> playersNearby = Motosignir.getEntitiesInAreaOfClass(Player.class, this.level, this, 50);
+        if (!playersNearby.isEmpty()) {
+            for (Player player: playersNearby) {
+                this.addInitialPlayersNearby(player);
+            }
+        }
+        ItemStack musicDisc = new ItemStack(DRItems.THOR_FIGHT_MUSIC_DISC.get());
+        BlockPos onPos = this.getOnPos();
+        level.levelEvent(null, 1010, onPos, Item.getId(musicDisc.getItem()));
+    }
+
+    private void addInitialPlayersNearby(Player player) {
+        player.getCapability(FightsThorProvider.FIGHTS_THOR).ifPresent(fightsThor -> {
+            fightsThor.addThor(this.getStringUUID());
+        });
+        this.initialPlayersNearby.add(player.getUUID());
+    }
+
+    public void stopPlayingBossMusic() {
+        if (!this.initialPlayersNearby.isEmpty()) {
+            ServerLevel serverLevel = (ServerLevel) this.level;
+            for (UUID playerUUID: initialPlayersNearby) {
+                if (serverLevel.getEntity(playerUUID) instanceof ServerPlayer serverPlayer) {
+                    stopSoundForPlayer(serverPlayer, DRSounds.THOR_FIGHT_MUSIC.get(), SoundSource.RECORDS);
+                    stopSoundForPlayer(serverPlayer, DRSounds.THOR_FIGHT_MUSIC_LOOP.get(), SoundSource.RECORDS);
+                }
+            }
+        }
+    }
+
+    public static void playSoundForPlayer(ServerPlayer player, SoundEvent soundEvent, BlockPos blockPos) {
+        DRMessages.sendToPlayer(new ThorPlayMusicS2CPacket(soundEvent.getLocation(), blockPos.getX(), blockPos.getY(), blockPos.getZ()), player);
+    }
+
+    public static void stopSoundForPlayer(ServerPlayer player, SoundEvent soundEvent, SoundSource soundSource) {
+        DRMessages.sendToPlayer(new ThorStopMusicS2CPacket(soundEvent.getLocation(), soundSource), player);
     }
 
     @Override
     public void die(@NotNull DamageSource damageSource) {
-        this.spawnAtLocation(new ItemStack(DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get(), 4));
-        if (RAND.nextFloat() < 0.1) {
-            this.spawnAtLocation(new ItemStack(DRItems.ASGARDIAN_STEEL_NUGGET.get(), RAND.nextInt(3, 7)));
+        if (damageSource.getEntity() instanceof Player) {
+            this.spawnAtLocation(new ItemStack(DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get(), 4));
+
+            if (RAND.nextFloat() < 0.1) {
+                this.spawnAtLocation(new ItemStack(DRItems.ASGARDIAN_STEEL_NUGGET.get(), RAND.nextInt(3, 7)));
+            }
+
+            if (RAND.nextFloat() < 0.02) {
+                this.spawnAtLocation(new ItemStack(DRItems.THOR_FIGHT_MUSIC_DISC.get()));
+            }
         }
 
-        if (RAND.nextFloat() < 0.02) {
-            this.spawnAtLocation(new ItemStack(DRItems.THOR_FIGHT_MUSIC_DISC.get()));
-        }
         super.die(damageSource);
         this.bossEvent.setVisible(false);
 
         if (this.level instanceof ServerLevel serverLevel) {
+            removeThorFromPlayerCapability(serverLevel);
             serverLevel.setWeatherParameters(0, 0, false, false);
             stopPlayingBossMusic();
             this.level.playSound(null, this.getOnPos(), DRSounds.THOR_DEATH_SOUND.get(), SoundSource.HOSTILE, 2.0f, 1.0f);
+        }
+    }
+
+    private void removeThorFromPlayerCapability(ServerLevel serverLevel) {
+        if (!this.initialPlayersNearby.isEmpty()) {
+            for (UUID playerUUID: this.initialPlayersNearby) {
+                if (serverLevel.getEntity(playerUUID) instanceof Player player) {
+                    player.getCapability(FightsThorProvider.FIGHTS_THOR).ifPresent(fightsThor -> {
+                        fightsThor.removeThor(this.getStringUUID());
+                    });
+                }
+            }
         }
     }
 

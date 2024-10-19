@@ -111,9 +111,6 @@ public class Motosignir extends Item {
         float damage = DivineRelicsCommonConfig.MOTOSIGNIR_DAMAGE.get();
         float force = DivineRelicsCommonConfig.MOTOSIGNIR_FORCE.get();
 
-        AABB aabb = new AABB(playerX - radius, playerY - radius, playerZ - radius,
-                playerX + radius, playerY + radius, playerZ + radius);
-
         List<LivingEntity> entitiesInRadius = getEntitiesInArea(level, playerX, playerY, playerZ, radius);
 
         hurtAndKnockbackEntites(entitiesInRadius, player, STUN_EFFECTS, damage, force, AMPLIFIER, EFFECTS_DURATION);
@@ -123,6 +120,16 @@ public class Motosignir extends Item {
         AABB aabb = new AABB(x - radius, y - radius, z - radius,
                 x + radius, y + radius, z + radius);
         return level.getEntitiesOfClass(LivingEntity.class, aabb);
+    }
+
+    public static <T extends Entity> List<T> getEntitiesInAreaOfClass(Class<T> entityClass, Level level, double x, double y, double z, double radius) {
+        AABB aabb = new AABB(x - radius, y - radius, z - radius,
+                x + radius, y + radius, z + radius);
+        return level.getEntitiesOfClass(entityClass, aabb);
+    }
+
+    public static <T extends Entity> List<T> getEntitiesInAreaOfClass(Class<T> entityClass, Level level, Entity entity, double radius) {
+        return getEntitiesInAreaOfClass(entityClass, level, entity.getX(), entity.getY(), entity.getZ(), radius);
     }
 
     public static void hurtAndKnockbackEntites (List<LivingEntity> entities, LivingEntity owner, Entity attacker, DamageSource damageSource, float baseDamage, double force) {

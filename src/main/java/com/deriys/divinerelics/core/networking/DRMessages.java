@@ -77,6 +77,18 @@ public class DRMessages {
                 .encoder(StuckSpearsS2CPacket::toBytes)
                 .consumerMainThread(StuckSpearsS2CPacket::handle)
                 .add();
+
+        net.messageBuilder(ThorPlayMusicS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(ThorPlayMusicS2CPacket::new)
+                .encoder(ThorPlayMusicS2CPacket::toBytes)
+                .consumerMainThread(ThorPlayMusicS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(ThorStopMusicS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(ThorStopMusicS2CPacket::new)
+                .encoder(ThorStopMusicS2CPacket::toBytes)
+                .consumerMainThread(ThorStopMusicS2CPacket::handle)
+                .add();
     }
 
     public static <MSG> void sendToServer(MSG message) {

@@ -230,6 +230,14 @@
         }
       ]
     },
+    "thor_fight_music_loop": {
+      "subtitle": "sounds.divinerelics.thor_fight_music",
+      "sounds": [
+        {
+          "name": "divinerelics:thor_fight_music_loop"
+        }
+      ]
+    },
     "thor_melee_attack": {
       "subtitle": "sounds.divinerelics.thor_melee_attack",
       "sounds": [

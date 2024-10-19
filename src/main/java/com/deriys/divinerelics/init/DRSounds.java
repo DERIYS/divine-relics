@@ -57,10 +57,12 @@ public class DRSounds {
 
     public static final RegistryObject<SoundEvent> THOR_FIGHT_MUSIC =
             registerSoundEvent("thor_fight_music");
+    public static final RegistryObject<SoundEvent> THOR_FIGHT_MUSIC_LOOP =
+            registerSoundEvent("thor_fight_music_loop");
     public static final RegistryObject<SoundEvent> THOR_MELEE_ATTACK =
             registerSoundEvent("thor_melee_attack");
     public static final RegistryObject<SoundEvent> THOR_LEG_ATTACK =
-            registerSoundEvent("thor_leg_attack");;
+            registerSoundEvent("thor_leg_attack");
     public static final RegistryObject<SoundEvent> THOR_CLAP_ATTACK =
             registerSoundEvent("thor_clap_attack");
     public static final RegistryObject<SoundEvent> THOR_GROUND_ATTACK =

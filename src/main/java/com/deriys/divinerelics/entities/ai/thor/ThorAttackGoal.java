@@ -200,7 +200,6 @@ public class ThorAttackGoal extends MeleeAttackGoal {
 
     @Override
     public void stop() {
-        System.out.println("stopping thor goal");
         entity.setAttacking(false);
         entity.setAttackState(ThorAttackState.NONE); // to prevent mjolnir throw spamming
         super.stop();

@@ -9,6 +9,8 @@ import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpears;
 import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpearsProvider;
 import com.deriys.divinerelics.capabilities.teammates.Teammates;
 import com.deriys.divinerelics.capabilities.teammates.TeammatesProvider;
+import com.deriys.divinerelics.capabilities.thor.FightsThor;
+import com.deriys.divinerelics.capabilities.thor.FightsThorProvider;
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.entity.*;
 import com.deriys.divinerelics.init.*;
@@ -31,6 +33,8 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.ZombieVillager;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -43,6 +47,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
@@ -50,12 +55,12 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static com.deriys.divinerelics.capabilities.teammates.TeammatesProvider.hasTeammate;
 import static com.deriys.divinerelics.effects.BifrostProtection.findNormVec;
 import static com.deriys.divinerelics.effects.BifrostProtection.getTPVector;
+import static com.deriys.divinerelics.entities.entity.ThorEntity.stopSoundForPlayer;
 import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 
 
@@ -209,6 +214,9 @@ public class DREvents {
                 if (!player.getCapability(LeviathanBindingProvider.LEVIATHAN_BINDING).isPresent()) {
                     event.addCapability(new ResourceLocation(DivineRelics.MODID, "leviathanbinding"), new LeviathanBindingProvider());
                 }
+                if (!player.getCapability(FightsThorProvider.FIGHTS_THOR).isPresent()) {
+                    event.addCapability(new ResourceLocation(DivineRelics.MODID, "fightsthor"), new FightsThorProvider());
+                }
             }
         }
 
@@ -218,12 +226,14 @@ public class DREvents {
             event.register(Teammates.class);
             event.register(LeviathanBinding.class);
             event.register(StuckSpears.class);
+            event.register(FightsThor.class);
         }
 
         @SubscribeEvent
         public static void onPlayerCloned(PlayerEvent.Clone event) {
-            if(event.isWasDeath()) {
-                Player original = event.getOriginal();
+            Player original = event.getOriginal();
+            Player player = event.getEntity();
+            if (event.isWasDeath()) {
                 original.revive();
 
                 original.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(oldStore -> {
@@ -243,6 +253,40 @@ public class DREvents {
                         newStore.copyFrom(oldStore);
                     });
                 });
+
+                original.getCapability(FightsThorProvider.FIGHTS_THOR).ifPresent(oldStore -> {
+                    event.getEntity().getCapability(FightsThorProvider.FIGHTS_THOR).ifPresent(newStore -> {
+                        newStore.copyFrom(oldStore);
+                    });
+                });
+
+            }
+
+            Objects.requireNonNull(player.getServer()).execute(() -> {
+                CompoundTag deathPositionTag = original.getPersistentData().getCompound("DRdeathPosition");
+                double deathX = deathPositionTag.getDouble("x");
+                double deathY = deathPositionTag.getDouble("y");
+                double deathZ = deathPositionTag.getDouble("z");
+                BlockPos deathPos = new BlockPos(deathX, deathY, deathZ);
+
+                double distanceSqr = player.position().distanceToSqr(deathPos.getX(), deathPos.getY(), deathPos.getZ());
+
+                if (distanceSqr > 70000) {
+                    stopSoundForPlayer((ServerPlayer) player, DRSounds.THOR_FIGHT_MUSIC.get(), SoundSource.RECORDS);
+                    stopSoundForPlayer((ServerPlayer) player, DRSounds.THOR_FIGHT_MUSIC_LOOP.get(), SoundSource.RECORDS);
+                    setLoggedOutCap(player);
+                }
+            });
+        }
+
+        @SubscribeEvent
+        public static void onPlayerDeath(LivingDeathEvent event) {
+            if (event.getEntity() instanceof Player player) {
+                CompoundTag deathPositionTag = new CompoundTag();
+                deathPositionTag.putDouble("x", player.getX());
+                deathPositionTag.putDouble("y", player.getY());
+                deathPositionTag.putDouble("z", player.getZ());
+                player.getPersistentData().put("DRdeathPosition", deathPositionTag);
             }
         }
 
@@ -270,17 +314,39 @@ public class DREvents {
                 Level level = thor.level;
                 ServerLevel serverLevel = ((ServerLevel) level);
                 serverLevel.setWeatherParameters(0, 60000, true, true);
-                ItemStack musicDisc = new ItemStack(DRItems.THOR_FIGHT_MUSIC_DISC.get());
-                BlockPos onPos = thor.getOnPos();
-                level.levelEvent(null, 1010, onPos, Item.getId(musicDisc.getItem()));
+                thor.startPlayingBossMusic();
             }
 
             if (entity instanceof ZombieVillager zombieVillager) {
-                VillagerProfession profession = zombieVillager.getVillagerData().getProfession();
-                if (profession == DRDwarfs.BROK.get() || profession == DRDwarfs.SINDRI.get()) {
-                    event.setCanceled(true);
-                }
+                stopSpawningEvent(zombieVillager.getVillagerData(), event);
+            } else if (entity instanceof Villager villager) {
+                stopSpawningEvent(villager.getVillagerData(), event);
             }
+        }
+
+        private static void stopSpawningEvent(VillagerData zombieVillager, EntityJoinLevelEvent event) {
+            VillagerProfession profession = zombieVillager.getProfession();
+            if (profession == DRDwarfs.BROK.get() || profession == DRDwarfs.SINDRI.get()) {
+                event.setCanceled(true);
+            }
+        }
+
+        @SubscribeEvent
+        public static void onPlayerLogOut(PlayerEvent.PlayerLoggedOutEvent event) {
+            Player player = event.getEntity();
+            Level level = player.getLevel();
+
+            if (!level.isClientSide) {
+                setLoggedOutCap(player);
+            }
+        }
+
+        private static void setLoggedOutCap(Player player) {
+            player.getCapability(FightsThorProvider.FIGHTS_THOR).ifPresent(fightsThorCap -> {
+                if (!fightsThorCap.getThorList().isEmpty()) {
+                    fightsThorCap.setHasLoggedOut(true);
+                }
+            });
         }
 
         public static boolean isValidBindingItem(Item item) {
