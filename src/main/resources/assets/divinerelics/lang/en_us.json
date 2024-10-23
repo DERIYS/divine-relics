@@ -81,6 +81,9 @@
 
   "effect.divinerelics.bifrost_protection": "Bifrost Protection",
 
+  "key.category.divinerelics.main": "Divine Relics",
+  "key.category.divinerelics.use_guardian_shield": "Use Guardian Shield",
+
   "sounds.divinerelics.motosignir_sound_wave": "Motosignir released its sound wave",
 
   "sounds.divinerelics.draupnir_spear_throwing": "Draupnir Spear is thrown",
