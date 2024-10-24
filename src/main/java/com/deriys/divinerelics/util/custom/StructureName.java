@@ -2,6 +2,11 @@ package com.deriys.divinerelics.util.custom;
 
 import java.util.Objects;
 
+/**
+ * The StructureName class represents a structure with a specified path and name.
+ * This class is commonly used in scenarios where structures need to be uniquely identified
+ * and managed using their path and name attributes.
+ */
 public class StructureName {
     private String path;
     private String name;

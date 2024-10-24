@@ -10,5 +10,5 @@ public class DRKeyBindings {
     public static final String KEY_USE_GUARDIAN_SHIELD = "key.category.divinerelics.use_guardian_shield";
 
     public static final KeyMapping GUARDIAN_SHIELD_KEY = new KeyMapping(KEY_USE_GUARDIAN_SHIELD, KeyConflictContext.IN_GAME,
-            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_CAPS_LOCK, KEY_CATEGORY_MAIN);
+            InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, KEY_CATEGORY_MAIN);
 }

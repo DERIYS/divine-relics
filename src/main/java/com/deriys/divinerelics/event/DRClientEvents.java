@@ -16,10 +16,17 @@ import net.minecraftforge.fml.common.Mod;
 public class DRClientEvents {
     @Mod.EventBusSubscriber(modid = DivineRelics.MODID, value = Dist.CLIENT)
     public static class ForgeClientEvents {
+        /**
+         * Handles the key input event for activating the Guardian Shield.
+         * When the specified key is pressed, this method checks if the player
+         * has a Guardian Shield in their off-hand and uses the item.
+         *
+         * @param event the key input event containing details about the key action
+         */
         @SubscribeEvent
         public static void onKeyInput(InputEvent.Key event){
-            if (event.getKey() == DRKeyBindings.GUARDIAN_SHIELD_KEY.getKey().getValue()) {
-                Minecraft mc = Minecraft.getInstance();
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.screen == null && event.getKey() == DRKeyBindings.GUARDIAN_SHIELD_KEY.getKey().getValue()) {
                 LocalPlayer player = mc.player;
                 MultiPlayerGameMode gameMode = mc.gameMode;
                 if (player != null && gameMode != null && player.getOffhandItem().getItem() == DRItems.GUARDIAN_SHIELD.get()) {
@@ -29,7 +36,6 @@ public class DRClientEvents {
                     }
                     if (event.getAction() == InputConstants.RELEASE) {
                         mc.options.keyUse.setDown(false);
-                        gameMode.releaseUsingItem(player);
                     }
                 }
 

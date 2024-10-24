@@ -38,9 +38,9 @@ import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
 
 public class Mjolnir extends AxeItem {
     public static final int THROW_THRESHOLD_TIME = DivineRelicsCommonConfig.MJOLNIR_THROW_THRESHOLD.get();
-    public static final float BASE_DAMAGE = DivineRelicsCommonConfig.MJOLNIR_DAMAGE.get();
-    public static final float BASE_ATTACK_SPEED = DivineRelicsCommonConfig.MJOLNIR_ATTACK_SPEED.get();
-    public static final float SHOOT_POWER = DivineRelicsCommonConfig.MJOLNIR_SHOOT_POWER.get();
+    public static final double BASE_DAMAGE = DivineRelicsCommonConfig.MJOLNIR_DAMAGE.get();
+    public static final double BASE_ATTACK_SPEED = DivineRelicsCommonConfig.MJOLNIR_ATTACK_SPEED.get();
+    public static final double SHOOT_POWER = DivineRelicsCommonConfig.MJOLNIR_SHOOT_POWER.get();
     private static final int RIPTIDE_COOLDOWN = DivineRelicsCommonConfig.MJOLNIR_RIPTIDE_COOLDOWN.get();
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
@@ -71,7 +71,7 @@ public class Mjolnir extends AxeItem {
                 if (!player.isShiftKeyDown() && !level.isClientSide) {
                     // Adding thrown Mjölnir
                     ThrownMjolnir thrownMjolnir = new ThrownMjolnir(level, player, itemStack);
-                    thrownMjolnir.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, SHOOT_POWER, 1.0F);
+                    thrownMjolnir.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, (float) SHOOT_POWER, 1.0F);
                     if (player.getAbilities().instabuild) {
                         thrownMjolnir.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;
                     }

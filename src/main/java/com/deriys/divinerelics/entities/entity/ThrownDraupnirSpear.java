@@ -40,7 +40,7 @@ import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 
 public class ThrownDraupnirSpear extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
-    private static final float SPEAR_DAMAGE = DivineRelicsCommonConfig.THROWN_DRAUPNIR_SPEAR_DAMAGE.get();
+    private static final double SPEAR_DAMAGE = DivineRelicsCommonConfig.THROWN_DRAUPNIR_SPEAR_DAMAGE.get();
     private double throwerX;
     private double throwerY;
     private double throwerZ;
@@ -126,7 +126,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
 
     protected void onHitEntity(EntityHitResult hitResult) {
         Entity hurtEntity = hitResult.getEntity();
-        float damage = SPEAR_DAMAGE;
+        double damage = SPEAR_DAMAGE;
         if (hurtEntity instanceof LivingEntity livingEntity) {
             damage += EnchantmentHelper.getDamageBonus(this.spearItem, livingEntity.getMobType());
         }
@@ -135,7 +135,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
         DamageSource damageSource = DamageSource.trident(this, (Entity)(owner == null ? this : owner));
         this.dealtDamage = true;
         SoundEvent soundEvent = DRSounds.DRAUPNIR_SPEAR_LANDING.get();
-        if (hurtEntity.hurt(damageSource, damage)) {
+        if (hurtEntity.hurt(damageSource, (float) damage)) {
             if (hurtEntity.getType() == EntityType.ENDERMAN) {
                 return;
             }
