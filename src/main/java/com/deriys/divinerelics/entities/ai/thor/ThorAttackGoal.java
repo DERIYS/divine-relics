@@ -25,13 +25,13 @@ public class ThorAttackGoal extends MeleeAttackGoal {
     private boolean shouldCountTillNextAttack = false;
     private ThorAttackState lastAttack = ThorAttackState.NONE;
 
-    public static float CLAP_ATTACK_DAMAGE = DivineRelicsCommonConfig.THOR_CLAP_DAMAGE.get();
-    public static float CLAP_ATTACK_FORCE = DivineRelicsCommonConfig.THOR_CLAP_FORCE.get();
-    public static float CLAP_ATTACK_RADUIS = DivineRelicsCommonConfig.THOR_CLAP_RADIUS.get();
+    public static double CLAP_ATTACK_DAMAGE = DivineRelicsCommonConfig.THOR_CLAP_DAMAGE.get();
+    public static double CLAP_ATTACK_FORCE = DivineRelicsCommonConfig.THOR_CLAP_FORCE.get();
+    public static double CLAP_ATTACK_RADUIS = DivineRelicsCommonConfig.THOR_CLAP_RADIUS.get();
 
-    public static float GROUND_ATTACK_DAMAGE = DivineRelicsCommonConfig.THOR_GROUND_DAMAGE.get();
-    public static float GROUND_ATTACK_FORCE = DivineRelicsCommonConfig.THOR_GROUND_FORCE.get();
-    public static float GROUND_ATTACK_RADUIS = DivineRelicsCommonConfig.THOR_GROUND_RADIUS.get();
+    public static double GROUND_ATTACK_DAMAGE = DivineRelicsCommonConfig.THOR_GROUND_DAMAGE.get();
+    public static double GROUND_ATTACK_FORCE = DivineRelicsCommonConfig.THOR_GROUND_FORCE.get();
+    public static double GROUND_ATTACK_RADUIS = DivineRelicsCommonConfig.THOR_GROUND_RADIUS.get();
 
 
     public ThorAttackGoal(PathfinderMob pathfinderMob, double pSpeedModifier, boolean pFollowingTargetEvenIfNotSeen) {
@@ -42,9 +42,15 @@ public class ThorAttackGoal extends MeleeAttackGoal {
     @Override
     public void start() {
         super.start();
-//        assignDelayTicks();
     }
 
+    /**
+     * Checks the distance to the enemy and performs an attack if the enemy is within the specified range.
+     * Sets the attack state and manages the attack animation and execution timing.
+     *
+     * @param pEnemy The enemy entity to check the distance against and potentially attack.
+     * @param pDistToEnemySqr The squared distance to the enemy.
+     */
     @Override
     protected void checkAndPerformAttack(LivingEntity pEnemy, double pDistToEnemySqr) {
         if (isEnemyWithinAttackDistance(pEnemy, pDistToEnemySqr)) {
@@ -65,7 +71,13 @@ public class ThorAttackGoal extends MeleeAttackGoal {
         }
     }
 
-
+    /**
+     * Checks if an enemy is within a certain attack range and decides the appropriate attack state for Thor.
+     *
+     * @param pEnemy The enemy entity to check the distance against.
+     * @param pDistToEnemySqr The squared distance to the enemy.
+     * @return A boolean indicating whether the enemy is within attack distance.
+     */
     private boolean isEnemyWithinAttackDistance(LivingEntity pEnemy, double pDistToEnemySqr) {
         float attackRange = 2.8f;
         ThorEntity thor = this.entity;
@@ -146,7 +158,6 @@ public class ThorAttackGoal extends MeleeAttackGoal {
         return this.ticksUntilNextAttack;
     }
 
-
     protected void performAttack(LivingEntity pEnemy) {
         ThorAttackState attackState = this.entity.getAttackState();
         if (attackState != ThorAttackState.MJOLNIR_THROW) {
@@ -156,18 +167,22 @@ public class ThorAttackGoal extends MeleeAttackGoal {
             this.mob.swing(InteractionHand.MAIN_HAND);
             this.mob.doHurtTarget(pEnemy);
         } else {
-            ThorEntity thor = this.entity;
-            thor.setHasMjolnirInHands(false);
-            thor.setWaitsForMjolnir(true);
-            Level level = thor.level;
-            ThrownMjolnir thrownMjolnir = new ThrownMjolnir(level, thor, new ItemStack(DRItems.MJOLNIR.get()));
-            thrownMjolnir.shootMjolnirAtTarget(thor, pEnemy);
-            thrownMjolnir.pickup = AbstractArrow.Pickup.DISALLOWED;
-            thrownMjolnir.setNoGravity(true);
-            level.addFreshEntity(thrownMjolnir);
-            thor.thrownMjolnirUUID = thrownMjolnir.getUUID();
-            level.playSound(null, thor.getOnPos(), DRSounds.MJOLNIR_THROWING.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
+            throwMjolnirAtEnemy(pEnemy);
         }
+    }
+
+    private void throwMjolnirAtEnemy(LivingEntity pEnemy) {
+        ThorEntity thor = this.entity;
+        thor.setHasMjolnirInHands(false);
+        thor.setWaitsForMjolnir(true);
+        Level level = thor.level;
+        ThrownMjolnir thrownMjolnir = new ThrownMjolnir(level, thor, new ItemStack(DRItems.MJOLNIR.get()));
+        thrownMjolnir.shootMjolnirAtTarget(thor, pEnemy);
+        thrownMjolnir.pickup = AbstractArrow.Pickup.DISALLOWED;
+        thrownMjolnir.setNoGravity(true);
+        level.addFreshEntity(thrownMjolnir);
+        thor.thrownMjolnirUUID = thrownMjolnir.getUUID();
+        level.playSound(null, thor.getOnPos(), DRSounds.MJOLNIR_THROWING.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
     }
 
     @Override

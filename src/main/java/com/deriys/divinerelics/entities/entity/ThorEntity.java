@@ -120,8 +120,6 @@ public class ThorEntity extends Monster implements IAnimatable {
     private List<UUID> needMusicReplay = new ArrayList<>();
     private List<UUID> initialPlayersNearby = new ArrayList<>();
 
-    private int musicTick = 0;
-
     public ThorEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
         this.setPersistenceRequired();
@@ -228,6 +226,27 @@ public class ThorEntity extends Monster implements IAnimatable {
         this.entityData.define(SUMMONING_COMPLETE, false);
     }
 
+    /**
+     * This method is responsible for the periodic updates of the ThorEntity. It performs various checks and updates based
+     * on the current state of the entity.
+     *
+     * It updates the boss bar's progress according to the health state of the entity.
+     *
+     * If the summoning is complete and the level is not client-side, it handles player tracking and ambient sound logic for
+     * aggressive behavior.
+     *
+     * The method also manages the introduction and looping of fight music for players in the vicinity.
+     *
+     * In case the entity is waiting for its thrown Mjölnir to return, the method updates its state based on Mjölnir's
+     * position and status.
+     *
+     * During the summoning phase, it spawns lightning strikes at specified ticks and sets the entity to a non-invulnerable
+     * state once summoning is complete.
+     *
+     * It also sets the entity to be in a chasing state if there is a target.
+     *
+     * The method reduces the attacking ticks if there are any left and calls the superclass tick method at the end.
+     */
     @Override
     public void tick() {
 
@@ -297,16 +316,16 @@ public class ThorEntity extends Monster implements IAnimatable {
         if (!summoningComplete && !this.level.isClientSide) {
             if (this.tickCount < INVULNERABLE_TICKS) {
                 if (contains(LIGHTNING_TICKS, this.tickCount)) {
-                    spawnLightning(this.level, getRandBlockPos(onPos, 100, 100, 50), this);
+                    spawnLightning(this.level, getRandBlockPos(onPos.offset(0, -10, 0), 100, 100, 50), this);
                 }
             } else if (this.tickCount == INVULNERABLE_TICKS) {
+                this.teleportTo(this.getX(), this.getY() - 10d, this.getZ());
                 spawnLightning(this.level, onPos, this);
                 onHitLighnting(this.level, this, onPos, this, this.thorDamageSource, 10f, 2f, 12);
                 this.setSummoningComplete(true);
                 this.setNoAi(false);
             }
         }
-
         LivingEntity target = this.getTarget();
         setChasing(this, FAST_SPEED_MODIFIER, SLOW_SPEED_MODIFIER, target != null && target.isAlive());
 
@@ -502,7 +521,7 @@ public class ThorEntity extends Monster implements IAnimatable {
 
     @Override
     public int getExperienceReward() {
-        return 2000;
+        return DivineRelicsCommonConfig.THOR_XP_AMOUNT.get();
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {

@@ -50,14 +50,14 @@ import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
 
 public class DraupnirSpear extends SwordItem {
     public static final int THROW_THRESHOLD_TIME = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_THROW_THRESHOLD.get();
-    public static final float BASE_DAMAGE = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_DAMAGE.get();
-    public static final float BASE_ATTACK_SPEED = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_ATTACK_SPEED.get();
-    public static final float SHOOT_POWER = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_SHOOT_POWER.get();
+    public static final double BASE_DAMAGE = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_DAMAGE.get();
+    public static final double BASE_ATTACK_SPEED = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_ATTACK_SPEED.get();
+    public static final double SHOOT_POWER = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_SHOOT_POWER.get();
 
     public static final Random RAND = new Random();
     private static final int DELAY_TICKS_THRESHOLD = 1;
     private static final double EXPLOSION_RADIUS = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_EXPLOSION_RADIUS.get();
-    private static final float EXPLOSION_DAMAGE = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_EXPLOSION_DAMAGE.get();
+    private static final double EXPLOSION_DAMAGE = DivineRelicsCommonConfig.DRAUPNIR_SPEAR_EXPLOSION_DAMAGE.get();
     private static final int THROWN_SPEARS_THRESHOLD = DivineRelicsCommonConfig.DRAUPNIR_SPEARS_COUNT.get();
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
@@ -180,6 +180,20 @@ public class DraupnirSpear extends SwordItem {
         return 36000;
     }
 
+    /**
+     * This method is invoked to handle ticking of an ItemStack in an entity's inventory and performs the following tasks:
+     * 1. Binds the item to an entity if it is not already owned.
+     * 2. Manages delay ticks for the item stack.
+     * 3. Resets the item stack's NBT data if there are no thrown spears and the NBT data is not reset.
+     * 4. Decrements delay ticks and handles the state of thrown spears.
+     *
+     * Spears are destroyed under the following conditions:
+     * - When delayTicks equals DELAY_TICKS_THRESHOLD.
+     * - The explosion state of the item stack is active.
+     * - The UUID for the thrown spears is retrieved.
+     * - The entity tied to the UUID is a valid spear and the current entity is an instance of Player.
+     * - The spear is destroyed using destroySpear, and its UUID is removed from the list of thrown spears.
+     */
     @Override
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
         if (getOwner(itemStack).isEmpty()) {
@@ -266,7 +280,7 @@ public class DraupnirSpear extends SwordItem {
                 if (!level.isClientSide) {
                     int thrownCount = getThrownCount(itemStack);
                     ThrownDraupnirSpear thrownSpear = new ThrownDraupnirSpear(level, player, itemStack);
-                    thrownSpear.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, SHOOT_POWER, 1.0F);
+                    thrownSpear.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, (float) SHOOT_POWER, 1.0F);
                     thrownSpear.pickup = AbstractArrow.Pickup.DISALLOWED;
 
                     thrownSpear.setThrowerPos(player.position());

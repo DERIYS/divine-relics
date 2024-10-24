@@ -38,7 +38,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
     public int clientSideReturnTridentTickCount;
     public boolean shouldReturn = false;
     public boolean relaxed = false;
-    public DamageSource damageSource = DamageSource.trident(this, (Entity)(this.getOwner() == null ? this : this.getOwner()));
+    public DamageSource damageSource = DamageSource.trident(this, this.getOwner() == null ? this : this.getOwner());
     public final int COOLDOWN = DivineRelicsCommonConfig.LEVIATHAN_AXE_THROW_COOLDOWN.get();
 
     public ThrownLeviathanAxe(EntityType<? extends ThrownLeviathanAxe> entityType, Level level) {
@@ -148,7 +148,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
 
     protected void onHitEntity(EntityHitResult hitResult) {
         Entity entity = hitResult.getEntity();
-        float damage = DivineRelicsCommonConfig.LEVIATHAN_AXE_DAMAGE.get();
+        double damage = DivineRelicsCommonConfig.LEVIATHAN_AXE_DAMAGE.get();
         if (entity instanceof LivingEntity hitEntity) {
             damage += EnchantmentHelper.getDamageBonus(this.leviathanItem, hitEntity.getMobType());
         }
@@ -158,7 +158,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         this.dealtDamage = true;
         this.rotationDirection *= -1;
         SoundEvent soundEvent = DRSounds.LEVIATHAN_AXE_IMPACT.get();
-        if (entity.hurt(this.damageSource, damage)) {
+        if (entity.hurt(this.damageSource, (float) damage)) {
             if (owner instanceof Player player) {
                 player.getCooldowns().addCooldown(this.leviathanItem.getItem(), this.COOLDOWN);
             }

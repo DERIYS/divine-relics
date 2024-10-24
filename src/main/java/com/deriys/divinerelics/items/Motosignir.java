@@ -107,9 +107,9 @@ public class Motosignir extends Item {
         level.playSound(null, player.getOnPos(), DRSounds.MOTOSIGNIR_SOUND_WAVE.get(), SoundSource.PLAYERS,
                 3.0f, 1);
 
-        float radius = DivineRelicsCommonConfig.MOTOSIGNIR_RANGE.get();
-        float damage = DivineRelicsCommonConfig.MOTOSIGNIR_DAMAGE.get();
-        float force = DivineRelicsCommonConfig.MOTOSIGNIR_FORCE.get();
+        double radius = DivineRelicsCommonConfig.MOTOSIGNIR_RANGE.get();
+        double damage = DivineRelicsCommonConfig.MOTOSIGNIR_DAMAGE.get();
+        double force = DivineRelicsCommonConfig.MOTOSIGNIR_FORCE.get();
 
         List<LivingEntity> entitiesInRadius = getEntitiesInArea(level, playerX, playerY, playerZ, radius);
 
@@ -132,7 +132,7 @@ public class Motosignir extends Item {
         return getEntitiesInAreaOfClass(entityClass, level, entity.getX(), entity.getY(), entity.getZ(), radius);
     }
 
-    public static void hurtAndKnockbackEntites (List<LivingEntity> entities, LivingEntity owner, Entity attacker, DamageSource damageSource, float baseDamage, double force) {
+    public static void hurtAndKnockbackEntites (List<LivingEntity> entities, LivingEntity owner, Entity attacker, DamageSource damageSource, double baseDamage, double force) {
         for(LivingEntity livingEntity: entities) {
             if (livingEntity != owner && !hasTeammate(owner, livingEntity)) {
                 double entityX = livingEntity.getX();
@@ -143,7 +143,7 @@ public class Motosignir extends Item {
                 double ratioZ = -Math.sin(angle);
 
                 float armorModifier = (float) (livingEntity.getAttributeValue(Attributes.ARMOR)) / 12;
-                float adjustedDamage = baseDamage + armorModifier;
+                double adjustedDamage = baseDamage + armorModifier;
 
                 ItemStack weapon = owner.getMainHandItem();
                 adjustedDamage += EnchantmentHelper.getDamageBonus(weapon, livingEntity.getMobType());
@@ -158,7 +158,7 @@ public class Motosignir extends Item {
                     livingEntity.knockback(force, ratioX, ratioZ);
                 }
 
-                livingEntity.hurt(damageSource, Math.min(adjustedDamage, adjustedDamage * distanceFactor));
+                livingEntity.hurt(damageSource, (float) Math.min(adjustedDamage, adjustedDamage * distanceFactor));
 
                 EnchantmentHelper.doPostHurtEffects(livingEntity, owner);
                 EnchantmentHelper.doPostDamageEffects(owner, livingEntity);
@@ -171,7 +171,7 @@ public class Motosignir extends Item {
     }
 
 
-    public static void hurtAndKnockbackEntites (List<LivingEntity> entities, Player player, MobEffect[] mobEffects, float baseDamage, double force, int amplifier, int duration) {
+    public static void hurtAndKnockbackEntites (List<LivingEntity> entities, Player player, MobEffect[] mobEffects, double baseDamage, double force, int amplifier, int duration) {
         for(LivingEntity livingEntity: entities) {
             if (livingEntity != player && (!(livingEntity instanceof Player && ((Player) livingEntity).isCreative())) && !hasTeammate(player, livingEntity)) {
                 double entityX = livingEntity.getX();
@@ -182,7 +182,7 @@ public class Motosignir extends Item {
                 double ratioZ = -Math.sin(angle);
 
                 float armorModifier = (float) (livingEntity.getAttributeValue(Attributes.ARMOR)) / 12;
-                float adjustedDamage = baseDamage + armorModifier;
+                float adjustedDamage = (float) baseDamage + armorModifier;
 
                 ItemStack weapon = player.getMainHandItem();
                 adjustedDamage += EnchantmentHelper.getDamageBonus(weapon, livingEntity.getMobType());

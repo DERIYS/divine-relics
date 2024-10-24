@@ -33,9 +33,9 @@ import static com.deriys.divinerelics.event.DREvents.ForgeEvents.getOwner;
 
 public class LeviathanAxe extends AxeItem {
     public static final int THROW_THRESHOLD_TIME = DivineRelicsCommonConfig.LEVIATHAN_AXE_THROW_THRESHOLD.get();
-    public static final float BASE_DAMAGE = DivineRelicsCommonConfig.LEVIATHAN_AXE_DAMAGE.get();
-    public static final float BASE_ATTACK_SPEED = DivineRelicsCommonConfig.LEVIATHAN_AXE_ATTACK_SPEED.get();
-    public static final float SHOOT_POWER = DivineRelicsCommonConfig.LEVIATHAN_AXE_SHOOT_POWER.get();
+    public static final double BASE_DAMAGE = DivineRelicsCommonConfig.LEVIATHAN_AXE_DAMAGE.get();
+    public static final double BASE_ATTACK_SPEED = DivineRelicsCommonConfig.LEVIATHAN_AXE_ATTACK_SPEED.get();
+    public static final double SHOOT_POWER = DivineRelicsCommonConfig.LEVIATHAN_AXE_SHOOT_POWER.get();
     public static final int FREEZE_TIME = DivineRelicsCommonConfig.LEVIATHAN_AXE_FREEZE_TIME_HIT.get();
     private final Multimap<Attribute, AttributeModifier> defaultModifiers;
 
@@ -65,7 +65,7 @@ public class LeviathanAxe extends AxeItem {
             if (ticks >= THROW_THRESHOLD_TIME) {
                 if (!level.isClientSide) {
                     ThrownLeviathanAxe thrownLeviathanAxe = new ThrownLeviathanAxe(level, player, itemStack);
-                    thrownLeviathanAxe.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, SHOOT_POWER, 1.0F);
+                    thrownLeviathanAxe.shootFromRotation(player, player.getXRot(), player.getYRot(), 0.0F, (float) SHOOT_POWER, 1.0F);
 
                     if (player.getAbilities().instabuild) {
                         thrownLeviathanAxe.pickup = AbstractArrow.Pickup.CREATIVE_ONLY;

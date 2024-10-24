@@ -42,10 +42,11 @@ public class ThrownMjolnir extends AbstractArrow {
     private ItemStack mjolnirItem;
     private boolean dealtDamage;
     private boolean hit;
-    public final float STRIKE_DAMAGE = DivineRelicsCommonConfig.THROWN_MJOLNIR_STRIKE_DAMAGE.get();
-    private final int COOLDOWN = DivineRelicsCommonConfig.MJOLNIR_THROW_COOLDOWN.get();
-    public static float STRIKE_RADIUS = DivineRelicsCommonConfig.THROWN_MJOLNIR_STRIKE_RADIUS.get();
-    public static float STRIKE_FORCE = DivineRelicsCommonConfig.THROWN_MJOLNIR_STRIKE_FORCE.get();
+    public static final double STRIKE_DAMAGE = DivineRelicsCommonConfig.THROWN_MJOLNIR_STRIKE_DAMAGE.get();
+    private static final int COOLDOWN = DivineRelicsCommonConfig.MJOLNIR_THROW_COOLDOWN.get();
+    public static double STRIKE_RADIUS = DivineRelicsCommonConfig.THROWN_MJOLNIR_STRIKE_RADIUS.get();
+    public static double STRIKE_FORCE = DivineRelicsCommonConfig.THROWN_MJOLNIR_STRIKE_FORCE.get();
+    public static double RETURNING_SPEED = DivineRelicsCommonConfig.THROWN_MJOLNIR_RETURNING_SPEED.get();
     public int clientSideReturnTridentTickCount;
     public boolean shouldReturn = false;
     public boolean relaxed = false;
@@ -103,7 +104,7 @@ public class ThrownMjolnir extends AbstractArrow {
                     this.yOld = this.getY();
                 }
 
-                double fact = 0.05 * DivineRelicsCommonConfig.THROWN_MJOLNIR_RETURNING_SPEED.get();
+                double fact = 0.05 * RETURNING_SPEED;
                 this.setDeltaMovement(this.getDeltaMovement().scale(0.95).add(vectorPM.normalize().scale(fact)));
                 if (this.clientSideReturnTridentTickCount == 0) {
                     this.playSound(DRSounds.MJOLNIR_RETURN.get(), 15.0F, 1.0F);
@@ -158,7 +159,7 @@ public class ThrownMjolnir extends AbstractArrow {
 
     protected void onHitEntity(EntityHitResult hitResult) {
         Entity entity = hitResult.getEntity();
-        float damage = DivineRelicsCommonConfig.THROWN_MJOLNIR_DAMAGE.get();
+        double damage = DivineRelicsCommonConfig.THROWN_MJOLNIR_DAMAGE.get();
         if (entity instanceof LivingEntity hitEntity) {
             damage += EnchantmentHelper.getDamageBonus(this.mjolnirItem, hitEntity.getMobType());
         }
@@ -167,7 +168,7 @@ public class ThrownMjolnir extends AbstractArrow {
         float volume = 1.0F;
         this.dealtDamage = true;
         SoundEvent soundEvent = DRSounds.MJOLNIR_IMPACT.get();
-        if (entity.hurt(this.damageSource, damage)) {
+        if (entity.hurt(this.damageSource, (float) damage)) {
             this.hit = true;
             Level level = this.level;
             BlockPos blockPos = entity.blockPosition();
@@ -220,7 +221,7 @@ public class ThrownMjolnir extends AbstractArrow {
         level.addFreshEntity(lightningBolt);
     }
 
-    public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, LivingEntity owner, DamageSource damageSource, float damage, float force, double strikeRadius) {
+    public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, LivingEntity owner, DamageSource damageSource, double damage, double force, double strikeRadius) {
 
         double hammerX = hammer.getX();
         double hammerY = hammer.getY();

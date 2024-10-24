@@ -29,9 +29,9 @@ public class DivineMead extends Item {
         if (!level.isClientSide && level.getDifficulty() != Difficulty.PEACEFUL && player != null && player.getMainHandItem() == stack && context.getClickedFace() == Direction.UP && clickedBlock != Blocks.LAVA) {
             ThorEntity thor = new ThorEntity(DREntitiyTypes.THOR.get(), level);
             if (clickedBlock instanceof SlabBlock || clickedBlock instanceof SnowLayerBlock) {
-                thor.setPos(Vec3.atCenterOf(context.getClickedPos()).add(0D, 0.1D, 0D));
+                thor.setPos(Vec3.atCenterOf(context.getClickedPos()).add(0D, 10.1D, 0D));
             } else {
-                thor.setPos(Vec3.atCenterOf(context.getClickedPos()).add(0D, 1D, 0D));
+                thor.setPos(Vec3.atCenterOf(context.getClickedPos()).add(0D, 11D, 0D));
             }
             thor.setSummoningComplete(false);
             level.addFreshEntity(thor);

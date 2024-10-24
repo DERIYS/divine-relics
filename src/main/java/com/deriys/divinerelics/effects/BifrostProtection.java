@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
@@ -22,7 +23,7 @@ public class BifrostProtection extends MobEffect {
     }
 
     @Override
-    public void applyEffectTick(LivingEntity livingEntity, int pAmplifier) {
+    public void applyEffectTick(@NotNull LivingEntity livingEntity, int pAmplifier) {
         super.applyEffectTick(livingEntity, pAmplifier);
     }
 
@@ -38,13 +39,6 @@ public class BifrostProtection extends MobEffect {
 
     public static Vec2 findNormVec(Vec3 vector) {
         return findNormVec(new Vec2((float) vector.x, (float) vector.y));
-    }
-
-    public static Vec3 rotateVector(Vec2 normVector, double vectorAngle) {
-        double baseAngle = Math.atan2(normVector.y, normVector.x);
-        double angle = baseAngle + vectorAngle;
-
-        return new Vec3(-Math.cos(angle), 0, -Math.sin(angle));
     }
 
     public static Vec3 rotateVector(Vec2 normVector, double vectorAngle, double length) {
@@ -73,6 +67,14 @@ public class BifrostProtection extends MobEffect {
         return new Vec3(pos.getX() + RAND.nextFloat() * 0.4 + 0.3, entityPos.y, pos.getZ() + RAND.nextFloat() * 0.4 + 0.3);
     }
 
+    /**
+     * Determines if a given teleportation vector is safe for the entity and calculates the necessary offset if needed.
+     *
+     * @param level The level or world in which the safety of the teleportation point is being evaluated.
+     * @param tpVector The vector representing the potential teleportation coordinates.
+     * @return TPData object containing status indicating whether the teleportation point is safe,
+     *         and an offset value for adjustment if the position is safe.
+     */
     public static TPData isSafeTP(Level level, Vec3 tpVector) {
         BlockPos middle = new BlockPos(tpVector);
         BlockPos ground = middle.below();
