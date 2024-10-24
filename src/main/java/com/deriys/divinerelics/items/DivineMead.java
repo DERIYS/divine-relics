@@ -2,7 +2,9 @@ package com.deriys.divinerelics.items;
 
 import com.deriys.divinerelics.entities.entity.ThorEntity;
 import com.deriys.divinerelics.init.DREntitiyTypes;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -38,7 +40,9 @@ public class DivineMead extends Item {
             if (!player.isCreative()) {
                 player.getInventory().removeItem(stack);
             }
+        } else if (level.getDifficulty() == Difficulty.PEACEFUL && !level.isClientSide && player != null) {
+            player.sendSystemMessage(Component.literal("The air shimmers, but something seems to prevent Thor from emerging. Maybe try altering the realm's conditions for his arrival...").withStyle(ChatFormatting.DARK_RED));
         }
-        return InteractionResult.CONSUME;
+        return InteractionResult.SUCCESS;
     }
 }

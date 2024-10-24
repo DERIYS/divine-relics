@@ -214,15 +214,15 @@ public class DivineRelicsCommonConfig {
         THOR_DAMAGE = BUILDER.comment("Thor Melee Damage")
                 .defineInRange("Thor Damage", 20.0f, 0f, 1000f);
         THOR_CLAP_DAMAGE = BUILDER.comment("Thor's Clap Attack Damage")
-                .defineInRange("Thor Clap Damage", 7.0f, 0f, 1000f);
+                .defineInRange("Thor Clap Damage", 27.0f, 0f, 1000f);
         THOR_CLAP_FORCE = BUILDER.comment("Thor's Clap Attack Knockback Force")
-                .defineInRange("Thor Clap Force", 3.5f, 0f, 100f);
+                .defineInRange("Thor Clap Force", 4.5f, 0f, 100f);
         THOR_CLAP_RADIUS = BUILDER.comment("Thor's Clap Attack Radius")
                 .defineInRange("Thor Clap Radius", 6.0f, 0f, 20f);
         THOR_GROUND_DAMAGE = BUILDER.comment("Thor's Ground Attack Damage")
-                .defineInRange("Thor Ground Damage", 17.0f, 0f, 100f);
+                .defineInRange("Thor Ground Damage", 37.0f, 0f, 100f);
         THOR_GROUND_FORCE = BUILDER.comment("Thor's Ground Attack Knockback Force")
-                .defineInRange("Thor Ground Force", 5.0f, 0f, 30f);
+                .defineInRange("Thor Ground Force", 6.0f, 0f, 30f);
         THOR_GROUND_RADIUS = BUILDER.comment("Thor's Ground Attack Radius")
                 .defineInRange("Thor Ground Radius", 8.0f, 0f, 30f);
         THOR_FOLLOW_RANGE = BUILDER.comment("How far Thor can see its target")
