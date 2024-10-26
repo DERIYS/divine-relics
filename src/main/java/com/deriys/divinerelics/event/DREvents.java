@@ -76,7 +76,7 @@ public class DREvents {
 
             if (hurtEntity instanceof LivingEntity livingEntity) {
                 Level level = livingEntity.getLevel();
-                if (livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
+                if (livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get()) && !(livingEntity instanceof Player player && player.getAbilities().instabuild)) {
                     if (attacker != null && isValidAttacker(attacker, directAttacker) && !level.isClientSide) {
                         Vec3 entityPos = livingEntity.position();
                         Vec3 attackerPos = attacker.position();
@@ -191,8 +191,10 @@ public class DREvents {
                     event.setCanceled(true);
                 }
             }
-            if (entity instanceof ItemEntity itemEntity && itemEntity.getItem().getItem() == DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get()) {
-                event.setCanceled(true);
+            if (entity instanceof ItemEntity itemEntity) {
+                if (itemEntity.getItem().is(DRTags.Items.CANT_BE_DESTROYED_BY_LIGHTNING)) {
+                    event.setCanceled(true);
+                }
             }
         }
 
@@ -319,13 +321,13 @@ public class DREvents {
 
             if (entity instanceof ZombieVillager zombieVillager) {
                 stopSpawningEvent(zombieVillager.getVillagerData(), event);
-            } else if (entity instanceof Villager villager) {
+            } else if (!(entity instanceof BrokEntity || entity instanceof SindriEntity) && entity instanceof Villager villager) {
                 stopSpawningEvent(villager.getVillagerData(), event);
             }
         }
 
-        private static void stopSpawningEvent(VillagerData zombieVillager, EntityJoinLevelEvent event) {
-            VillagerProfession profession = zombieVillager.getProfession();
+        private static void stopSpawningEvent(VillagerData villagerData, EntityJoinLevelEvent event) {
+            VillagerProfession profession = villagerData.getProfession();
             if (profession == DRDwarfs.BROK.get() || profession == DRDwarfs.SINDRI.get()) {
                 event.setCanceled(true);
             }

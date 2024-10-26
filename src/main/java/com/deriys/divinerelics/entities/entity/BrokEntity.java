@@ -38,11 +38,11 @@ public class BrokEntity extends Villager implements IAnimatable {
 
     private long lastRestockTime = 0;
     private static final int RESTOCK_INTERVAL = DivineRelicsCommonConfig.BROK_AND_SINDRI_RESTOCK_TIME.get();
+    private boolean needsRestock = false;
 
     public BrokEntity(EntityType<? extends Villager> p_35381_, Level p_35382_) {
         super(p_35381_, p_35382_);
         this.setVillagerData(this.getVillagerData().setProfession(DRDwarfs.BROK.get()).setLevel(1));
-        this.lastRestockTime = this.level.getGameTime();
     }
 
     @Override
@@ -88,11 +88,17 @@ public class BrokEntity extends Villager implements IAnimatable {
     private boolean needsRestock() {
         if (this.offers != null) {
             for (MerchantOffer offer : this.offers) {
-                if (offer.needsRestock()) {
+                if (offer.isOutOfStock()) {
+                    if (!this.needsRestock) {
+                        this.lastRestockTime = this.level.getGameTime();
+                        this.needsRestock = true;
+                    }
                     return true;
                 }
             }
-        } return false;
+        }
+        this.needsRestock = false;
+        return false;
     }
 
     @Override
