@@ -2,6 +2,9 @@
 
 > _“The **nature** of a thing is more important than the **form of a thing**.” — Brok_
 
+## Mod's trailer:
+[![Divine Relics Trailer](https://img.youtube.com/vi/YH9qYa70hYM/maxresdefault.jpg)](https://www.youtube.com/watch?v=YH9qYa70hYM)
+
 [Curseforge Page](https://www.curseforge.com/minecraft/mc-mods/divine-relics)
 
 [Modrinth Page](https://modrinth.com/mod/divine-relics)
