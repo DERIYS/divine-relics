@@ -52,8 +52,6 @@ public class DRSounds {
             registerSoundEvent("hel_walker_hit_4");
     public static final RegistryObject<SoundEvent> HEL_WALKER_HIT_5 =
             registerSoundEvent("hel_walker_hit_5");
-    public static final RegistryObject<SoundEvent> HEL_WALKER_HIT_6 =
-            registerSoundEvent("hel_walker_hit_6");
 
     public static final RegistryObject<SoundEvent> THOR_FIGHT_MUSIC =
             registerSoundEvent("thor_fight_music");

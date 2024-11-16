@@ -55,13 +55,13 @@ public class HelWalkerEntity extends Monster implements IAnimatable {
     public int attackingTicks = 0;
     private AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
-    private SoundEvent[] attackSounds = {
+    private final SoundEvent[] attackSounds = {
             DRSounds.HEL_WALKER_ATTACK_1.get(),
             DRSounds.HEL_WALKER_ATTACK_2.get(),
             DRSounds.HEL_WALKER_ATTACK_3.get(),
     };
 
-    private SoundEvent[] ambientSounds = {
+    private final SoundEvent[] ambientSounds = {
             DRSounds.HEL_WALKER_AMBIENT_1.get(),
             DRSounds.HEL_WALKER_AMBIENT_2.get(),
             DRSounds.HEL_WALKER_AMBIENT_3.get(),
@@ -70,13 +70,17 @@ public class HelWalkerEntity extends Monster implements IAnimatable {
             DRSounds.HEL_WALKER_AMBIENT_6.get(),
     };
 
-    private SoundEvent[] hitSounds = {
+    private final SoundEvent[] hitSounds = {
             DRSounds.HEL_WALKER_HIT_1.get(),
             DRSounds.HEL_WALKER_HIT_2.get(),
             DRSounds.HEL_WALKER_HIT_3.get(),
             DRSounds.HEL_WALKER_HIT_4.get(),
-            DRSounds.HEL_WALKER_HIT_5.get(),
-            DRSounds.HEL_WALKER_HIT_6.get(),
+            DRSounds.HEL_WALKER_HIT_5.get()
+    };
+
+    private final String[] helWalkerAttacks = {
+            "animation.hel_walker.attack_1",
+            "animation.hel_walker.attack_2"
     };
 
     public HelWalkerEntity(EntityType<? extends HelWalkerEntity> entityType, Level level) {
@@ -139,7 +143,7 @@ public class HelWalkerEntity extends Monster implements IAnimatable {
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         if(this.isAttacking() && this.attackingTicks == 0) {
             event.getController().markNeedsReload();
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.hel_walker.attack", ILoopType.EDefaultLoopTypes.PLAY_ONCE));
+            event.getController().setAnimation(new AnimationBuilder().addAnimation(getRandomAttack(), ILoopType.EDefaultLoopTypes.PLAY_ONCE));
             this.attackingTicks = 30;
             return PlayState.CONTINUE;
         }
@@ -152,6 +156,10 @@ public class HelWalkerEntity extends Monster implements IAnimatable {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.hel_walker.idle", ILoopType.EDefaultLoopTypes.LOOP));
         }
         return PlayState.CONTINUE;
+    }
+
+    private String getRandomAttack() {
+        return this.helWalkerAttacks[RAND.nextInt(this.helWalkerAttacks.length)];
     }
 
     @Override

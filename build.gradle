@@ -4,7 +4,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '5.1.+'
 }
 
-version = '1.19.2-1.0.3'
+version = '1.19.2-1.0.4'
 group = 'com.deriys.divinerelics' // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = 'divinerelics'
 

@@ -215,12 +215,6 @@
         "divinerelics:hel_walker_hit_5"
       ]
     },
-    "hel_walker_hit_6": {
-      "subtitle": "sounds.divinerelics.hel_walker_hit_1",
-      "sounds": [
-        "divinerelics:hel_walker_hit_6"
-      ]
-    },
     "thor_fight_music": {
       "subtitle": "sounds.divinerelics.thor_fight_music",
       "sounds": [

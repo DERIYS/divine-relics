@@ -3,6 +3,7 @@ package com.deriys.divinerelics.items;
 import com.deriys.divinerelics.capabilities.leviathan.LeviathanBindingProvider;
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.entity.ThrownLeviathanAxe;
+import com.deriys.divinerelics.init.DREffects;
 import com.deriys.divinerelics.init.DRSounds;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
@@ -104,7 +105,7 @@ public class LeviathanAxe extends AxeItem {
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
         if (entity instanceof LivingEntity livingEntity && !player.getLevel().isClientSide && entity.isAlive()) {
-            if (entity instanceof Player && !player.getAbilities().instabuild) {
+            if (entity instanceof Player && !player.getAbilities().instabuild && !player.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
                 livingEntity.setTicksFrozen(livingEntity.getTicksFrozen() + FREEZE_TIME);
             }
         }

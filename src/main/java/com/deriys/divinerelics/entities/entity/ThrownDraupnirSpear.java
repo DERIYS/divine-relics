@@ -146,7 +146,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
                     EnchantmentHelper.doPostDamageEffects((LivingEntity)owner, livingEntityHurt);
                 }
 
-                if (this.spearItem.getItem() instanceof DraupnirSpear draupnirSpear) {
+                if (this.spearItem.getItem() instanceof DraupnirSpear draupnirSpear && !this.level.isClientSide) {
                     draupnirSpear.addThrownSpear(this.spearItem, hurtEntity.getUUID());
                     hurtEntity.getCapability(StuckSpearsProvider.STUCK_SPEARS).ifPresent(cap -> {
                         Vec3 positionDifference = this.position().subtract(hurtEntity.position());

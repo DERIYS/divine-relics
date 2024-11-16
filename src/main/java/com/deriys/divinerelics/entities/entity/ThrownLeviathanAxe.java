@@ -2,6 +2,7 @@ package com.deriys.divinerelics.entities.entity;
 
 import com.deriys.divinerelics.capabilities.leviathan.LeviathanBindingProvider;
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
+import com.deriys.divinerelics.init.DREffects;
 import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
@@ -162,7 +163,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
             if (owner instanceof Player player) {
                 player.getCooldowns().addCooldown(this.leviathanItem.getItem(), this.COOLDOWN);
             }
-            if (entity instanceof LivingEntity livingEntity && livingEntity.isAlive()) {
+            if (entity instanceof LivingEntity livingEntity && livingEntity.isAlive() && !livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
                 livingEntity.setTicksFrozen(DivineRelicsCommonConfig.THROWN_LEVIATHAN_FROZEN_TICKS_HIT.get());
             }
             volume = 5.0F;
