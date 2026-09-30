@@ -2,7 +2,6 @@ package com.deriys.divinerelics;
 
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.core.networking.DRMessages;
-import com.deriys.divinerelics.init.DRDwarfs;
 import com.deriys.divinerelics.entities.client.render.*;
 import com.deriys.divinerelics.init.*;
 import com.deriys.divinerelics.init.DRItemProperties;
@@ -62,7 +61,6 @@ public class DivineRelics
         DREntitiyTypes.register(modEventBus);
         DRConfiguredFeatures.register(modEventBus);
         DRPlacedFeatures.register(modEventBus);
-        DRDwarfs.register(modEventBus);
         DRStructures.register(modEventBus);
 
         GeckoLib.initialize();
@@ -79,15 +77,19 @@ public class DivineRelics
     {
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            EntityRenderers.register(DREntitiyTypes.DRAUGR.get(), DraugrRenderer::new);
-            EntityRenderers.register(DREntitiyTypes.HEL_WALKER.get(), HelWalkerRenderer::new);
-            EntityRenderers.register(DREntitiyTypes.BROK.get(), BrokRenderer::new);
-            EntityRenderers.register(DREntitiyTypes.SINDRI.get(), SindriRenderer::new);
-            EntityRenderers.register(DREntitiyTypes.THOR.get(), ThorRenderer::new);
-            EntityRenderers.register(DREntitiyTypes.THROWN_DRAUPNIR_SPEAR.get(), ThrownDraupnirSpearRenderer::new);
-            EntityRenderers.register(DREntitiyTypes.THROWN_MJOLNIR.get(), ThrownMjolnirRenderer::new);
-            EntityRenderers.register(DREntitiyTypes.THROWN_LEVIATHAN.get(), ThrownLeviathanRenderer::new);
-            DRItemProperties.addCustomItemProperties();
+            // Setup events run in parallel across mods; EntityRenderers and ItemProperties are plain HashMaps, so
+            // registering into them must happen on the main thread.
+            event.enqueueWork(() -> {
+                EntityRenderers.register(DREntitiyTypes.DRAUGR.get(), DraugrRenderer::new);
+                EntityRenderers.register(DREntitiyTypes.HEL_WALKER.get(), HelWalkerRenderer::new);
+                EntityRenderers.register(DREntitiyTypes.BROK.get(), BrokRenderer::new);
+                EntityRenderers.register(DREntitiyTypes.SINDRI.get(), SindriRenderer::new);
+                EntityRenderers.register(DREntitiyTypes.THOR.get(), ThorRenderer::new);
+                EntityRenderers.register(DREntitiyTypes.THROWN_DRAUPNIR_SPEAR.get(), ThrownDraupnirSpearRenderer::new);
+                EntityRenderers.register(DREntitiyTypes.THROWN_MJOLNIR.get(), ThrownMjolnirRenderer::new);
+                EntityRenderers.register(DREntitiyTypes.THROWN_LEVIATHAN.get(), ThrownLeviathanRenderer::new);
+                DRItemProperties.addCustomItemProperties();
+            });
         }
     }
 }

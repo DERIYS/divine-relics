@@ -1,12 +1,11 @@
 package com.deriys.divinerelics.core.networking.packets;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SimpleSoundInstance;
+import com.deriys.divinerelics.core.networking.DRClientPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvent;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.function.Supplier;
 
@@ -39,12 +38,8 @@ public class ThorPlayMusicS2CPacket {
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
-            SoundEvent soundEvent = ForgeRegistries.SOUND_EVENTS.getValue(this.soundLocation);
-            if (soundEvent != null) {
-                Minecraft.getInstance().getSoundManager().play(SimpleSoundInstance.forRecord(soundEvent, x, y, z));
-            }
-        });
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+                DRClientPacketHandler.handlePlayMusic(this.soundLocation, x, y, z)));
         return true;
     }
 }

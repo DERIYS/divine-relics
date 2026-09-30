@@ -21,7 +21,7 @@ public class DRItems {
             () -> new HeimdallGauntlet(new Item.Properties().fireResistant().stacksTo(1).tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> DRAUPNIR_RING = ITEMS.register("draupnir_ring",
-            () -> new Item(new Item.Properties().stacksTo(1).fireResistant().stacksTo(1).tab(DRCreativeTab.MAINTAB)));
+            () -> new Item(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> DRAUPNIR_SPEAR_BASE = ITEMS.register("draupnir_spear_base",
             () -> new Item(new Item.Properties().stacksTo(1).fireResistant().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> DRAUPNIR_SPEAR = ITEMS.register("draupnir_spear",
@@ -77,7 +77,7 @@ public class DRItems {
     public static final RegistryObject<Item> SVARTALFHEIM_STEEL_AXE = ITEMS.register("svartalfheim_steel_axe",
             () -> new AxeItem(DRTiers.SVARTALFHEIM_STEEL_TIER, 4.0F, -3.0f, new Item.Properties().tab(DRCreativeTab.MAINTAB)));
     public static final RegistryObject<Item> SVARTALFHEIM_STEEL_HOE = ITEMS.register("svartalfheim_steel_hoe",
-            () -> new AxeItem(DRTiers.SVARTALFHEIM_STEEL_TIER, -4.0F, 0.0f, new Item.Properties().tab(DRCreativeTab.MAINTAB)));
+            () -> new HoeItem(DRTiers.SVARTALFHEIM_STEEL_TIER, -4, 0.0f, new Item.Properties().tab(DRCreativeTab.MAINTAB)));
 
     public static final RegistryObject<Item> ASGARDIAN_STEEL_NUGGET = ITEMS.register("asgardian_steel_nugget",
             () -> new Item(new Item.Properties().tab(DRCreativeTab.MAINTAB).rarity(Rarity.EPIC)));
@@ -94,7 +94,7 @@ public class DRItems {
     public static final RegistryObject<Item> ASGARDIAN_STEEL_AXE = ITEMS.register("asgardian_steel_axe",
             () -> new AxeItem(DRTiers.ASGARDIAN_STEEL_TIER, 5.0F, -3.0f, new Item.Properties().tab(DRCreativeTab.MAINTAB).rarity(Rarity.EPIC)));
     public static final RegistryObject<Item> ASGARDIAN_STEEL_HOE = ITEMS.register("asgardian_steel_hoe",
-            () -> new AxeItem(DRTiers.ASGARDIAN_STEEL_TIER, -4.0F, 0.0f, new Item.Properties().tab(DRCreativeTab.MAINTAB).rarity(Rarity.EPIC)));
+            () -> new HoeItem(DRTiers.ASGARDIAN_STEEL_TIER, -4, 0.0f, new Item.Properties().tab(DRCreativeTab.MAINTAB).rarity(Rarity.EPIC)));
 
     public static final RegistryObject<Item> PERFECT_ASGARDIAN_STEEL_INGOT = ITEMS.register("perfect_asgardian_steel_ingot",
             () -> new Item(new Item.Properties().fireResistant().tab(DRCreativeTab.MAINTAB)));

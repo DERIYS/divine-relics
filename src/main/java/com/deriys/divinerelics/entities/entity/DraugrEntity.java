@@ -1,7 +1,9 @@
 package com.deriys.divinerelics.entities.entity;
 
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
+import com.deriys.divinerelics.entities.ai.TimedAttack;
 import com.deriys.divinerelics.entities.ai.draugr.DraugrAttackGoal;
+import com.deriys.divinerelics.entities.client.SyncedAnimationController;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
 import com.deriys.divinerelics.items.DraupnirSpear;
@@ -11,8 +13,10 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,7 +39,6 @@ import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.builder.ILoopType;
-import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
@@ -48,9 +51,18 @@ public class DraugrEntity extends Monster implements IAnimatable {
     private static final AttributeModifier FAST_SPEED_MODIFIER = new AttributeModifier("FastSpeed", DivineRelicsCommonConfig.DRAUGR_SPEED_MODIFIER.get(), AttributeModifier.Operation.MULTIPLY_BASE);
 
     public static final int BURNING_TIME = DivineRelicsCommonConfig.DRAUGR_BURNING_TIME.get();
+    /** The attack lasts as long as its animation (animation.draugr.attack) and hits halfway through it. */
+    public static final int ATTACK_DURATION = 30;
+    public static final int ATTACK_IMPACT_TICK = 15;
+    /** Extra reach of the attack on top of the usual melee reach. */
+    public static final float ATTACK_RANGE = 2.8F;
     private static final EntityDataAccessor<Boolean> ATTACKING =
             SynchedEntityData.defineId(DraugrEntity.class, EntityDataSerializers.BOOLEAN);
-    public int attackingTicks = 0;
+    /** Game time at which the current attack started on the server: clients play its animation from there. */
+    private static final EntityDataAccessor<Integer> ATTACK_START_TIME =
+            SynchedEntityData.defineId(DraugrEntity.class, EntityDataSerializers.INT);
+    /** Server: the current attack's progress (see {@link #startAttack}). */
+    private final TimedAttack attack = new TimedAttack();
     private AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     private SoundEvent[] ambientSounds = {
@@ -71,18 +83,42 @@ public class DraugrEntity extends Monster implements IAnimatable {
         return this.entityData.get(ATTACKING);
     }
 
+    /**
+     * Starts an attack on {@code target}. It plays out to the end on its own (see {@link #tick}), whether or not the
+     * Draugr still has a target by then: its animation and its hit always stay together.
+     */
+    public void startAttack(@Nullable LivingEntity target) {
+        this.setAttacking(true);
+        this.entityData.set(ATTACK_START_TIME, (int) this.level.getGameTime());
+        this.attack.start(target);
+        this.level.playSound(null, this.getOnPos(), DRSounds.DRAUGR_ATTACK.get(), SoundSource.HOSTILE, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
+    }
+
+    private void performAttackImpact() {
+        this.swing(InteractionHand.MAIN_HAND);
+        // The swing always happens; it only lands on a target that is still alive and within reach.
+        LivingEntity target = this.attack.getTarget();
+        if (target != null && this.attack.targetInReach(this, TimedAttack.meleeRangeSqr(this, target, ATTACK_RANGE))
+                && this.doHurtTarget(target) && target.isAlive()
+                && target instanceof Player player && !player.getAbilities().instabuild) {
+            target.setRemainingFireTicks(target.getRemainingFireTicks() + BURNING_TIME);
+        }
+    }
+
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(ATTACKING, false);
+        this.entityData.define(ATTACK_START_TIME, 0);
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (this.level.isClientSide && this.attackingTicks > 0){
-            this.attackingTicks--;
+        if (!this.level.isClientSide && this.isAlive()
+                && this.attack.tick(this, ATTACK_IMPACT_TICK, ATTACK_DURATION, this::performAttackImpact)) {
+            this.setAttacking(false);
         }
 
         LivingEntity target = this.getTarget();
@@ -117,18 +153,21 @@ public class DraugrEntity extends Monster implements IAnimatable {
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        if(this.isAttacking() && this.attackingTicks == 0) {
-            event.getController().markNeedsReload();
-            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.draugr.attack", ILoopType.EDefaultLoopTypes.PLAY_ONCE));
-            this.attackingTicks = 30;
-            return PlayState.CONTINUE;
-        }
-
-        if (this.attackingTicks == 0) {
-            if (event.isMoving()) {
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.draugr.walk", ILoopType.EDefaultLoopTypes.LOOP));
+        if (this.isAttacking()) {
+            // Played from where the server is in the attack, also if it started while the Draugr was not drawn.
+            int startTime = this.entityData.get(ATTACK_START_TIME);
+            double elapsed = SyncedAnimationController.ticksSince(this.level, startTime, event.getPartialTick());
+            if (elapsed < ATTACK_DURATION) {
+                if (event.getController() instanceof SyncedAnimationController<?> controller) {
+                    controller.playSynced("animation.draugr.attack", startTime, elapsed);
+                }
                 return PlayState.CONTINUE;
             }
+        }
+
+        if (event.isMoving()) {
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.draugr.walk", ILoopType.EDefaultLoopTypes.LOOP));
+        } else {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.draugr.idle", ILoopType.EDefaultLoopTypes.LOOP));
         }
         return PlayState.CONTINUE;
@@ -157,7 +196,7 @@ public class DraugrEntity extends Monster implements IAnimatable {
 
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller",
+        animationData.addAnimationController(new SyncedAnimationController<>(this, "controller",
                 0, this::predicate));
     }
 

@@ -34,4 +34,11 @@ public class HelWalkerRenderer extends GeoEntityRenderer<HelWalkerEntity> {
 
         return super.getRenderType(animatable, partialTick, poseStack, bufferSource, buffer, packedLight, texture);
     }
+
+    @Override
+    public void render(HelWalkerEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+        // GeckoLib renderers never fire RenderLivingEvent, so the stuck spears are drawn here.
+        StuckSpearRenderer.render(entity, poseStack, bufferSource, packedLight, partialTick);
+    }
 }

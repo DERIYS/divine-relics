@@ -12,6 +12,8 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class DRMessages {
+    /** Bump whenever a packet's layout changes (1.1: stuck spears carry their hit point and direction). */
+    private static final String PROTOCOL_VERSION = "1.1";
     private static SimpleChannel INSTANCE;
 
     private static int packetId = 0;
@@ -23,9 +25,11 @@ public class DRMessages {
     public static void register() {
         SimpleChannel net = NetworkRegistry.ChannelBuilder
                 .named(new ResourceLocation(DivineRelics.MODID, "messages"))
-                .networkProtocolVersion(() -> "1.0")
-                .clientAcceptedVersions(s -> true)
-                .serverAcceptedVersions(s -> true)
+                .networkProtocolVersion(() -> PROTOCOL_VERSION)
+                // Reject peers with a different (or missing) channel version instead of accepting anything: packet ids
+                // and layouts are positional, so a mismatched mod version would silently decode garbage.
+                .clientAcceptedVersions(PROTOCOL_VERSION::equals)
+                .serverAcceptedVersions(PROTOCOL_VERSION::equals)
                 .simpleChannel();
 
         INSTANCE = net;
@@ -109,5 +113,10 @@ public class DRMessages {
 
     public static <MSG> void sendToTrackingEntity(MSG message, Entity entity) {
         INSTANCE.send(PacketDistributor.TRACKING_ENTITY.with(() -> entity), message);
+    }
+
+    /** Players tracking {@code entity}, plus the entity itself when it is a player. */
+    public static <MSG> void sendToTrackingEntityAndSelf(MSG message, Entity entity) {
+        INSTANCE.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> entity), message);
     }
 }

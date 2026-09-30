@@ -1,9 +1,11 @@
 package com.deriys.divinerelics.core.networking.packets;
 
-import net.minecraft.client.Minecraft;
+import com.deriys.divinerelics.core.networking.DRClientPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -28,9 +30,8 @@ public class ThorStopMusicS2CPacket {
     }
 
     public void handle(Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            Minecraft.getInstance().getSoundManager().stop(this.soundLocation, this.soundSource);
-        });
+        ctx.get().enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+                DRClientPacketHandler.handleStopMusic(this.soundLocation, this.soundSource)));
         ctx.get().setPacketHandled(true);
     }
 }

@@ -5,9 +5,12 @@ import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.ThorPlayMusicS2CPacket;
 import com.deriys.divinerelics.core.networking.packets.ThorStopMusicS2CPacket;
+import com.deriys.divinerelics.entities.ai.TimedAttack;
 import com.deriys.divinerelics.entities.ai.thor.FireIgnoringPathNavigation;
 import com.deriys.divinerelics.entities.ai.thor.ThorAttackGoal;
 import com.deriys.divinerelics.entities.ai.thor.ThorAttackState;
+import com.deriys.divinerelics.entities.ai.thor.ThorShieldKnockback;
+import com.deriys.divinerelics.entities.client.SyncedAnimationController;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
 import com.deriys.divinerelics.items.Motosignir;
@@ -25,8 +28,11 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -42,6 +48,7 @@ import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
@@ -54,14 +61,12 @@ import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.builder.ILoopType;
-import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 import software.bernie.geckolib3.util.GeckoLibUtil;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -82,7 +87,8 @@ public class ThorEntity extends Monster implements IAnimatable {
             SynchedEntityData.defineId(ThorEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> WAITS_FOR_MJOLNIR =
             SynchedEntityData.defineId(ThorEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Integer> ATTACKING_TICKS =
+    /** Game time at which the current attack started on the server: clients play its animation from there. */
+    private static final EntityDataAccessor<Integer> ATTACK_START_TIME =
             SynchedEntityData.defineId(ThorEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Boolean> SUMMONING_COMPLETE =
             SynchedEntityData.defineId(ThorEntity.class, EntityDataSerializers.BOOLEAN);
@@ -100,6 +106,9 @@ public class ThorEntity extends Monster implements IAnimatable {
     };
     public DamageSource thorDamageSource = DamageSource.mobAttack(this);
     public UUID thrownMjolnirUUID = null;
+    /** Thor gives up on a thrown hammer that did not come back in time (removed, stuck in a non-ticking chunk...). */
+    private static final int MJOLNIR_RETURN_TIMEOUT = 400;
+    private int ticksWaitingForMjolnir = 0;
 
     private List<ServerPlayer> trackingPlayers = new ArrayList<>();
     public short ambientSoundCount = -1;
@@ -119,6 +128,9 @@ public class ThorEntity extends Monster implements IAnimatable {
     };
     private List<UUID> needMusicReplay = new ArrayList<>();
     private List<UUID> initialPlayersNearby = new ArrayList<>();
+
+    /** Server: the current attack's progress (see {@link #startAttack}). */
+    private final TimedAttack attack = new TimedAttack();
 
     public ThorEntity(EntityType<? extends Monster> entityType, Level level) {
         super(entityType, level);
@@ -172,12 +184,72 @@ public class ThorEntity extends Monster implements IAnimatable {
         this.entityData.set(WAITS_FOR_MJOLNIR, waitsForMjolnir);
     }
 
-    public void setAttackingTicks(int ticks) {
-        this.entityData.set(ATTACKING_TICKS, ticks);
+    public int getAttackStartTime() {
+        return this.entityData.get(ATTACK_START_TIME);
     }
 
-    public int getAttackingTicks() {
-        return this.entityData.get(ATTACKING_TICKS);
+    /**
+     * Starts an attack. It plays out to the end on its own (see {@link #tickAttack}), whether or not Thor still has a
+     * target by then: its animation and its impact always stay together.
+     */
+    public void startAttack(ThorAttackState state, @Nullable LivingEntity target) {
+        this.setAttackState(state);
+        this.setAttacking(true);
+        this.entityData.set(ATTACK_START_TIME, (int) this.level.getGameTime());
+        this.attack.start(target);
+        this.playAttackSound(state);
+    }
+
+    /** Advances the current attack by a tick (server): it hits halfway through and ends with its animation. */
+    private void tickAttack() {
+        ThorAttackState state = this.getAttackState();
+        if (this.attack.tick(this, state.getImpactTick(), state.getDurationTicks(), () -> this.performAttackImpact(state))) {
+            this.setAttacking(false);
+            if (state == ThorAttackState.MJOLNIR_THROW) {
+                this.setAttackState(ThorAttackState.NONE);
+            }
+        }
+    }
+
+    private void performAttackImpact(ThorAttackState state) {
+        LivingEntity target = this.attack.getTarget();
+        switch (state) {
+            case CLAP_ATTACK -> onHitLighnting(this.level, this, this.getOnPos(), this, this.thorDamageSource,
+                    ThorAttackGoal.CLAP_ATTACK_DAMAGE, ThorAttackGoal.CLAP_ATTACK_FORCE, ThorAttackGoal.CLAP_ATTACK_RADUIS);
+            case GROUND_ATTACK -> onHitLighnting(this.level, this, this.getOnPos(), this, this.thorDamageSource,
+                    ThorAttackGoal.GROUND_ATTACK_DAMAGE, ThorAttackGoal.GROUND_ATTACK_FORCE, ThorAttackGoal.GROUND_ATTACK_RADUIS);
+            case MELEE_ATTACK, LEG_ATTACK -> {
+                this.swing(InteractionHand.MAIN_HAND);
+                // The swing always happens; it only lands on a target that is still alive and within reach.
+                if (target != null && this.attack.targetInReach(this, ThorAttackGoal.attackRangeSqr(this, target))) {
+                    // The hammer swing has no knockback of its own, but a blocked one still throws the target back.
+                    double force = state == ThorAttackState.LEG_ATTACK ? ThorAttackGoal.LEG_ATTACK_FORCE : 0.0D;
+                    ThorShieldKnockback.knockBackAndHurt(target, this.position(), force,
+                            strength -> Motosignir.applyKnockBack(target, this, strength), () -> this.doHurtTarget(target));
+                }
+            }
+            case MJOLNIR_THROW -> {
+                Vec3 aim = target != null && target.isAlive() ? target.position().add(0, target.getEyeHeight() / 1.5F, 0)
+                        : this.attack.getLastTargetPos();
+                if (aim != null && !this.waitsForMjolnir() && this.thrownMjolnirUUID == null) {
+                    this.throwMjolnirAt(aim);
+                }
+            }
+            default -> {
+            }
+        }
+    }
+
+    private void throwMjolnirAt(Vec3 aim) {
+        this.setHasMjolnirInHands(false);
+        this.setWaitsForMjolnir(true);
+        ThrownMjolnir thrownMjolnir = new ThrownMjolnir(this.level, this, new ItemStack(DRItems.MJOLNIR.get()));
+        thrownMjolnir.shootMjolnirAt(this, aim);
+        thrownMjolnir.pickup = AbstractArrow.Pickup.DISALLOWED;
+        thrownMjolnir.setNoGravity(true);
+        this.level.addFreshEntity(thrownMjolnir);
+        this.thrownMjolnirUUID = thrownMjolnir.getUUID();
+        this.level.playSound(null, this.getOnPos(), DRSounds.MJOLNIR_THROWING.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
     }
 
     public void setSummoningComplete(boolean summoningComplete) {
@@ -222,7 +294,7 @@ public class ThorEntity extends Monster implements IAnimatable {
         this.entityData.define(ATTACK_STATE, (byte) 0);
         this.entityData.define(HAS_MJOLNIR_IN_HANDS, true);
         this.entityData.define(WAITS_FOR_MJOLNIR, false);
-        this.entityData.define(ATTACKING_TICKS, 0);
+        this.entityData.define(ATTACK_START_TIME, 0);
         this.entityData.define(SUMMONING_COMPLETE, false);
     }
 
@@ -249,29 +321,33 @@ public class ThorEntity extends Monster implements IAnimatable {
      */
     @Override
     public void tick() {
-
-        float bossBarProgress = this.getHealth() / this.getMaxHealth();
-        if (this.bossEvent.getProgress() != bossBarProgress){
-            this.bossEvent.setProgress(bossBarProgress);
+        boolean summoningComplete = this.isSummoningComplete();
+        if (!this.level.isClientSide) {
+            // While Thor is being summoned, his bar fills up as he arrives; afterwards it shows his health.
+            float bossBarProgress = summoningComplete ? this.getHealth() / this.getMaxHealth()
+                    : Mth.clamp((float) this.tickCount / INVULNERABLE_TICKS, 0.0F, 1.0F);
+            if (this.bossEvent.getProgress() != bossBarProgress) {
+                this.bossEvent.setProgress(bossBarProgress);
+            }
+            // Players who can see Thor get his bar once they are within 50 blocks.
+            this.trackingPlayers.removeIf(trackingPlayer -> {
+                if (trackingPlayer.position().distanceToSqr(this.position()) < 2500) {
+                    this.bossEvent.addPlayer(trackingPlayer);
+                    return true;
+                }
+                return false;
+            });
         }
 
-        boolean summoningComplete = this.isSummoningComplete();
         if (!this.level.isClientSide && summoningComplete) {
-
-            if (!this.trackingPlayers.isEmpty()) {
-                for (ServerPlayer trackingPlayer: this.trackingPlayers) {
-                    if (trackingPlayer.position().distanceToSqr(this.position()) < 2500) {
-                        this.bossEvent.addPlayer(trackingPlayer);
-                    }
-                }
-                this.trackingPlayers = new ArrayList<>();
-            }
 
             LivingEntity target = this.getTarget();
             if (this.isAggressive() && !(target instanceof Mob)) {
                 if (this.isAlive() && this.random.nextInt(1000) < this.ambientSoundInterval++) {
                     this.resetAmbientInterval();
-                    this.playSound(AMBIENT_SOUNDS[++this.ambientSoundCount % 9], this.getSoundVolume(), this.getVoicePitch());
+                    // floorMod on the array length: the persisted short used to overflow into a negative index.
+                    this.ambientSoundCount = (short) Math.floorMod(this.ambientSoundCount + 1, AMBIENT_SOUNDS.length);
+                    this.playSound(AMBIENT_SOUNDS[this.ambientSoundCount], this.getSoundVolume(), this.getVoicePitch());
                 }
             }
 
@@ -294,21 +370,21 @@ public class ThorEntity extends Monster implements IAnimatable {
 
         if (!this.level.isClientSide && this.waitsForMjolnir()) {
             ServerLevel serverLevel = (ServerLevel) level;
-            if (serverLevel.getEntity(this.thrownMjolnirUUID) instanceof ThrownMjolnir thrownMjolnir) {
+            Entity thrownEntity = this.thrownMjolnirUUID == null ? null : serverLevel.getEntity(this.thrownMjolnirUUID);
+            if (thrownEntity instanceof ThrownMjolnir thrownMjolnir) {
                 if (thrownMjolnir.isOnGround() || thrownMjolnir.hasHit()) {
                     thrownMjolnir.setReturning(true);
                 }
                 if (thrownMjolnir.isReturning() && this.position().distanceToSqr(thrownMjolnir.position()) < 15) {
-                    ThorAttackState attackState = this.getAttackState();
-                    if (attackState != ThorAttackState.CLAP_ATTACK && attackState != ThorAttackState.GROUND_ATTACK) {
-                        this.setHasMjolnirInHands(true);
-                    }
-                    thrownMjolnir.discard();
-                    this.setWaitsForMjolnir(false);
-                    this.thrownMjolnirUUID = null;
+                    this.catchMjolnir(thrownMjolnir);
                 }
-
             }
+            // Without a timeout a lost hammer left Thor waiting forever: he never threw again (boss soft-lock).
+            if (this.waitsForMjolnir() && ++this.ticksWaitingForMjolnir > MJOLNIR_RETURN_TIMEOUT) {
+                this.catchMjolnir(thrownEntity);
+            }
+        } else {
+            this.ticksWaitingForMjolnir = 0;
         }
 
         BlockPos onPos = this.getOnPos();
@@ -329,12 +405,12 @@ public class ThorEntity extends Monster implements IAnimatable {
         LivingEntity target = this.getTarget();
         setChasing(this, FAST_SPEED_MODIFIER, SLOW_SPEED_MODIFIER, target != null && target.isAlive());
 
-        int attackingTicks = this.getAttackingTicks();
-
-        if (attackingTicks > 0) {
-            this.setAttackingTicks(attackingTicks - 1);
-        }
         super.tick();
+
+        // After the goals ran, so an attack started this tick counts this tick as its first (tick 0).
+        if (!this.level.isClientSide && this.isAlive()) {
+            this.tickAttack();
+        }
     }
 
     public boolean canSeeTarget(LivingEntity target) {
@@ -348,8 +424,27 @@ public class ThorEntity extends Monster implements IAnimatable {
         return result.getType() == HitResult.Type.MISS;
     }
 
+    private void catchMjolnir(@Nullable Entity thrownMjolnir) {
+        ThorAttackState attackState = this.getAttackState();
+        if (attackState != ThorAttackState.CLAP_ATTACK && attackState != ThorAttackState.GROUND_ATTACK) {
+            this.setHasMjolnirInHands(true);
+        }
+        if (thrownMjolnir != null) {
+            thrownMjolnir.discard();
+        }
+        this.setWaitsForMjolnir(false);
+        this.thrownMjolnirUUID = null;
+        this.ticksWaitingForMjolnir = 0;
+    }
+
     public static boolean contains(int[] arr, int value) {
-        return Arrays.stream(arr).anyMatch(x -> x == value);
+        // Plain loop: called every tick during the summoning, a stream + lambda allocated each time.
+        for (int element : arr) {
+            if (element == value) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -361,7 +456,13 @@ public class ThorEntity extends Monster implements IAnimatable {
         this.setAttacking(compoundTag.getBoolean("Attacking"));
         this.setAttackState(ThorAttackState.getState(compoundTag.getByte("AttackState")));
         this.setHasMjolnirInHands(compoundTag.getBoolean("HasMjolnirInHands"));
-        this.setAttackingTicks(compoundTag.getInt("AttackingTicks"));
+        // Resumes an attack that was under way when Thor was saved, at the same point of it.
+        if (this.isAttacking() && compoundTag.contains("AttackTick") && compoundTag.getInt("AttackTick") >= 0) {
+            this.attack.resume(compoundTag.getInt("AttackTick"));
+            this.entityData.set(ATTACK_START_TIME, (int) this.level.getGameTime() - this.attack.getTick());
+        } else {
+            this.setAttacking(false);
+        }
         if (compoundTag.hasUUID("ThrownMjolnirUUID")) {
             this.thrownMjolnirUUID = compoundTag.getUUID("ThrownMjolnirUUID");
         }
@@ -387,7 +488,7 @@ public class ThorEntity extends Monster implements IAnimatable {
         compoundTag.putBoolean("Attacking", this.isAttacking());
         compoundTag.putBoolean("HasMjolnirInHands", this.entityData.get(HAS_MJOLNIR_IN_HANDS));
         compoundTag.putBoolean("WaitsForMjolnir", this.waitsForMjolnir());
-        compoundTag.putInt("AttackingTicks", this.getAttackingTicks());
+        compoundTag.putInt("AttackTick", this.attack.getTick());
         compoundTag.putInt("TickCount", this.tickCount);
         compoundTag.putShort("AmbientSoundCount", this.ambientSoundCount);
         compoundTag.putByte("AttackState", this.entityData.get(ATTACK_STATE));
@@ -413,7 +514,7 @@ public class ThorEntity extends Monster implements IAnimatable {
     public void startSeenByPlayer(@NotNull ServerPlayer serverPlayer) {
         super.startSeenByPlayer(serverPlayer);
         if (!this.isSummoningComplete()) {
-            this.trackingPlayers.add(serverPlayer);
+            this.trackingPlayers.add(serverPlayer); // gets the (filling) bar once within 50 blocks, see tick()
         } else {
             this.bossEvent.addPlayer(serverPlayer);
         }
@@ -441,6 +542,8 @@ public class ThorEntity extends Monster implements IAnimatable {
     public void stopSeenByPlayer(@NotNull ServerPlayer serverPlayer) {
         super.stopSeenByPlayer(serverPlayer);
         this.bossEvent.removePlayer(serverPlayer);
+        // Otherwise a player who left during the summoning stays referenced and is added to the boss bar afterwards.
+        this.trackingPlayers.remove(serverPlayer);
     }
 
     public void startPlayingBossMusic() {
@@ -525,31 +628,26 @@ public class ThorEntity extends Monster implements IAnimatable {
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        if(this.isAttacking() && this.getAttackingTicks() == 0) {
-            event.getController().markNeedsReload();
-            switch (this.getAttackState()){
-                case MELEE_ATTACK -> setAttackAnimation(event, "animation.thor.melee_attack", 24);
-                case LEG_ATTACK -> setAttackAnimation(event, "animation.thor.leg_attack", 30);
-                case CLAP_ATTACK -> setAttackAnimation(event, "animation.thor.clap_attack", 48);
-                case GROUND_ATTACK -> setAttackAnimation(event, "animation.thor.ground_attack", 50);
-                case MJOLNIR_THROW -> setAttackAnimation(event, "animation.thor.mjolnir_throw_attack", 30);
-            }
-            return PlayState.CONTINUE;
-        }
-
-        if (this.getAttackingTicks() == 0) {
-            if (event.isMoving()) {
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.thor.walk", ILoopType.EDefaultLoopTypes.LOOP));
+        ThorAttackState state = this.getAttackState();
+        if (this.isAttacking() && state.getAnimationName() != null) {
+            // Where the server is in this attack. GeckoLib only runs this while Thor is drawn, so an attack that
+            // started while nobody looked at him is picked up part-way, at the same point as its server-side hit.
+            int startTime = this.getAttackStartTime();
+            double elapsed = SyncedAnimationController.ticksSince(this.level, startTime, event.getPartialTick());
+            if (elapsed < state.getDurationTicks()) {
+                if (event.getController() instanceof SyncedAnimationController<?> controller) {
+                    controller.playSynced(state.getAnimationName(), startTime, elapsed);
+                }
                 return PlayState.CONTINUE;
             }
+        }
+
+        if (event.isMoving()) {
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.thor.walk", ILoopType.EDefaultLoopTypes.LOOP));
+        } else {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.thor.idle", ILoopType.EDefaultLoopTypes.LOOP));
         }
         return PlayState.CONTINUE;
-    }
-
-    private <E extends IAnimatable> void setAttackAnimation(AnimationEvent<E> event, String animationName, int ticks) {
-        event.getController().setAnimation(new AnimationBuilder().addAnimation(animationName, ILoopType.EDefaultLoopTypes.PLAY_ONCE));
-        this.setAttackingTicks(ticks);
     }
 
     public void playAttackSound(ThorAttackState attackState) {
@@ -568,7 +666,7 @@ public class ThorEntity extends Monster implements IAnimatable {
 
     @Override
     public void registerControllers (AnimationData animationData){
-        animationData.addAnimationController(new AnimationController(this, "controller",
+        animationData.addAnimationController(new SyncedAnimationController<>(this, "controller",
                 0, this::predicate));
     }
 

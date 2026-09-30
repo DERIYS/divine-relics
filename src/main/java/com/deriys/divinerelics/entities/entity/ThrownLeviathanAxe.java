@@ -6,7 +6,9 @@ import com.deriys.divinerelics.init.DREffects;
 import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -39,8 +41,9 @@ public class ThrownLeviathanAxe extends AbstractArrow {
     public int clientSideReturnTridentTickCount;
     public boolean shouldReturn = false;
     public boolean relaxed = false;
-    public DamageSource damageSource = DamageSource.trident(this, this.getOwner() == null ? this : this.getOwner());
     public final int COOLDOWN = DivineRelicsCommonConfig.LEVIATHAN_AXE_THROW_COOLDOWN.get();
+    /** Entities already hit during the current return flight, so each one is hit at most once per return. */
+    private final IntOpenHashSet returnHitEntityIds = new IntOpenHashSet();
 
     public ThrownLeviathanAxe(EntityType<? extends ThrownLeviathanAxe> entityType, Level level) {
         super(entityType, level);
@@ -53,6 +56,15 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         this.leviathanItem = p_37571_.copy();
         this.entityData.set(ID_FOIL, p_37571_.hasFoil());
         this.entityData.set(SHOULD_RETURN, this.shouldReturn);
+    }
+
+    /**
+     * Built on demand: a source cached in a field initializer has no owner for axes loaded from disk, so their hits
+     * were attributed to the axe itself (no kill credit/XP, teammate protection bypassed).
+     */
+    public DamageSource getDamageSource() {
+        Entity owner = this.getOwner();
+        return DamageSource.trident(this, owner == null ? this : owner);
     }
 
     protected void defineSynchedData() {
@@ -89,6 +101,7 @@ public class ThrownLeviathanAxe extends AbstractArrow {
                 this.relaxed = false;
                 this.isOnGround = false;
                 this.setNoPhysics(true);
+                Vec3 pathStart = this.position();
                 Vec3 vectorPM = player.getEyePosition().subtract(this.position());
                 this.setPosRaw(this.getX(), this.getY() + vectorPM.y * 0.015 * 4, this.getZ());
                 if (this.level.isClientSide) {
@@ -97,6 +110,12 @@ public class ThrownLeviathanAxe extends AbstractArrow {
 
                 double fact = 0.05 * 3;
                 this.setDeltaMovement(this.getDeltaMovement().scale(0.95).add(vectorPM.normalize().scale(fact)));
+                if (!this.level.isClientSide) {
+                    // super.tick() moves the axe by exactly this delta, so this is the path it covers this tick.
+                    Vec3 pathEnd = this.position().add(this.getDeltaMovement());
+                    ReturnFlight.smashBlocks(this, player, pathStart, pathEnd);
+                    ReturnFlight.hitEntities(this, player, pathStart, pathEnd, this.returnHitEntityIds, this::canHitEntity, this::onHitEntity);
+                }
                 if (this.clientSideReturnTridentTickCount == 0) {
                     this.playSound(DRSounds.LEVIATHAN_AXE_RETURN.get(), 15.0F, 1.0F);
                 }
@@ -105,6 +124,12 @@ public class ThrownLeviathanAxe extends AbstractArrow {
             }
         }
         super.tick();
+
+        if (this.inGround && !this.isNoPhysics()) {
+            // It has come to rest in a block. AbstractArrow keeps the last flight movement around, and a recall would
+            // otherwise carry that on in the throw direction (through the terrain) before turning back to the owner.
+            this.setDeltaMovement(Vec3.ZERO);
+        }
     }
 
     public boolean isReturning() {
@@ -112,6 +137,9 @@ public class ThrownLeviathanAxe extends AbstractArrow {
     }
 
     public void setReturning(boolean returning) {
+        if (returning && !this.isReturning()) {
+            this.returnHitEntityIds.clear(); // a new return flight may hit everything again
+        }
         this.entityData.set(SHOULD_RETURN, returning);
     }
 
@@ -157,9 +185,13 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         Entity owner = this.getOwner();
         float volume = 1.0F;
         this.dealtDamage = true;
-        this.rotationDirection *= -1;
+        // The returning axe flies on through everything it hits; an outbound one bounces off the target.
+        boolean bounceOff = !this.isReturning();
+        if (bounceOff) {
+            this.rotationDirection *= -1;
+        }
         SoundEvent soundEvent = DRSounds.LEVIATHAN_AXE_IMPACT.get();
-        if (entity.hurt(this.damageSource, (float) damage)) {
+        if (entity.hurt(this.getDamageSource(), (float) damage)) {
             if (owner instanceof Player player) {
                 player.getCooldowns().addCooldown(this.leviathanItem.getItem(), this.COOLDOWN);
             }
@@ -179,7 +211,9 @@ public class ThrownLeviathanAxe extends AbstractArrow {
                 this.doPostHurtEffects(livingEntityHit);
             }
         }
-        this.setDeltaMovement(this.getDeltaMovement().multiply(-0.01, -0.1, -0.01));
+        if (bounceOff) {
+            this.setDeltaMovement(this.getDeltaMovement().multiply(-0.01, -0.1, -0.01));
+        }
         this.playSound(soundEvent, volume, RAND.nextFloat() * 0.15F + 0.925F);
     }
 
@@ -222,14 +256,15 @@ public class ThrownLeviathanAxe extends AbstractArrow {
         }
 
         this.dealtDamage = p_37578_.getBoolean("DealtDamage");
-        this.rotationDirection = p_37578_.getInt("RotationDirection");
+        this.rotationDirection = p_37578_.contains("RotationDirection", Tag.TAG_INT) ? p_37578_.getInt("RotationDirection") : 1;
     }
 
     public void addAdditionalSaveData(CompoundTag p_37582_) {
         super.addAdditionalSaveData(p_37582_);
         p_37582_.put("Leviathan", this.leviathanItem.save(new CompoundTag()));
         p_37582_.putBoolean("DealtDamage", this.dealtDamage);
-        this.rotationDirection = p_37582_.getInt("RotationDirection");
+        // Used to read the (absent) value back from the output tag, which reset the field to 0 on every save.
+        p_37582_.putInt("RotationDirection", this.rotationDirection);
     }
 
     public void tickDespawn() {

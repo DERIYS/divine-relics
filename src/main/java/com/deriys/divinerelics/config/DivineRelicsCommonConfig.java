@@ -77,6 +77,8 @@ public class DivineRelicsCommonConfig {
     public static final ForgeConfigSpec.DoubleValue THOR_GROUND_DAMAGE;
     public static final ForgeConfigSpec.DoubleValue THOR_GROUND_FORCE;
     public static final ForgeConfigSpec.DoubleValue THOR_GROUND_RADIUS;
+    public static final ForgeConfigSpec.DoubleValue THOR_SHIELD_KNOCKBACK_DISTANCE;
+    public static final ForgeConfigSpec.DoubleValue THOR_SHIELD_KNOCKBACK_HEIGHT;
     public static final ForgeConfigSpec.ConfigValue<Integer> THOR_XP_AMOUNT;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> BROK_AND_SINDRI_RESTOCK_TIME;
@@ -139,7 +141,7 @@ public class DivineRelicsCommonConfig {
         THROWN_MJOLNIR_RETURNING_SPEED = BUILDER.comment("Speed at which a thrown Mjölnir returns to the player.")
                 .defineInRange("Thrown Mjölnir Returning Speed", 3.0f, 0f, 10f);
         THROWN_MJOLNIR_LIGHNTING_COUNT = BUILDER.comment("Number of lightning strikes summoned by a thrown Mjölnir upon hitting a target.")
-                .define("Lightning Count", 4);
+                .defineInRange("Lightning Count", 4, 0, 32);
 
         LEVIATHAN_AXE_DAMAGE = BUILDER.comment("Melee damage dealt by the Leviathan Axe.")
                 .defineInRange("Leviathan Axe Damage", 18.0f, 0f, 1000f);
@@ -225,6 +227,10 @@ public class DivineRelicsCommonConfig {
                 .defineInRange("Thor Ground Force", 6.0f, 0f, 30f);
         THOR_GROUND_RADIUS = BUILDER.comment("Thor's Ground Attack Radius")
                 .defineInRange("Thor Ground Radius", 8.0f, 0f, 30f);
+        THOR_SHIELD_KNOCKBACK_DISTANCE = BUILDER.comment("How many blocks away a player blocking one of Thor's attacks, or a flying Mjölnir, with a shield is thrown on level ground (they take no damage). A Guardian Shield parry stops it completely. Clients cap how fast they can be thrown: with the default height this is reached at about 20 blocks.")
+                .defineInRange("Thor Shield Knockback Distance", 15.0f, 0f, 30f);
+        THOR_SHIELD_KNOCKBACK_HEIGHT = BUILDER.comment("How many blocks high that blow lifts them. In the air the throw keeps its momentum; along the ground friction and every bump stop it after a few blocks. 0 slides them along the ground.")
+                .defineInRange("Thor Shield Knockback Height", 1.0f, 0f, 5f);
         THOR_FOLLOW_RANGE = BUILDER.comment("How far Thor can see its target")
                 .defineInRange("Thor Follow Range", 50.0f, 0f, 1000f);
         THOR_SPEED_MODIFIER = BUILDER.comment("How fast Thor will follow you")
@@ -250,11 +256,11 @@ public class DivineRelicsCommonConfig {
         ASGARDIAN_STEEL_ORE_VEIN_SIZE = BUILDER.comment("How many Asgardian Steel Ore blocks spawn in one vein")
                 .define("Asgardian Steel Vein Size", 7);
 
-        NO_WATER_NEARBY_USE = BUILDER.comment("Whether the structures are going to use NoWaterNearby type of structure to avoid spawning near or in the water. Results in a significantly slower generation speed.")
+        NO_WATER_NEARBY_USE = BUILDER.comment("Whether the NoWaterNearby structures additionally require that no water biome (river, ocean, beach, swamp...) is within the distance below. Starts on open water are always rejected; this adds a stricter surface biome check with a small generation cost.")
                 .define("Use NoWaterNearby structure type", false);
 
-        NO_WATER_NEARBY_DISTANCE = BUILDER.comment("The minimum distance from the structure to the nearest water biome in blocks. Used only if the NoWaterNearby flag is true. The bigger the value the slower is the generation.")
-                .define("NoWaterNearby Distance", 40);
+        NO_WATER_NEARBY_DISTANCE = BUILDER.comment("The minimum distance from the structure to the nearest water biome in blocks. Used only if the NoWaterNearby flag is true. The cost grows with the square of this value.")
+                .defineInRange("NoWaterNearby Distance", 40, 0, 256);
 
         BUILDER.pop();
         SPEC = BUILDER.build();

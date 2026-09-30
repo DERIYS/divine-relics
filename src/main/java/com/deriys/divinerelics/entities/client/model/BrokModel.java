@@ -3,7 +3,6 @@ package com.deriys.divinerelics.entities.client.model;
 
 import com.deriys.divinerelics.DivineRelics;
 import com.deriys.divinerelics.entities.entity.BrokEntity;
-import com.deriys.divinerelics.entities.entity.DraugrEntity;
 import net.minecraft.resources.ResourceLocation;
 import software.bernie.geckolib3.model.AnimatedGeoModel;
 

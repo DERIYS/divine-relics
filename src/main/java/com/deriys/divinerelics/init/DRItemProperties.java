@@ -3,8 +3,6 @@ package com.deriys.divinerelics.init;
 import com.deriys.divinerelics.items.DwarvenCompass;
 import net.minecraft.client.renderer.item.CompassItemPropertyFunction;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.GlobalPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 
@@ -30,8 +28,8 @@ public class DRItemProperties {
     }
 
     private static void makeDwarvenCompassAngle(DwarvenCompass compass) {
-        ItemProperties.register(compass, new ResourceLocation("angle"), new CompassItemPropertyFunction((level, itemStack, entity) -> {
-            return GlobalPos.of(level.dimension(), new BlockPos(compass.getStructureX(itemStack), 0, compass.getStructureZ(itemStack)));
-        }));
+        // null (no target yet / search running) makes the needle spin instead of pointing at (0, 0); targets from
+        // another dimension also spin, like a lodestone compass.
+        ItemProperties.register(compass, new ResourceLocation("angle"), new CompassItemPropertyFunction((level, itemStack, entity) -> DwarvenCompass.getTarget(itemStack)));
     }
 }

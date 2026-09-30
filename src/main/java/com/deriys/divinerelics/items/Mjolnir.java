@@ -120,7 +120,8 @@ public class Mjolnir extends AxeItem {
 
     @Override
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
-        if (getOwner(itemStack).isEmpty()) {
+        // Binding is server state; doing it on the client only produced a temporary NBT desync.
+        if (!level.isClientSide && getOwner(itemStack).isEmpty()) {
             bindItemToEntity(entity, itemStack);
         }
         super.inventoryTick(itemStack, level, entity, p_41407_, p_41408_);
@@ -174,7 +175,7 @@ public class Mjolnir extends AxeItem {
             components.add(Component.literal("The legendary hammer of the God of Thunder, forged by the Huldra brothers, is now at your possession. Be careful, for the hammer does not make you its original possessor."));
         } else {
             components.add(Component.literal("Press SHIFT for more info").withStyle(ChatFormatting.YELLOW));
-            String ownerName = stack.getOrCreateTag().getString("OwnerNickname");
+            String ownerName = stack.hasTag() ? stack.getTag().getString("OwnerNickname") : "";
             if (!ownerName.isEmpty()) {
                 components.add(Component.literal(""));
                 components.add(Component.literal("Loyal to: " + ownerName));

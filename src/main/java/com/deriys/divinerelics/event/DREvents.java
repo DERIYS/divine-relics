@@ -11,16 +11,19 @@ import com.deriys.divinerelics.capabilities.teammates.Teammates;
 import com.deriys.divinerelics.capabilities.teammates.TeammatesProvider;
 import com.deriys.divinerelics.capabilities.thor.FightsThor;
 import com.deriys.divinerelics.capabilities.thor.FightsThorProvider;
-import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.entity.*;
 import com.deriys.divinerelics.init.*;
+import com.deriys.divinerelics.entities.ai.thor.ThorShieldKnockback;
 import com.deriys.divinerelics.items.DraupnirSpear;
+import com.deriys.divinerelics.items.GuardianShield;
 import com.deriys.divinerelics.items.LeviathanAxe;
 import com.deriys.divinerelics.items.Mjolnir;
 import com.deriys.divinerelics.items.Motosignir;
+import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -32,30 +35,40 @@ import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.ZombieVillager;
-import net.minecraft.world.entity.npc.Villager;
-import net.minecraft.world.entity.npc.VillagerData;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.FishingHook;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ShulkerBullet;
+import net.minecraft.world.entity.projectile.ThrownExperienceBottle;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
+import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.event.entity.living.ShieldBlockEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraftforge.registries.MissingMappingsEvent;
 
 import java.util.*;
+import javax.annotation.Nullable;
+import java.lang.reflect.Field;
 
 import static com.deriys.divinerelics.capabilities.teammates.TeammatesProvider.hasTeammate;
 import static com.deriys.divinerelics.effects.BifrostProtection.findNormVec;
@@ -74,33 +87,16 @@ public class DREvents {
             Entity attacker = damageSource.getEntity();
             Entity directAttacker = damageSource.getDirectEntity();
 
-            if (hurtEntity instanceof LivingEntity livingEntity) {
-                Level level = livingEntity.getLevel();
-                if (livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get()) && !(livingEntity instanceof Player player && player.getAbilities().instabuild)) {
-                    if (attacker != null && isValidAttacker(attacker, directAttacker) && !level.isClientSide) {
-                        Vec3 entityPos = livingEntity.position();
-                        Vec3 attackerPos = attacker.position();
-
-                        Vec2 attackVector = new Vec2((float) (entityPos.x - attackerPos.x), (float) (entityPos.z - attackerPos.z));
-                        dodgeAttack(level, livingEntity, attackVector);
-                        if (!(attacker instanceof Player)) {
-                            level.playSound(null, new BlockPos(entityPos), SoundEvents.PLAYER_ATTACK_WEAK, SoundSource.PLAYERS, 1f, 1f);
-                        }
-                        hurtEntity.lookAt(EntityAnchorArgument.Anchor.EYES, attacker.getEyePosition());
-                        event.setCanceled(true);
-                    }
+            // Attacks that are always ignored are resolved first, so they no longer trigger side effects below
+            // (Bifrost dodge teleport, Guardian Shield parry) before being cancelled anyway.
+            if (hurtEntity instanceof LivingEntity livingEntityHurt) {
+                if (directAttacker instanceof ThrownMjolnir thrownMjolnir && thrownMjolnir.getOwner() == livingEntityHurt) {
+                    event.setCanceled(true);
+                    return;
                 }
-            }
-
-            if (hurtEntity instanceof Player player && attacker instanceof LivingEntity livingAttacker) {
-                if (player.isBlocking() && player.getOffhandItem().getItem() == DRItems.GUARDIAN_SHIELD.get()) {
-                    int ticksInUse = player.getTicksUsingItem();
-                    if (ticksInUse <= DivineRelicsCommonConfig.GUARDIAN_SHIELD_PARRY_WINDOW.get()) {
-                        float amount = event.getAmount();
-                        float damage = (amount < 3)? 2: amount * 0.8f;
-                        player.getLevel().playSound(null, player.getOnPos(), DRSounds.GUARDIAN_SHIELD_PARRY.get(), SoundSource.PLAYERS, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
-                        Motosignir.hurtAndKnockbackEntites(List.of(livingAttacker), player, Motosignir.STUN_EFFECTS, damage, Math.min(Math.log10(damage) / 2.5, 1.5f), 1, 100);
-                    }
+                if (attacker instanceof Player attackerPlayer && isDRWeapon(directAttacker) && hasTeammate(attackerPlayer, livingEntityHurt)) {
+                    event.setCanceled(true);
+                    return;
                 }
             }
 
@@ -112,20 +108,37 @@ public class DREvents {
                             player.getCooldowns().addCooldown(mjolnir, 40);
                         } else {
                             event.setCanceled(true);
+                            return;
                         }
                     }
                 }
             }
 
-            if (hurtEntity instanceof LivingEntity livingEntityHurt && directAttacker instanceof ThrownMjolnir thrownMjolnir && thrownMjolnir.getOwner() instanceof LivingEntity owner && owner == livingEntityHurt) {
+            if (hurtEntity instanceof LivingEntity livingEntity && !livingEntity.getLevel().isClientSide
+                    && canBifrostDodge(livingEntity, attacker, directAttacker)) {
+                bifrostDodge(livingEntity, attacker, livingEntity.position().subtract(attacker.position()));
                 event.setCanceled(true);
             }
 
-            if (hurtEntity instanceof LivingEntity hurtPlayer && attacker instanceof Player attackerPlayer && hasTeammate(attackerPlayer, hurtPlayer) && isDRWeapon(directAttacker)) {
-                event.setCanceled(true);
+            if (!isParrying && hurtEntity instanceof Player player && !player.getLevel().isClientSide && attacker instanceof LivingEntity livingAttacker) {
+                if (GuardianShield.isParrying(player)) {
+                    float amount = event.getAmount();
+                    float damage = (amount < 3)? 2: amount * 0.8f;
+                    player.getLevel().playSound(null, player.getOnPos(), DRSounds.GUARDIAN_SHIELD_PARRY.get(), SoundSource.PLAYERS, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
+                    // The parry damages the attacker, which fires this event again. If the attacker is parrying as
+                    // well, both players would parry each other forever (StackOverflowError on the server thread).
+                    isParrying = true;
+                    try {
+                        Motosignir.hurtAndKnockbackEntites(List.of(livingAttacker), player, Motosignir.STUN_EFFECTS, damage, Math.min(Math.log10(damage) / 2.5, 1.5f), 1, 100);
+                    } finally {
+                        isParrying = false;
+                    }
+                }
             }
-
         }
+
+        /** Re-entrancy guard for the Guardian Shield parry (only touched on the server thread). */
+        private static boolean isParrying = false;
 
 
         @SubscribeEvent
@@ -137,6 +150,12 @@ public class DREvents {
                     event.setCanceled(true);
                 }
             }
+        }
+
+        /** Runs last, so it only sees blocks that really happen: Thor's attacks still push through those. */
+        @SubscribeEvent(priority = EventPriority.LOWEST)
+        public static void onShieldBlocked(ShieldBlockEvent event) {
+            ThorShieldKnockback.onShieldBlock(event.getEntity());
         }
 
         @SubscribeEvent
@@ -235,9 +254,12 @@ public class DREvents {
         public static void onPlayerCloned(PlayerEvent.Clone event) {
             Player original = event.getOriginal();
             Player player = event.getEntity();
-            if (event.isWasDeath()) {
-                original.revive();
-
+            // A new player object is also created when leaving the End, not only on death: the capabilities have to be
+            // carried over in both cases (before, returning from the End wiped teammates and weapon bindings).
+            // reviveCaps()/invalidateCaps() is the Forge pattern for reading the removed player's capabilities;
+            // revive() also un-removed the dead entity itself.
+            original.reviveCaps();
+            try {
                 original.getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(oldStore -> {
                     event.getEntity().getCapability(MjolnirBindingProvider.MJOLNIR_BINDING).ifPresent(newStore -> {
                         newStore.copyFrom(oldStore);
@@ -261,7 +283,14 @@ public class DREvents {
                         newStore.copyFrom(oldStore);
                     });
                 });
+            } finally {
+                original.invalidateCaps();
+            }
 
+            // The death position is only recorded on death; for other clones it would read (0, 0, 0).
+            if (!event.isWasDeath() || !original.getPersistentData().contains("DRdeathPosition", Tag.TAG_COMPOUND)
+                    || !(player instanceof ServerPlayer)) {
+                return;
             }
 
             Objects.requireNonNull(player.getServer()).execute(() -> {
@@ -295,6 +324,12 @@ public class DREvents {
         @SubscribeEvent
         public static void onItemPickup(EntityItemPickupEvent event) {
             ItemStack itemStack = event.getItem().getItem();
+            CompoundTag tag = itemStack.getTag();
+            if (tag != null && tag.isEmpty()) {
+                // Repairs stacks that older versions tagged with an empty "{}" on pickup (see getOwner), which made
+                // them refuse to stack with identical untagged items. Vanilla normalises empty tags to null as well.
+                itemStack.setTag(null);
+            }
             Item item = itemStack.getItem();
             String owner = getOwner(itemStack);
             Player player = event.getEntity();
@@ -318,20 +353,23 @@ public class DREvents {
                 serverLevel.setWeatherParameters(0, 60000, true, true);
                 thor.startPlayingBossMusic();
             }
+        }
 
-            if (entity instanceof ZombieVillager zombieVillager) {
-                stopSpawningEvent(zombieVillager.getVillagerData(), event);
-            } else if (!(entity instanceof BrokEntity || entity instanceof SindriEntity) && entity instanceof Villager villager) {
-                stopSpawningEvent(villager.getVillagerData(), event);
+        /**
+         * Brok and Sindri were once villagers with their own professions. Vanilla handed those professions out to
+         * random zombie villagers and to villagers taking some job sites, so they were removed. Saves still list them:
+         * this drops them silently, and villagers or zombie villagers that had one simply become unemployed.
+         */
+        @SubscribeEvent
+        public static void onMissingMappings(MissingMappingsEvent event) {
+            for (MissingMappingsEvent.Mapping<VillagerProfession> mapping : event.getMappings(ForgeRegistries.Keys.VILLAGER_PROFESSIONS, DivineRelics.MODID)) {
+                if (REMOVED_PROFESSIONS.contains(mapping.getKey().getPath())) {
+                    mapping.ignore();
+                }
             }
         }
 
-        private static void stopSpawningEvent(VillagerData villagerData, EntityJoinLevelEvent event) {
-            VillagerProfession profession = villagerData.getProfession();
-            if (profession == DRDwarfs.BROK.get() || profession == DRDwarfs.SINDRI.get()) {
-                event.setCanceled(true);
-            }
-        }
+        private static final Set<String> REMOVED_PROFESSIONS = Set.of("brok_master", "sindri_master");
 
         @SubscribeEvent
         public static void onPlayerLogOut(PlayerEvent.PlayerLoggedOutEvent event) {
@@ -362,11 +400,10 @@ public class DREvents {
         }
 
         public static String getOwner(ItemStack itemStack) {
-            if (itemStack != null) {
-                CompoundTag nbt = itemStack.getOrCreateTag();
-                return nbt.getString("OwnerUUID");
-            }
-            return "";
+            // getTag(), not getOrCreateTag(): this is called for every item picked up by any player, and creating an
+            // empty tag made every picked-up stack incompatible (non-stackable) with the same untagged item.
+            CompoundTag nbt = itemStack == null ? null : itemStack.getTag();
+            return nbt == null ? "" : nbt.getString("OwnerUUID");
         }
 
         public static double getVelocity(Player player) {
@@ -378,6 +415,94 @@ public class DREvents {
 
         private static boolean isValidAttacker(Entity attacker, Entity directAttacker) {
             return !(directAttacker instanceof ThrownDraupnirSpear) && (attacker instanceof LivingEntity livingEntity && !(livingEntity.getMainHandItem().getItem() == DRItems.DRAUPNIR_SPEAR.get() && directAttacker == attacker) && !(livingEntity instanceof ThorEntity));
+        }
+
+        /** Whether the Heimdall Gauntlet's Bifrost Protection lets {@code target} dodge this attack. */
+        private static boolean canBifrostDodge(LivingEntity target, @Nullable Entity attacker, @Nullable Entity directAttacker) {
+            return target.hasEffect(DREffects.BIFROST_PROTECTION.get())
+                    && !(target instanceof Player player && player.getAbilities().instabuild)
+                    && attacker != null && isValidAttacker(attacker, directAttacker);
+        }
+
+        /** Teleports {@code target} out of the way of an attack coming along {@code attackDirection}. */
+        private static void bifrostDodge(LivingEntity target, Entity attacker, Vec3 attackDirection) {
+            Level level = target.getLevel();
+            Vec3 targetPos = target.position();
+            dodgeAttack(level, target, new Vec2((float) attackDirection.x, (float) attackDirection.z));
+            if (!(attacker instanceof Player)) {
+                level.playSound(null, new BlockPos(targetPos), SoundEvents.PLAYER_ATTACK_WEAK, SoundSource.PLAYERS, 1f, 1f);
+            }
+            target.lookAt(EntityAnchorArgument.Anchor.EYES, attacker.getEyePosition());
+        }
+
+        /**
+         * Projectiles fly on past an entity that dodges them with Bifrost Protection, the way they fly past an enderman,
+         * instead of bouncing off it.
+         * <p>
+         * Runs on both sides: the client knows its own player's effects, so that player sees the projectile fly on at
+         * once. For everyone else, the server re-sends the projectile's motion.
+         */
+        @SubscribeEvent
+        public static void onProjectileImpact(ProjectileImpactEvent event) {
+            if (!(event.getRayTraceResult() instanceof EntityHitResult hit) || !(hit.getEntity() instanceof LivingEntity target)) {
+                return;
+            }
+            Projectile projectile = event.getProjectile();
+            Entity attacker = projectile.getOwner();
+            if (!isDodgeableProjectile(projectile) || !canBifrostDodge(target, attacker, projectile)
+                    // Attacks that are ignored anyway (see LivingAttackEvent) keep their usual outcome.
+                    || projectile instanceof ThrownMjolnir && attacker == target
+                    || attacker instanceof Player attackerPlayer && isDRWeapon(projectile) && hasTeammate(attackerPlayer, target)) {
+                return;
+            }
+            if (projectile instanceof AbstractArrow arrow && arrow.getPierceLevel() > 0) {
+                markPierced(arrow, target);
+            }
+            if (!target.getLevel().isClientSide) {
+                Vec3 motion = projectile.getDeltaMovement();
+                // Out of the projectile's path; falling straight down, away from where it was shot from.
+                Vec3 direction = motion.horizontalDistanceSqr() > 1.0E-6D ? motion : target.position().subtract(attacker.position());
+                bifrostDodge(target, attacker, direction);
+                projectile.hasImpulse = true;
+            }
+            event.setCanceled(true);
+        }
+
+        /**
+         * Fishing hooks and experience bottles are no attacks. Shulker bullets home in: one flying on would keep chasing
+         * and forcing dodges, so it hits, and the attack itself is dodged as before.
+         */
+        private static boolean isDodgeableProjectile(Projectile projectile) {
+            return !(projectile instanceof FishingHook || projectile instanceof ThrownExperienceBottle || projectile instanceof ShulkerBullet);
+        }
+
+        @Nullable
+        private static Field piercingIgnoreEntityIds;
+        private static boolean piercingFieldLookedUp;
+
+        /**
+         * A piercing arrow retries every entity along its path within the same tick until one is marked as pierced, which
+         * vanilla only does on an actual hit: a dodged one would be retried forever. It counts as pierced now.
+         */
+        private static void markPierced(AbstractArrow arrow, Entity target) {
+            try {
+                if (!piercingFieldLookedUp) {
+                    piercingFieldLookedUp = true;
+                    piercingIgnoreEntityIds = ObfuscationReflectionHelper.findField(AbstractArrow.class, "f_36701_");
+                }
+                if (piercingIgnoreEntityIds != null) {
+                    IntOpenHashSet pierced = (IntOpenHashSet) piercingIgnoreEntityIds.get(arrow);
+                    if (pierced == null) {
+                        pierced = new IntOpenHashSet(5);
+                        piercingIgnoreEntityIds.set(arrow, pierced);
+                    }
+                    pierced.add(target.getId());
+                    return;
+                }
+            } catch (ReflectiveOperationException | RuntimeException ignored) {
+                piercingIgnoreEntityIds = null;
+            }
+            arrow.setPierceLevel((byte) 0); // no access to the set: it simply stops piercing
         }
 
         public static boolean isDRWeapon(Entity directAttacker) {
@@ -395,7 +520,7 @@ public class DREvents {
 
             Vec2 attackVNorm = findNormVec(attackVector);
 
-            double scale = new Random().nextFloat() * 1.5 + 0.5;
+            double scale = hurtEntity.getRandom().nextFloat() * 1.5 + 0.5;
 
             Vec3 tpVector = getTPVector(level, attackVNorm, entityPos, scale);
 

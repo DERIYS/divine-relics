@@ -1,28 +1,24 @@
 package com.deriys.divinerelics.entities.ai.thor;
 
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
+import com.deriys.divinerelics.entities.ai.TimedAttack;
 import com.deriys.divinerelics.entities.entity.ThorEntity;
-import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
-import com.deriys.divinerelics.init.DRItems;
-import com.deriys.divinerelics.init.DRSounds;
-import com.deriys.divinerelics.items.Motosignir;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.MeleeAttackGoal;
-import net.minecraft.world.entity.projectile.AbstractArrow;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
 
-import static com.deriys.divinerelics.entities.entity.ThrownMjolnir.onHitLighnting;
+import javax.annotation.Nullable;
+
 import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 
+/**
+ * Chases Thor's target and decides which attack he starts when. Once started, an attack is carried out by
+ * {@link ThorEntity} itself, so it finishes (hit included, in time with its animation) even if this goal stops because
+ * the target is gone.
+ */
 public class ThorAttackGoal extends MeleeAttackGoal {
     private final ThorEntity entity;
-    private int attackDelay = -1;
-    private int ticksUntilNextAttack = -1;
-    private boolean shouldCountTillNextAttack = false;
     private ThorAttackState lastAttack = ThorAttackState.NONE;
 
     public static double CLAP_ATTACK_DAMAGE = DivineRelicsCommonConfig.THOR_CLAP_DAMAGE.get();
@@ -33,81 +29,54 @@ public class ThorAttackGoal extends MeleeAttackGoal {
     public static double GROUND_ATTACK_FORCE = DivineRelicsCommonConfig.THOR_GROUND_FORCE.get();
     public static double GROUND_ATTACK_RADUIS = DivineRelicsCommonConfig.THOR_GROUND_RADIUS.get();
 
+    public static final double LEG_ATTACK_FORCE = 1.8D;
+    /** Extra reach of Thor's close attacks on top of the usual melee reach. */
+    private static final float CLOSE_ATTACK_RANGE = 2.8F;
 
     public ThorAttackGoal(PathfinderMob pathfinderMob, double pSpeedModifier, boolean pFollowingTargetEvenIfNotSeen) {
         super(pathfinderMob, pSpeedModifier, pFollowingTargetEvenIfNotSeen);
         entity = ((ThorEntity) pathfinderMob);
     }
 
-    @Override
-    public void start() {
-        super.start();
+    /** Squared distance within which Thor's close attacks (melee, leg kick) reach {@code target}. */
+    public static double attackRangeSqr(Mob thor, LivingEntity target) {
+        return TimedAttack.meleeRangeSqr(thor, target, CLOSE_ATTACK_RANGE);
     }
 
-    /**
-     * Checks the distance to the enemy and performs an attack if the enemy is within the specified range.
-     * Sets the attack state and manages the attack animation and execution timing.
-     *
-     * @param pEnemy The enemy entity to check the distance against and potentially attack.
-     * @param pDistToEnemySqr The squared distance to the enemy.
-     */
+    /** Starts an attack on {@code pEnemy} when Thor is free and it is in range of one. */
     @Override
     protected void checkAndPerformAttack(LivingEntity pEnemy, double pDistToEnemySqr) {
-        if (isEnemyWithinAttackDistance(pEnemy, pDistToEnemySqr)) {
-            shouldCountTillNextAttack = true;
-            if(isTimeToStartAttackAnimation()) {
-                entity.setAttacking(true);
-                entity.playAttackSound(entity.getAttackState());
-            }
-
-            if(isTimeToAttack()) {
-                this.mob.getLookControl().setLookAt(pEnemy.getX(), pEnemy.getEyeY(), pEnemy.getZ());
-                performAttack(pEnemy);
-            }
-        } else {
-            if (entity.getAttackState() != ThorAttackState.NONE) {
-                entity.setAttackState(ThorAttackState.NONE);
-            }
+        ThorEntity thor = this.entity;
+        if (thor.isAttacking()) {
+            return; // the running attack plays out on its own
+        }
+        double range = attackRangeSqr(thor, pEnemy);
+        ThorAttackState attack = this.chooseAttack(pEnemy, pDistToEnemySqr, range);
+        if (attack != null) {
+            this.lastAttack = attack;
+            thor.startAttack(attack, pEnemy);
+        } else if (pDistToEnemySqr > range * 5.0D && thor.getAttackState() != ThorAttackState.NONE) {
+            thor.setAttackState(ThorAttackState.NONE);
         }
     }
 
-    /**
-     * Checks if an enemy is within a certain attack range and decides the appropriate attack state for Thor.
-     *
-     * @param pEnemy The enemy entity to check the distance against.
-     * @param pDistToEnemySqr The squared distance to the enemy.
-     * @return A boolean indicating whether the enemy is within attack distance.
-     */
-    private boolean isEnemyWithinAttackDistance(LivingEntity pEnemy, double pDistToEnemySqr) {
-        float attackRange = 2.8f;
+    @Nullable
+    private ThorAttackState chooseAttack(LivingEntity enemy, double distSqr, double range) {
         ThorEntity thor = this.entity;
-        boolean isAttacking = thor.isAttacking();
-        double distance = getAttackReachSqr(pEnemy) + attackRange * attackRange;
-        if (pDistToEnemySqr <= distance) {
-            if (!isAttacking && ticksUntilNextAttack <= 0) {
-                ThorAttackState randAttack = ThorAttackState.genCloseState(thor, this.lastAttack);
-                setNewAttackState(randAttack);
-            }
-            return true;
-        } else {
-            ThorAttackState attackState = thor.getAttackState();
-            if (pDistToEnemySqr <= distance * 2f && (shouldClapAttack() || attackState == ThorAttackState.CLAP_ATTACK)) {
-                if (!isAttacking && canClapAttack() && ticksUntilNextAttack <= 0) {
-                    setNewAttackState(ThorAttackState.CLAP_ATTACK);
-                }
-                return true;
-            } else if (pDistToEnemySqr <= distance * 5f && (shouldGroundAttack() || attackState == ThorAttackState.GROUND_ATTACK)) {
-                if (!isAttacking && canGroundAttack() && ticksUntilNextAttack <= 0) {
-                    setNewAttackState(ThorAttackState.GROUND_ATTACK);
-                }
-                return true;
-            } else if (pDistToEnemySqr > distance * 5f && entity.canSeeTarget(pEnemy) && (shouldMjolnirThrow() || attackState == ThorAttackState.MJOLNIR_THROW)) {
-                if (!isAttacking && !thor.waitsForMjolnir() && thor.thrownMjolnirUUID == null && ticksUntilNextAttack <= 0) {
-                    setNewAttackState(ThorAttackState.MJOLNIR_THROW);
-                }
-                return true;
-            } else return attackState == ThorAttackState.MJOLNIR_THROW && isAttacking;
+        if (distSqr <= range) {
+            return ThorAttackState.genCloseState(thor, this.lastAttack);
         }
+        if (distSqr <= range * 2.0D && shouldClapAttack() && this.lastAttack != ThorAttackState.CLAP_ATTACK) {
+            return ThorAttackState.CLAP_ATTACK;
+        }
+        if (distSqr <= range * 5.0D && shouldGroundAttack() && this.lastAttack != ThorAttackState.GROUND_ATTACK) {
+            return ThorAttackState.GROUND_ATTACK;
+        }
+        if (distSqr > range * 5.0D && shouldMjolnirThrow() && !thor.waitsForMjolnir() && thor.thrownMjolnirUUID == null
+                && thor.canSeeTarget(enemy)) {
+            return ThorAttackState.MJOLNIR_THROW;
+        }
+        return null;
     }
 
     private boolean shouldMjolnirThrow() {
@@ -120,103 +89,5 @@ public class ThorAttackGoal extends MeleeAttackGoal {
 
     private boolean shouldGroundAttack() {
         return RAND.nextDouble() < 0.04D;
-    }
-
-    private boolean canGroundAttack() {
-        return this.lastAttack != ThorAttackState.GROUND_ATTACK;
-    }
-
-    private boolean canClapAttack() {
-        return this.lastAttack != ThorAttackState.CLAP_ATTACK;
-    }
-
-    private void setNewAttackState(ThorAttackState attackState) {
-        this.lastAttack = attackState;
-        this.entity.setAttackState(attackState);
-        this.assignDelayTicks();
-    }
-
-    private void assignDelayTicks() {
-        int attackTicks = ThorAttackState.getAttackStateTicks(entity.getAttackState());
-        ticksUntilNextAttack = attackTicks * 2;
-        attackDelay = attackTicks;
-    }
-
-    protected void resetAttackCooldown() {
-        this.ticksUntilNextAttack = this.adjustedTickDelay(attackDelay * 2);
-    }
-
-    protected boolean isTimeToAttack() {
-        return this.ticksUntilNextAttack == this.attackDelay;
-    }
-
-    protected boolean isTimeToStartAttackAnimation() {
-        return this.ticksUntilNextAttack == this.attackDelay * 2;
-    }
-
-    protected int getTicksUntilNextAttack() {
-        return this.ticksUntilNextAttack;
-    }
-
-    protected void performAttack(LivingEntity pEnemy) {
-        ThorAttackState attackState = this.entity.getAttackState();
-        if (attackState != ThorAttackState.MJOLNIR_THROW) {
-            if (attackState == ThorAttackState.LEG_ATTACK) {
-                Motosignir.applyKnockBack(pEnemy, this.entity, 1.8f);
-            }
-            this.mob.swing(InteractionHand.MAIN_HAND);
-            this.mob.doHurtTarget(pEnemy);
-        } else {
-            throwMjolnirAtEnemy(pEnemy);
-        }
-    }
-
-    private void throwMjolnirAtEnemy(LivingEntity pEnemy) {
-        ThorEntity thor = this.entity;
-        thor.setHasMjolnirInHands(false);
-        thor.setWaitsForMjolnir(true);
-        Level level = thor.level;
-        ThrownMjolnir thrownMjolnir = new ThrownMjolnir(level, thor, new ItemStack(DRItems.MJOLNIR.get()));
-        thrownMjolnir.shootMjolnirAtTarget(thor, pEnemy);
-        thrownMjolnir.pickup = AbstractArrow.Pickup.DISALLOWED;
-        thrownMjolnir.setNoGravity(true);
-        level.addFreshEntity(thrownMjolnir);
-        thor.thrownMjolnirUUID = thrownMjolnir.getUUID();
-        level.playSound(null, thor.getOnPos(), DRSounds.MJOLNIR_THROWING.get(), SoundSource.HOSTILE, 1.0F, 1.0F);
-    }
-
-    @Override
-    public void tick() {
-        super.tick();
-
-        ThorEntity thor = this.entity;
-        ThorAttackState state = thor.getAttackState();
-        if (performsAttack(thor, 24, ThorAttackState.CLAP_ATTACK)) {
-            onHitLighnting(thor.level, thor, thor.getOnPos(), thor, thor.thorDamageSource, CLAP_ATTACK_DAMAGE, CLAP_ATTACK_FORCE, CLAP_ATTACK_RADUIS);
-        } else if (performsAttack(thor, 25, ThorAttackState.GROUND_ATTACK)) {
-            onHitLighnting(thor.level, thor, thor.getOnPos(), thor, thor.thorDamageSource, GROUND_ATTACK_DAMAGE, GROUND_ATTACK_FORCE, GROUND_ATTACK_RADUIS);
-        }
-
-        if(!thor.level.isClientSide && shouldCountTillNextAttack && this.ticksUntilNextAttack > 0) {
-            this.ticksUntilNextAttack--;
-            if (this.ticksUntilNextAttack == 0){
-                thor.setAttacking(false);
-                if (state == ThorAttackState.MJOLNIR_THROW) {
-                    thor.setAttackState(ThorAttackState.NONE);
-                }
-            }
-        }
-    }
-
-    private boolean performsAttack(ThorEntity thor, int x, ThorAttackState attackState) {
-        ThorAttackState thorAttackState = thor.getAttackState();
-        return !thor.level.isClientSide && this.ticksUntilNextAttack == x && (thorAttackState == attackState || (lastAttack == attackState && thorAttackState == ThorAttackState.NONE));
-    }
-
-    @Override
-    public void stop() {
-        entity.setAttacking(false);
-        entity.setAttackState(ThorAttackState.NONE); // to prevent mjolnir throw spamming
-        super.stop();
     }
 }

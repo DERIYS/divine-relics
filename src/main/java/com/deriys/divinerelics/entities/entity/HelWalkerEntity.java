@@ -1,7 +1,9 @@
 package com.deriys.divinerelics.entities.entity;
 
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
+import com.deriys.divinerelics.entities.ai.TimedAttack;
 import com.deriys.divinerelics.entities.ai.hel_walker.HelWalkerAttackGoal;
+import com.deriys.divinerelics.entities.client.SyncedAnimationController;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
 import com.deriys.divinerelics.items.DraupnirSpear;
@@ -11,8 +13,11 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Difficulty;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -37,7 +42,6 @@ import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
 import software.bernie.geckolib3.core.builder.AnimationBuilder;
 import software.bernie.geckolib3.core.builder.ILoopType;
-import software.bernie.geckolib3.core.controller.AnimationController;
 import software.bernie.geckolib3.core.event.predicate.AnimationEvent;
 import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
@@ -50,9 +54,21 @@ public class HelWalkerEntity extends Monster implements IAnimatable {
     private static final AttributeModifier SLOW_SPEED_MODIFIER = new AttributeModifier("SlowSpeed", -0.3, AttributeModifier.Operation.MULTIPLY_BASE);
     private static final AttributeModifier FAST_SPEED_MODIFIER = new AttributeModifier("FastSpeed", DivineRelicsCommonConfig.HEL_WALKER_SPEED_MODIFIER.get(), AttributeModifier.Operation.MULTIPLY_BASE);
     public static final int FREEZING_TIME = DivineRelicsCommonConfig.HEL_WALKER_FREEZING_TIME.get();
+    /** The attack lasts as long as its animations (animation.hel_walker.attack_1/2) and hits halfway through them. */
+    public static final int ATTACK_DURATION = 30;
+    public static final int ATTACK_IMPACT_TICK = 15;
+    /** Extra reach of the attack on top of the usual melee reach. */
+    public static final float ATTACK_RANGE = 2.8F;
     private static final EntityDataAccessor<Boolean> ATTACKING =
             SynchedEntityData.defineId(HelWalkerEntity.class, EntityDataSerializers.BOOLEAN);
-    public int attackingTicks = 0;
+    /** Game time at which the current attack started on the server: clients play its animation from there. */
+    private static final EntityDataAccessor<Integer> ATTACK_START_TIME =
+            SynchedEntityData.defineId(HelWalkerEntity.class, EntityDataSerializers.INT);
+    /** Which of {@link #helWalkerAttacks} the current attack plays, picked by the server so every client sees the same. */
+    private static final EntityDataAccessor<Byte> ATTACK_ANIMATION =
+            SynchedEntityData.defineId(HelWalkerEntity.class, EntityDataSerializers.BYTE);
+    /** Server: the current attack's progress (see {@link #startAttack}). */
+    private final TimedAttack attack = new TimedAttack();
     private AnimationFactory factory = GeckoLibUtil.createFactory(this);
 
     private final SoundEvent[] attackSounds = {
@@ -95,18 +111,44 @@ public class HelWalkerEntity extends Monster implements IAnimatable {
         return this.entityData.get(ATTACKING);
     }
 
+    /**
+     * Starts an attack on {@code target}. It plays out to the end on its own (see {@link #tick}), whether or not the
+     * Hel Walker still has a target by then: its animation and its hit always stay together.
+     */
+    public void startAttack(@Nullable LivingEntity target) {
+        this.setAttacking(true);
+        this.entityData.set(ATTACK_START_TIME, (int) this.level.getGameTime());
+        this.entityData.set(ATTACK_ANIMATION, (byte) RAND.nextInt(this.helWalkerAttacks.length));
+        this.attack.start(target);
+        this.level.playSound(null, this.getOnPos(), this.getAttackSound(), SoundSource.HOSTILE, 1.0f, RAND.nextFloat() * 0.1F + 0.95F);
+    }
+
+    private void performAttackImpact() {
+        this.swing(InteractionHand.MAIN_HAND);
+        // The swing always happens; it only lands on a target that is still alive and within reach.
+        LivingEntity target = this.attack.getTarget();
+        if (target != null && this.attack.targetInReach(this, TimedAttack.meleeRangeSqr(this, target, ATTACK_RANGE))
+                && this.doHurtTarget(target) && target.isAlive()
+                && target instanceof Player player && !player.getAbilities().instabuild) {
+            target.setTicksFrozen(target.getTicksFrozen() + FREEZING_TIME);
+        }
+    }
+
     @Override
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(ATTACKING, false);
+        this.entityData.define(ATTACK_START_TIME, 0);
+        this.entityData.define(ATTACK_ANIMATION, (byte) 0);
     }
 
     @Override
     public void tick() {
         super.tick();
 
-        if (this.level.isClientSide && this.attackingTicks > 0){
-            this.attackingTicks--;
+        if (!this.level.isClientSide && this.isAlive()
+                && this.attack.tick(this, ATTACK_IMPACT_TICK, ATTACK_DURATION, this::performAttackImpact)) {
+            this.setAttacking(false);
         }
 
         LivingEntity target = this.getTarget();
@@ -141,46 +183,46 @@ public class HelWalkerEntity extends Monster implements IAnimatable {
     }
 
     private <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
-        if(this.isAttacking() && this.attackingTicks == 0) {
-            event.getController().markNeedsReload();
-            event.getController().setAnimation(new AnimationBuilder().addAnimation(getRandomAttack(), ILoopType.EDefaultLoopTypes.PLAY_ONCE));
-            this.attackingTicks = 30;
-            return PlayState.CONTINUE;
-        }
-
-        if (this.attackingTicks == 0) {
-            if (event.isMoving()) {
-                event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.hel_walker.walk", ILoopType.EDefaultLoopTypes.LOOP));
+        if (this.isAttacking()) {
+            // Played from where the server is in the attack, also if it started while the Hel Walker was not drawn.
+            int startTime = this.entityData.get(ATTACK_START_TIME);
+            double elapsed = SyncedAnimationController.ticksSince(this.level, startTime, event.getPartialTick());
+            if (elapsed < ATTACK_DURATION) {
+                if (event.getController() instanceof SyncedAnimationController<?> controller) {
+                    int variant = Mth.clamp(this.entityData.get(ATTACK_ANIMATION), 0, this.helWalkerAttacks.length - 1);
+                    controller.playSynced(this.helWalkerAttacks[variant], startTime, elapsed);
+                }
                 return PlayState.CONTINUE;
             }
+        }
+
+        if (event.isMoving()) {
+            event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.hel_walker.walk", ILoopType.EDefaultLoopTypes.LOOP));
+        } else {
             event.getController().setAnimation(new AnimationBuilder().addAnimation("animation.hel_walker.idle", ILoopType.EDefaultLoopTypes.LOOP));
         }
         return PlayState.CONTINUE;
     }
 
-    private String getRandomAttack() {
-        return this.helWalkerAttacks[RAND.nextInt(this.helWalkerAttacks.length)];
-    }
-
     @Override
     public void registerControllers(AnimationData animationData) {
-        animationData.addAnimationController(new AnimationController(this, "controller",
+        animationData.addAnimationController(new SyncedAnimationController<>(this, "controller",
                 0, this::predicate));
     }
 
     public SoundEvent getAttackSound() {
-        return this.attackSounds[RAND.nextInt(0, 3)];
+        return this.attackSounds[RAND.nextInt(this.attackSounds.length)];
     }
 
     @Override
     protected SoundEvent getHurtSound(DamageSource damageSource) {
-        return this.hitSounds[RAND.nextInt(0, 3)];
+        return this.hitSounds[RAND.nextInt(this.hitSounds.length)]; // was nextInt(0, 3): hit sounds 4 and 5 never played
     }
 
     @Nullable
     @Override
     protected SoundEvent getAmbientSound() {
-        return this.ambientSounds[RAND.nextInt(0, 6)];
+        return this.ambientSounds[RAND.nextInt(this.ambientSounds.length)];
     }
 
     @Override

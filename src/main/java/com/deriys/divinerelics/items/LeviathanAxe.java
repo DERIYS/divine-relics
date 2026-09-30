@@ -90,7 +90,8 @@ public class LeviathanAxe extends AxeItem {
 
     @Override
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
-        if (getOwner(itemStack).isEmpty()) {
+        // Binding is server state; doing it on the client only produced a temporary NBT desync.
+        if (!level.isClientSide && getOwner(itemStack).isEmpty()) {
             bindItemToEntity(entity, itemStack);
         }
         super.inventoryTick(itemStack, level, entity, p_41407_, p_41408_);
@@ -105,7 +106,8 @@ public class LeviathanAxe extends AxeItem {
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity) {
         if (entity instanceof LivingEntity livingEntity && !player.getLevel().isClientSide && entity.isAlive()) {
-            if (entity instanceof Player && !player.getAbilities().instabuild && !player.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
+            // Creative mode and Bifrost protection are properties of the target (as for the thrown axe), not the attacker.
+            if (entity instanceof Player target && !target.getAbilities().instabuild && !target.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
                 livingEntity.setTicksFrozen(livingEntity.getTicksFrozen() + FREEZE_TIME);
             }
         }
@@ -139,7 +141,7 @@ public class LeviathanAxe extends AxeItem {
             components.add(Component.literal("Once wielded by Kratos’ wife, this axe embodies icy vengeance. Its enchanted blade cleaves through foes, always returning to its wielder’s grasp."));
         } else {
             components.add(Component.literal("Press SHIFT for more info").withStyle(ChatFormatting.YELLOW));
-            String ownerName = stack.getOrCreateTag().getString("OwnerNickname");
+            String ownerName = stack.hasTag() ? stack.getTag().getString("OwnerNickname") : "";
             if (!ownerName.isEmpty()) {
                 components.add(Component.literal(""));
                 components.add(Component.literal("Loyal to: " + ownerName));

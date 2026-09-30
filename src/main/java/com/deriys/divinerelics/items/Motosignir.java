@@ -3,9 +3,11 @@ package com.deriys.divinerelics.items;
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.MotosignirParticleS2CPacket;
+import com.deriys.divinerelics.entities.ai.thor.ThorShieldKnockback;
 import com.deriys.divinerelics.entities.entity.ThorEntity;
 import com.deriys.divinerelics.init.DREffects;
 import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
+import com.deriys.divinerelics.entities.entity.ThrownMjolnir;
 import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
@@ -154,11 +156,21 @@ public class Motosignir extends Item {
 
 //                owner.sendSystemMessage(Component.literal("Dealt " + Math.floor(Math.min(adjustedDamage, adjustedDamage * distanceFactor)*100)/100 + " damage to " + livingEntity.getDisplayName().getString() + " at " + Math.floor(distanceToEnemy*100)/100 + " distance"));
 
-                if (!livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get()) || damageSource.getEntity() instanceof ThorEntity) {
-                    livingEntity.knockback(force, ratioX, ratioZ);
+                float damage = (float) Math.min(adjustedDamage, adjustedDamage * distanceFactor);
+                boolean thorsBlow = owner instanceof ThorEntity;
+                if (thorsBlow || attacker instanceof ThrownMjolnir) {
+                    // Thor's strikes and a flying Mjölnir's throw shield-blocking targets back as well.
+                    ThorShieldKnockback.knockBackAndHurt(livingEntity, attacker.position(), force, strength -> {
+                        if (thorsBlow || !livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {
+                            livingEntity.knockback(strength, ratioX, ratioZ);
+                        }
+                    }, () -> livingEntity.hurt(damageSource, damage));
+                } else {
+                    if (!livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get()) || damageSource.getEntity() instanceof ThorEntity) {
+                        livingEntity.knockback(force, ratioX, ratioZ);
+                    }
+                    livingEntity.hurt(damageSource, damage);
                 }
-
-                livingEntity.hurt(damageSource, (float) Math.min(adjustedDamage, adjustedDamage * distanceFactor));
 
                 EnchantmentHelper.doPostHurtEffects(livingEntity, owner);
                 EnchantmentHelper.doPostDamageEffects(owner, livingEntity);

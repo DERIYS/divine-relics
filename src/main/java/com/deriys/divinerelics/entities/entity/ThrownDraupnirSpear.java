@@ -1,5 +1,7 @@
 package com.deriys.divinerelics.entities.entity;
 
+import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpear;
+import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpears;
 import com.deriys.divinerelics.capabilities.stuck_spears.StuckSpearsProvider;
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.core.networking.DRMessages;
@@ -9,7 +11,6 @@ import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.items.DraupnirSpear;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.particles.BlockParticleOption;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -18,6 +19,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -28,9 +30,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.NetworkHooks;
 
@@ -41,6 +43,13 @@ import static com.deriys.divinerelics.items.DraupnirSpear.RAND;
 public class ThrownDraupnirSpear extends AbstractArrow {
     private static final EntityDataAccessor<Boolean> ID_FOIL;
     private static final double SPEAR_DAMAGE = DivineRelicsCommonConfig.THROWN_DRAUPNIR_SPEAR_DAMAGE.get();
+    /** A stuck spear's tip always goes at least this deep. */
+    private static final double MIN_STUCK_DEPTH = 0.15D;
+    /** How far from the target's centre line a stuck spear may pass (at most). */
+    private static final double MAX_CORE_OFFSET = 0.15D;
+    /** Height range (share of the hitbox height) a stuck spear goes in at: the torso and head, not the legs. */
+    private static final double CORE_MIN_HEIGHT = 0.4D;
+    private static final double CORE_MAX_HEIGHT = 0.9D;
     private double throwerX;
     private double throwerY;
     private double throwerZ;
@@ -72,9 +81,7 @@ public class ThrownDraupnirSpear extends AbstractArrow {
         this.throwerZ = throwerPos.z;
     }
 
-    public static void spawnSpearParticles(ClientLevel level, double x, double y, double z, double throwerX, double throwerY, double throwerZ, float pitch, float height) {
-        BlockParticleOption particleOption = new BlockParticleOption(ParticleTypes.BLOCK, Blocks.WHITE_CONCRETE.defaultBlockState());
-
+    public static void spawnSpearParticles(Level level, double x, double y, double z, double throwerX, double throwerY, double throwerZ, float pitch, float height) {
         double pitchRadians = Math.toRadians(pitch);
 
         Vec3 throwVec = new Vec3(throwerX - x, throwerY - y, throwerZ - z).normalize().scale(height * Math.cos(pitchRadians));
@@ -83,10 +90,15 @@ public class ThrownDraupnirSpear extends AbstractArrow {
         double offsetY = -height * Math.sin(pitchRadians);
         double offsetZ = throwVec.z;
 
-        level.addParticle(particleOption,
-                x + offsetX + (Math.random() * 0.2 - 0.1),
-                y + offsetY + (Math.random() * 0.2 - 0.1),
-                z + offsetZ + (Math.random() * 0.2 - 0.1),
+        spawnSpearParticle(level, x + offsetX, y + offsetY, z + offsetZ);
+    }
+
+    /** The puff a Draupnir spear gives off at its back end, both landed in a block and stuck in an entity. */
+    public static void spawnSpearParticle(Level level, double x, double y, double z) {
+        level.addParticle(new BlockParticleOption(ParticleTypes.BLOCK, Blocks.WHITE_CONCRETE.defaultBlockState()),
+                x + (Math.random() * 0.2 - 0.1),
+                y + (Math.random() * 0.2 - 0.1),
+                z + (Math.random() * 0.2 - 0.1),
                 0, 0, 0);
     }
 
@@ -149,22 +161,8 @@ public class ThrownDraupnirSpear extends AbstractArrow {
                 if (this.spearItem.getItem() instanceof DraupnirSpear draupnirSpear && !this.level.isClientSide) {
                     draupnirSpear.addThrownSpear(this.spearItem, hurtEntity.getUUID());
                     hurtEntity.getCapability(StuckSpearsProvider.STUCK_SPEARS).ifPresent(cap -> {
-                        Vec3 positionDifference = this.position().subtract(hurtEntity.position());
-                        Vec2 bodyRotationVector = getBodyRotationVector((LivingEntity) hurtEntity);
-                        Vec2 positionDifference2D = new Vec2((float) positionDifference.x, (float) positionDifference.z);
-
-                        float angleBetweenVectors = (float) angleBetweenVectors(positionDifference2D, bodyRotationVector);
-
-                        double hurtEntityWidth = hurtEntity.getBbWidth();
-                        double hurtEntityHeight = hurtEntity.getEyeHeight();
-
-                        double xOffset = RAND.nextDouble() * hurtEntityWidth * 0.6 - hurtEntityWidth * 0.3;
-                        double yOffset = RAND.nextDouble() * hurtEntityHeight * 0.6 + hurtEntityHeight * 0.3;
-                        double zOffset = RAND.nextDouble() * hurtEntityWidth * 0.3 - hurtEntityWidth * 0.15;
-
-                        cap.addSpear(new Vec3(xOffset, yOffset, zOffset), RAND.nextFloat() * 10 - 5, angleBetweenVectors < 90);
-
-                        DRMessages.sendToAllPlayers(new StuckSpearsS2CPacket(hurtEntity.getId(), cap.getSpears()));
+                        this.stickInto(livingEntityHurt, cap);
+                        DRMessages.sendToTrackingEntityAndSelf(new StuckSpearsS2CPacket(hurtEntity.getId(), cap.getSpears()), hurtEntity);
                     });
                     if (!level.isClientSide) {
                         DraupnirSpear.sendExplosionPacket(this.level, hurtEntity.getX(), this.getY(), hurtEntity.getZ(), 1D, 0.5D, 10);
@@ -179,23 +177,41 @@ public class ThrownDraupnirSpear extends AbstractArrow {
         this.playSound(soundEvent, 2.0F, 1.0F);
     }
 
-    public Vec2 getBodyRotationVector(LivingEntity entity) {
-        float yaw = entity.yBodyRot;
-        float pitch = entity.getXRot();
-
-        // Convert angles to radians
-        float yawRad = (float) Math.toRadians(yaw);
-        float pitchRad = (float) Math.toRadians(pitch);
-
-        // Calculate the direction vector
-        double x = -Math.sin(yawRad) * Math.cos(pitchRad);
-        double z = Math.cos(yawRad) * Math.cos(pitchRad);
-
-        return new Vec2((float) x, (float) z);
+    /**
+     * Records where and at which angle this spear went into {@code target}, in the target's body frame, so that it is
+     * drawn sticking out of that spot for as long as it stays there.
+     */
+    private void stickInto(LivingEntity target, StuckSpears spears) {
+        Vec3 motion = this.getDeltaMovement();
+        AABB box = target.getBoundingBox();
+        Vec3 center = box.getCenter();
+        Vec3 direction = (motion.lengthSqr() > 1.0E-7D ? motion : center.subtract(this.position())).normalize();
+        // Hitboxes are often much wider than the model (an iron golem's is 1.4 blocks, its head half a block), so the
+        // spear is aimed at the body's core: its flight line is shifted sideways close to the centre line, keeping its
+        // angle, and kept at torso/head height instead of between the legs or above the head.
+        Vec3 core = closestToAxis(this.position(), direction, center);
+        double coreRadius = Math.min(MAX_CORE_OFFSET, box.getXsize() * 0.25D);
+        Vec3 offAxis = new Vec3(core.x - center.x, 0.0D, core.z - center.z);
+        if (offAxis.length() > coreRadius) {
+            core = core.subtract(offAxis.scale(1.0D - coreRadius / offAxis.length()));
+        }
+        double height = box.getYsize();
+        core = new Vec3(core.x, Mth.clamp(core.y, box.minY + height * CORE_MIN_HEIGHT, box.minY + height * CORE_MAX_HEIGHT), core.z);
+        Vec3 entry = box.clip(core.subtract(direction.scale(16.0D)), core).orElse(core);
+        // The tip goes in as far as the core, unless that would bury too much of the spear to still see it.
+        float depth = (float) Mth.clamp(entry.distanceTo(core), MIN_STUCK_DEPTH, StuckSpear.MAX_DEPTH);
+        float bodyYaw = target.yBodyRot * Mth.DEG_TO_RAD;
+        spears.addSpear(entry.subtract(target.position()).yRot(bodyYaw), direction.yRot(bodyYaw), depth, RAND.nextFloat() * 360.0F);
     }
 
-    public double angleBetweenVectors(Vec2 vec1, Vec2 vec2) {
-        return Math.toDegrees(Math.acos(vec1.dot(vec2) / (vec1.length() * vec2.length())));
+    /** The point of the line through {@code from} along {@code direction} closest to the vertical axis through {@code center}. */
+    private static Vec3 closestToAxis(Vec3 from, Vec3 direction, Vec3 center) {
+        double horizontal = direction.x * direction.x + direction.z * direction.z;
+        if (horizontal < 1.0E-6D) {
+            return new Vec3(from.x, center.y, from.z); // flying straight up or down: the whole line is equally close
+        }
+        double t = ((center.x - from.x) * direction.x + (center.z - from.z) * direction.z) / horizontal;
+        return from.add(direction.scale(t));
     }
 
     @Override

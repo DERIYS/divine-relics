@@ -1,9 +1,9 @@
 package com.deriys.divinerelics.core.networking.packets;
 
-import com.deriys.divinerelics.items.HeimdallGauntlet;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
+import com.deriys.divinerelics.core.networking.DRClientPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -41,13 +41,8 @@ public class GauntletParticleS2CPacket {
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
-            Minecraft mc = Minecraft.getInstance();
-            ClientLevel level = mc.level;
-            if (level != null) {
-                HeimdallGauntlet.addTeleportParticles(level, playerX, playerY, playerZ, tpX, tpZ);
-            }
-        });
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+                DRClientPacketHandler.handleGauntletParticles(playerX, playerY, playerZ, tpX, tpZ)));
         return true;
     }
 }

@@ -119,6 +119,12 @@ public class DraupnirSpear extends SwordItem {
         tag.put("ThrownSpears", spearsTag);
     }
 
+    /** Number of stored spear targets, without parsing the UUID strings. */
+    private int getThrownSpearsCount(ItemStack stack) {
+        CompoundTag tag = stack.getTag();
+        return tag == null ? 0 : tag.getList("ThrownSpears", 8).size();
+    }
+
     public List<UUID> getThrownSpears(ItemStack stack) {
         CompoundTag tag = stack.getOrCreateTag();
         ListTag spearsTag = tag.getList("ThrownSpears", 8);
@@ -141,7 +147,7 @@ public class DraupnirSpear extends SwordItem {
     }
 
     public boolean isNBTReset(ItemStack stack) {
-        return !getExplosionState(stack) && getThrownCount(stack) == 0 && getDelayTicks(stack) == 0 && getThrownSpears(stack).isEmpty();
+        return !getExplosionState(stack) && getThrownCount(stack) == 0 && getDelayTicks(stack) == 0 && getThrownSpearsCount(stack) == 0;
     }
 
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand interactionHand) {
@@ -196,18 +202,20 @@ public class DraupnirSpear extends SwordItem {
      */
     @Override
     public void inventoryTick(ItemStack itemStack, Level level, Entity entity, int p_41407_, boolean p_41408_) {
-        if (getOwner(itemStack).isEmpty()) {
+        // Binding is server state; doing it on the client only produced a temporary NBT desync.
+        if (!level.isClientSide && getOwner(itemStack).isEmpty()) {
             bindItemToEntity(entity, itemStack);
         }
 
         int delayTicks = getDelayTicks(itemStack);
-        List<UUID> thrownSpears = getThrownSpears(itemStack);
-        if (thrownSpears.isEmpty() && !isNBTReset(itemStack)) {
+        // The UUID list used to be parsed (twice) every tick on both sides; only the explosion step needs the values.
+        if (getThrownSpearsCount(itemStack) == 0 && !isNBTReset(itemStack)) {
             resetNBT(itemStack);
         }
         if (delayTicks > DELAY_TICKS_THRESHOLD) {
             setDelayTicks(itemStack, --delayTicks);
         } else if (delayTicks == DELAY_TICKS_THRESHOLD && getExplosionState(itemStack)) {
+            List<UUID> thrownSpears = getThrownSpears(itemStack);
             UUID uuid = thrownSpears.get(0);
             if (!level.isClientSide) {
                 ServerLevel serverLevel = ((ServerLevel) level);
@@ -224,7 +232,7 @@ public class DraupnirSpear extends SwordItem {
                     } else {
                         entityUUID.getCapability(StuckSpearsProvider.STUCK_SPEARS).ifPresent(stuckSpears -> {
                             stuckSpears.removeSpear();
-                            DRMessages.sendToAllPlayers(new StuckSpearsS2CPacket(entityUUID.getId(), stuckSpears.getSpears()));
+                            DRMessages.sendToTrackingEntityAndSelf(new StuckSpearsS2CPacket(entityUUID.getId(), stuckSpears.getSpears()), entityUUID);
                         });
                         entityUUID.invulnerableTime = 1;
                     }
@@ -347,7 +355,7 @@ public class DraupnirSpear extends SwordItem {
             components.add(Component.literal("May this weapon strike true; may it be wielded with wisdom; may it be put down when its job is done."));
         } else {
             components.add(Component.literal("Press SHIFT for more info").withStyle(ChatFormatting.YELLOW));
-            String ownerName = stack.getOrCreateTag().getString("OwnerNickname");
+            String ownerName = stack.hasTag() ? stack.getTag().getString("OwnerNickname") : "";
             if (!ownerName.isEmpty()) {
                 components.add(Component.literal(""));
                 components.add(Component.literal("Loyal to: " + ownerName));

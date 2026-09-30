@@ -1,9 +1,9 @@
 package com.deriys.divinerelics.core.networking.packets;
 
-import com.deriys.divinerelics.items.Motosignir;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
+import com.deriys.divinerelics.core.networking.DRClientPacketHandler;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
@@ -41,13 +41,8 @@ public class MotosignirParticleS2CPacket {
 
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
-        context.enqueueWork(() -> {
-            Minecraft mc = Minecraft.getInstance();
-            ClientLevel level = mc.level;
-            if (level != null) {
-                Motosignir.addSoundWaveParticles(level, playerX, playerY, playerZ, viewVectorX, viewVectorZ);
-            }
-        });
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> () ->
+                DRClientPacketHandler.handleMotosignirParticles(playerX, playerY, playerZ, viewVectorX, viewVectorZ)));
         return true;
     }
 }

@@ -1,5 +1,6 @@
 package com.deriys.divinerelics.items;
 
+import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.init.DRSounds;
 import net.minecraft.ChatFormatting;
@@ -57,6 +58,12 @@ public class GuardianShield extends ShieldItem {
     @Override
     public boolean isValidRepairItem(ItemStack p_43091_, ItemStack p_43092_) {
         return p_43092_.is(DRItems.PERFECT_ASGARDIAN_STEEL_INGOT.get());
+    }
+
+    /** Whether the player raised the Guardian Shield recently enough that an attack hitting it now is parried. */
+    public static boolean isParrying(Player player) {
+        return player.isBlocking() && player.getOffhandItem().getItem() == DRItems.GUARDIAN_SHIELD.get()
+                && player.getTicksUsingItem() <= DivineRelicsCommonConfig.GUARDIAN_SHIELD_PARRY_WINDOW.get();
     }
 
     @Override

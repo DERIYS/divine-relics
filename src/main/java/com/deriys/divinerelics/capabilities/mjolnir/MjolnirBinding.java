@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MjolnirBinding {
+    /**
+     * Upper bound for remembered thrown weapons. Entries are only removed when the weapon is picked up again, so the
+     * UUIDs of weapons that vanished otherwise (void, /kill, despawn) used to pile up in the player data forever.
+     */
+    private static final int MAX_ENTRIES = 16;
+
     private List<String> mjolnirList = new ArrayList<>();
 
     public List<String> getMjolnirList() {
@@ -15,6 +21,12 @@ public class MjolnirBinding {
     }
 
     public void addMjolnir(String mjolnir) {
+        if (this.mjolnirList.contains(mjolnir)) {
+            return;
+        }
+        if (this.mjolnirList.size() >= MAX_ENTRIES) {
+            this.mjolnirList.remove(0);
+        }
         this.mjolnirList.add(mjolnir);
     }
 
@@ -23,7 +35,7 @@ public class MjolnirBinding {
     }
 
     public void copyFrom(MjolnirBinding source) {
-        this.mjolnirList = source.mjolnirList;
+        this.mjolnirList = new ArrayList<>(source.mjolnirList);
     }
 
     public void saveNBTData(CompoundTag nbt) {
@@ -37,11 +49,12 @@ public class MjolnirBinding {
     }
 
     public void loadNBTData(CompoundTag nbt) {
+        this.mjolnirList.clear(); // loading into an already populated capability must not duplicate entries
         if (nbt.contains("mjolnir_bind")) {
             ListTag listTag = nbt.getList("mjolnir_bind", 8);
             for (int i = 0; i < listTag.size(); i++) {
                 String mjolnir = listTag.getString(i);
-                this.mjolnirList.add(mjolnir);
+                this.addMjolnir(mjolnir);
             }
         }
     }

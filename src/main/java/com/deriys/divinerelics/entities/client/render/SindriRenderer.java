@@ -1,9 +1,7 @@
 package com.deriys.divinerelics.entities.client.render;
 
 import com.deriys.divinerelics.DivineRelics;
-import com.deriys.divinerelics.entities.client.model.BrokModel;
 import com.deriys.divinerelics.entities.client.model.SindriModel;
-import com.deriys.divinerelics.entities.entity.BrokEntity;
 import com.deriys.divinerelics.entities.entity.SindriEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -34,5 +32,12 @@ public class SindriRenderer extends GeoEntityRenderer<SindriEntity> {
 
         poseStack.scale(0.9f, 0.9f, 0.9f);
         return super.getRenderType(animatable, partialTick, poseStack, bufferSource, buffer, packedLight, texture);
+    }
+
+    @Override
+    public void render(SindriEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        super.render(entity, entityYaw, partialTick, poseStack, bufferSource, packedLight);
+        // GeckoLib renderers never fire RenderLivingEvent, so the stuck spears are drawn here.
+        StuckSpearRenderer.render(entity, poseStack, bufferSource, packedLight, partialTick);
     }
 }

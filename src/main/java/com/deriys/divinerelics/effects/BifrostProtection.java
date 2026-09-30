@@ -2,6 +2,7 @@ package com.deriys.divinerelics.effects;
 
 import com.deriys.divinerelics.util.custom.TPData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
@@ -27,18 +28,26 @@ public class BifrostProtection extends MobEffect {
         super.applyEffectTick(livingEntity, pAmplifier);
     }
 
+    /**
+     * Unit vector perpendicular to the horizontal vector {@code (x, z)} (stored as {@code Vec2(x, y=z)}).
+     * <p>
+     * Same result as before for {@code x != 0}; the old form divided by {@code x}, so an attack vector without an X
+     * component (attacker exactly north or south of the target) produced NaN, which propagated into the dodge target.
+     */
     public static Vec2 findNormVec(Vec2 vector) {
         float x = vector.x;
         float z = vector.y;
 
-        float zn = (float) (x / (Math.sqrt(x*x + z*z)));
-        float xn = -z*zn/x;
-
-        return new Vec2(xn, zn);
+        float length = Mth.sqrt(x * x + z * z);
+        if (length < 1.0E-6F) {
+            return new Vec2(1.0F, 0.0F); // no horizontal direction (attacker straight above/below): any is fine
+        }
+        return new Vec2(-z / length, x / length);
     }
 
     public static Vec2 findNormVec(Vec3 vector) {
-        return findNormVec(new Vec2((float) vector.x, (float) vector.y));
+        // Horizontal components: this passed the vertical y component as z, so the result depended on the pitch.
+        return findNormVec(new Vec2((float) vector.x, (float) vector.z));
     }
 
     public static Vec3 rotateVector(Vec2 normVector, double vectorAngle, double length) {
