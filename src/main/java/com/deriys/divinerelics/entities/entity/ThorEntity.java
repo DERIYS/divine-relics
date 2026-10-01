@@ -112,6 +112,7 @@ public class ThorEntity extends Monster implements IAnimatable {
 
     private List<ServerPlayer> trackingPlayers = new ArrayList<>();
     public short ambientSoundCount = -1;
+    private boolean hasTauntedReturningMjolnirHit;
 
     public int ambientSoundInterval = this.getAmbientSoundInterval();
 
@@ -215,17 +216,16 @@ public class ThorEntity extends Monster implements IAnimatable {
         LivingEntity target = this.attack.getTarget();
         switch (state) {
             case CLAP_ATTACK -> onHitLighnting(this.level, this, this.getOnPos(), this, this.thorDamageSource,
-                    ThorAttackGoal.CLAP_ATTACK_DAMAGE, ThorAttackGoal.CLAP_ATTACK_FORCE, ThorAttackGoal.CLAP_ATTACK_RADUIS);
+                    DivineRelicsCommonConfig.THOR_CLAP_DAMAGE.get(), ThorAttackGoal.CLAP_ATTACK_FORCE,
+                    DivineRelicsCommonConfig.THOR_CLAP_RADIUS.get(), null, state);
             case GROUND_ATTACK -> onHitLighnting(this.level, this, this.getOnPos(), this, this.thorDamageSource,
-                    ThorAttackGoal.GROUND_ATTACK_DAMAGE, ThorAttackGoal.GROUND_ATTACK_FORCE, ThorAttackGoal.GROUND_ATTACK_RADUIS);
+                    DivineRelicsCommonConfig.THOR_GROUND_DAMAGE.get(), ThorAttackGoal.GROUND_ATTACK_FORCE,
+                    DivineRelicsCommonConfig.THOR_GROUND_RADIUS.get(), null, state);
             case MELEE_ATTACK, LEG_ATTACK -> {
                 this.swing(InteractionHand.MAIN_HAND);
                 // The swing always happens; it only lands on a target that is still alive and within reach.
                 if (target != null && this.attack.targetInReach(this, ThorAttackGoal.attackRangeSqr(this, target))) {
-                    // The hammer swing has no knockback of its own, but a blocked one still throws the target back.
-                    double force = state == ThorAttackState.LEG_ATTACK ? ThorAttackGoal.LEG_ATTACK_FORCE : 0.0D;
-                    ThorShieldKnockback.knockBackAndHurt(target, this.position(), force,
-                            strength -> Motosignir.applyKnockBack(target, this, strength), () -> this.doHurtTarget(target));
+                    ThorShieldKnockback.hurtWithKnockback(target, this, state, 0.0D, () -> this.doHurtTarget(target));
                 }
             }
             case MJOLNIR_THROW -> {
@@ -237,6 +237,13 @@ public class ThorEntity extends Monster implements IAnimatable {
             }
             default -> {
             }
+        }
+    }
+
+    public void onReturningMjolnirHitPlayer() {
+        if (!this.level.isClientSide() && !this.hasTauntedReturningMjolnirHit) {
+            this.hasTauntedReturningMjolnirHit = true;
+            this.playSound(DRSounds.THOR_AMBIENT_DUMBASS.get(), this.getSoundVolume(), this.getVoicePitch());
         }
     }
 
@@ -452,6 +459,7 @@ public class ThorEntity extends Monster implements IAnimatable {
         super.readAdditionalSaveData(compoundTag);
         this.tickCount = compoundTag.getInt("TickCount");
         this.ambientSoundCount = compoundTag.getShort("AmbientSoundCount");
+        this.hasTauntedReturningMjolnirHit = compoundTag.getBoolean("HasTauntedReturningMjolnirHit");
         this.setSummoningComplete(compoundTag.getBoolean("SummoningComplete"));
         this.setAttacking(compoundTag.getBoolean("Attacking"));
         this.setAttackState(ThorAttackState.getState(compoundTag.getByte("AttackState")));
@@ -491,6 +499,7 @@ public class ThorEntity extends Monster implements IAnimatable {
         compoundTag.putInt("AttackTick", this.attack.getTick());
         compoundTag.putInt("TickCount", this.tickCount);
         compoundTag.putShort("AmbientSoundCount", this.ambientSoundCount);
+        compoundTag.putBoolean("HasTauntedReturningMjolnirHit", this.hasTauntedReturningMjolnirHit);
         compoundTag.putByte("AttackState", this.entityData.get(ATTACK_STATE));
         if (this.thrownMjolnirUUID != null) {
             compoundTag.putUUID("ThrownMjolnirUUID", this.thrownMjolnirUUID);

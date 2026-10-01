@@ -1,0 +1,11 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "java": true,
+        "free": true,
+        "nproc": true,
+        "/usr/lib/jvm/java-17-openjdk-amd64/bin/java": true
+    },
+    // Gradle 7.5.1 (required by ForgeGradle 5.1) can't run on the Java 21 JRE bundled with the Java extension.
+    "java.import.gradle.java.home": "/usr/lib/jvm/java-17-openjdk-amd64",
+    "java.configuration.updateBuildConfiguration": "automatic"
+}

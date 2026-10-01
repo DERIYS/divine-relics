@@ -85,6 +85,8 @@ public class DRSounds {
             registerSoundEvent("thor_ambient_8");
     public static final RegistryObject<SoundEvent> THOR_AMBIENT_9 =
             registerSoundEvent("thor_ambient_9");
+    public static final RegistryObject<SoundEvent> THOR_AMBIENT_DUMBASS =
+            registerSoundEvent("thor_ambient_dumbass");
     public static final RegistryObject<SoundEvent> THOR_DEATH_SOUND =
             registerSoundEvent("thor_death_sound");
 

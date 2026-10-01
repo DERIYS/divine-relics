@@ -79,6 +79,25 @@ public class DivineRelicsCommonConfig {
     public static final ForgeConfigSpec.DoubleValue THOR_GROUND_RADIUS;
     public static final ForgeConfigSpec.DoubleValue THOR_SHIELD_KNOCKBACK_DISTANCE;
     public static final ForgeConfigSpec.DoubleValue THOR_SHIELD_KNOCKBACK_HEIGHT;
+    public static final ForgeConfigSpec.DoubleValue THOR_MELEE_KNOCKBACK_DISTANCE;
+    public static final ForgeConfigSpec.DoubleValue THOR_MELEE_SHIELD_KNOCKBACK_DISTANCE;
+    public static final ForgeConfigSpec.DoubleValue THOR_MELEE_KNOCKBACK_HEIGHT;
+    public static final ForgeConfigSpec.DoubleValue THOR_LEG_KNOCKBACK_DISTANCE;
+    public static final ForgeConfigSpec.DoubleValue THOR_LEG_SHIELD_KNOCKBACK_DISTANCE;
+    public static final ForgeConfigSpec.DoubleValue THOR_LEG_KNOCKBACK_HEIGHT;
+    public static final ForgeConfigSpec.DoubleValue THOR_CLAP_KNOCKBACK_DISTANCE;
+    public static final ForgeConfigSpec.DoubleValue THOR_CLAP_SHIELD_KNOCKBACK_DISTANCE;
+    public static final ForgeConfigSpec.DoubleValue THOR_CLAP_KNOCKBACK_HEIGHT;
+    public static final ForgeConfigSpec.DoubleValue THOR_GROUND_KNOCKBACK_DISTANCE;
+    public static final ForgeConfigSpec.DoubleValue THOR_GROUND_SHIELD_KNOCKBACK_DISTANCE;
+    public static final ForgeConfigSpec.DoubleValue THOR_GROUND_KNOCKBACK_HEIGHT;
+    public static final ForgeConfigSpec.DoubleValue THOR_MJOLNIR_KNOCKBACK_DISTANCE;
+    public static final ForgeConfigSpec.DoubleValue THOR_MJOLNIR_SHIELD_KNOCKBACK_DISTANCE;
+    public static final ForgeConfigSpec.DoubleValue THOR_MJOLNIR_KNOCKBACK_HEIGHT;
+    public static final ForgeConfigSpec.DoubleValue THOR_AREA_MIN_DAMAGE_FACTOR;
+    public static final ForgeConfigSpec.DoubleValue THOR_AREA_MIN_KNOCKBACK_FACTOR;
+    public static final ForgeConfigSpec.DoubleValue THOR_CLOSE_KNOCKBACK_RANGE;
+    public static final ForgeConfigSpec.DoubleValue THOR_CLOSE_KNOCKBACK_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Integer> THOR_XP_AMOUNT;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> BROK_AND_SINDRI_RESTOCK_TIME;
@@ -217,20 +236,58 @@ public class DivineRelicsCommonConfig {
                 .defineInRange("Thor Damage", 20.0f, 0f, 1000f);
         THOR_CLAP_DAMAGE = BUILDER.comment("Thor's Clap Attack Damage")
                 .defineInRange("Thor Clap Damage", 27.0f, 0f, 1000f);
-        THOR_CLAP_FORCE = BUILDER.comment("Thor's Clap Attack Knockback Force")
+        THOR_CLAP_FORCE = BUILDER.comment("Legacy clap force. Thor's combat attacks now use the per-attack knockback distances instead.")
                 .defineInRange("Thor Clap Force", 4.5f, 0f, 100f);
         THOR_CLAP_RADIUS = BUILDER.comment("Thor's Clap Attack Radius")
                 .defineInRange("Thor Clap Radius", 6.0f, 0f, 20f);
         THOR_GROUND_DAMAGE = BUILDER.comment("Thor's Ground Attack Damage")
                 .defineInRange("Thor Ground Damage", 37.0f, 0f, 100f);
-        THOR_GROUND_FORCE = BUILDER.comment("Thor's Ground Attack Knockback Force")
-                .defineInRange("Thor Ground Force", 6.0f, 0f, 30f);
+        THOR_GROUND_FORCE = BUILDER.comment("Legacy ground force. Thor's combat attacks now use the per-attack knockback distances instead.")
+                .defineInRange("Thor Ground Force", 8.0f, 0f, 30f);
         THOR_GROUND_RADIUS = BUILDER.comment("Thor's Ground Attack Radius")
                 .defineInRange("Thor Ground Radius", 8.0f, 0f, 30f);
-        THOR_SHIELD_KNOCKBACK_DISTANCE = BUILDER.comment("How many blocks away a player blocking one of Thor's attacks, or a flying Mjölnir, with a shield is thrown on level ground (they take no damage). A Guardian Shield parry stops it completely. Clients cap how fast they can be thrown: with the default height this is reached at about 20 blocks.")
+        THOR_SHIELD_KNOCKBACK_DISTANCE = BUILDER.comment("Shield knockback distance for player-owned Mjölnir and Thor's summoning shockwave. Thor's combat attacks use their own distances below. A Guardian Shield parry stops knockback completely.")
                 .defineInRange("Thor Shield Knockback Distance", 15.0f, 0f, 30f);
         THOR_SHIELD_KNOCKBACK_HEIGHT = BUILDER.comment("How many blocks high that blow lifts them. In the air the throw keeps its momentum; along the ground friction and every bump stop it after a few blocks. 0 slides them along the ground.")
                 .defineInRange("Thor Shield Knockback Height", 1.0f, 0f, 5f);
+        THOR_MELEE_KNOCKBACK_DISTANCE = BUILDER.comment("Hammer melee knockback distance in blocks on level ground without movement input. Walls and terrain can shorten it.")
+                .defineInRange("Thor Melee Knockback Distance", 3.0D, 0.0D, 30.0D);
+        THOR_MELEE_SHIELD_KNOCKBACK_DISTANCE = BUILDER.comment("Hammer melee knockback distance when blocked with a shield.")
+                .defineInRange("Thor Melee Shield Knockback Distance", 1.5D, 0.0D, 30.0D);
+        THOR_MELEE_KNOCKBACK_HEIGHT = BUILDER.comment("Peak hammer melee launch height in blocks, for blocked and unblocked hits.")
+                .defineInRange("Thor Melee Knockback Height", 0.2D, 0.0D, 5.0D);
+        THOR_LEG_KNOCKBACK_DISTANCE = BUILDER.comment("Leg kick knockback distance in blocks.")
+                .defineInRange("Thor Leg Knockback Distance", 5.5D, 0.0D, 30.0D);
+        THOR_LEG_SHIELD_KNOCKBACK_DISTANCE = BUILDER.comment("Leg kick knockback distance when blocked with a shield.")
+                .defineInRange("Thor Leg Shield Knockback Distance", 5.0D, 0.0D, 30.0D);
+        THOR_LEG_KNOCKBACK_HEIGHT = BUILDER.comment("Peak leg kick launch height in blocks, for blocked and unblocked hits.")
+                .defineInRange("Thor Leg Knockback Height", 0.2D, 0.0D, 5.0D);
+        THOR_CLAP_KNOCKBACK_DISTANCE = BUILDER.comment("Clap knockback distance in blocks before distance falloff and the close-range bonus.")
+                .defineInRange("Thor Clap Knockback Distance", 10.0D, 0.0D, 30.0D);
+        THOR_CLAP_SHIELD_KNOCKBACK_DISTANCE = BUILDER.comment("Clap knockback distance when blocked, before falloff and the close-range bonus.")
+                .defineInRange("Thor Clap Shield Knockback Distance", 10.0D, 0.0D, 30.0D);
+        THOR_CLAP_KNOCKBACK_HEIGHT = BUILDER.comment("Peak clap launch height in blocks, for blocked and unblocked hits.")
+                .defineInRange("Thor Clap Knockback Height", 1.0D, 0.0D, 5.0D);
+        THOR_GROUND_KNOCKBACK_DISTANCE = BUILDER.comment("Ground slam knockback distance in blocks before distance falloff and the close-range bonus.")
+                .defineInRange("Thor Ground Knockback Distance", 17.0D, 0.0D, 30.0D);
+        THOR_GROUND_SHIELD_KNOCKBACK_DISTANCE = BUILDER.comment("Ground slam knockback distance when blocked, before falloff and the close-range bonus.")
+                .defineInRange("Thor Ground Shield Knockback Distance", 15.0D, 0.0D, 30.0D);
+        THOR_GROUND_KNOCKBACK_HEIGHT = BUILDER.comment("Peak ground slam launch height in blocks, for blocked and unblocked hits.")
+                .defineInRange("Thor Ground Knockback Height", 2.5D, 0.0D, 5.0D);
+        THOR_MJOLNIR_KNOCKBACK_DISTANCE = BUILDER.comment("Thor-owned thrown Mjolnir knockback distance in blocks. Direct hits and surrounding strikes stay at full strength.")
+                .defineInRange("Thor Mjolnir Knockback Distance", 6.0D, 0.0D, 30.0D);
+        THOR_MJOLNIR_SHIELD_KNOCKBACK_DISTANCE = BUILDER.comment("Thor-owned thrown Mjolnir knockback distance when blocked with the Guardian Shield.")
+                .defineInRange("Thor Mjolnir Shield Knockback Distance", 5.0D, 0.0D, 30.0D);
+        THOR_MJOLNIR_KNOCKBACK_HEIGHT = BUILDER.comment("Peak thrown Mjolnir launch height in blocks, for blocked and unblocked hits.")
+                .defineInRange("Thor Mjolnir Knockback Height", 1.0D, 0.0D, 5.0D);
+        THOR_AREA_MIN_DAMAGE_FACTOR = BUILDER.comment("Minimum damage fraction at the edge of clap/ground range. Falloff is linear from Thor's hitbox surface.")
+                .defineInRange("Thor Area Minimum Damage Factor", 0.7D, 0.0D, 1.0D);
+        THOR_AREA_MIN_KNOCKBACK_FACTOR = BUILDER.comment("Minimum horizontal knockback fraction at the edge of clap/ground range.")
+                .defineInRange("Thor Area Minimum Knockback Factor", 0.85D, 0.0D, 1.0D);
+        THOR_CLOSE_KNOCKBACK_RANGE = BUILDER.comment("Clap/ground proximity bonus range in blocks between hitbox surfaces. 0 disables the bonus.")
+                .defineInRange("Thor Close Knockback Range", 1.5D, 0.0D, 5.0D);
+        THOR_CLOSE_KNOCKBACK_MULTIPLIER = BUILDER.comment("Maximum horizontal clap/ground knockback multiplier at hitbox contact, fading to 1 at the proximity range.")
+                .defineInRange("Thor Close Knockback Multiplier", 1.7D, 1.0D, 3.0D);
         THOR_FOLLOW_RANGE = BUILDER.comment("How far Thor can see its target")
                 .defineInRange("Thor Follow Range", 50.0f, 0f, 1000f);
         THOR_SPEED_MODIFIER = BUILDER.comment("How fast Thor will follow you")

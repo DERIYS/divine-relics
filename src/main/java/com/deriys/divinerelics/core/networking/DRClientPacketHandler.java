@@ -15,6 +15,7 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.List;
@@ -31,6 +32,13 @@ import java.util.List;
  */
 public final class DRClientPacketHandler {
     private DRClientPacketHandler() {
+    }
+
+    public static void handleThorKnockback(Vec3 motion) {
+        if (Minecraft.getInstance().player != null) {
+            Minecraft.getInstance().player.setDeltaMovement(motion);
+            Minecraft.getInstance().player.hasImpulse = true;
+        }
     }
 
     public static void handleMotosignirParticles(double playerX, double playerY, double playerZ, double viewVectorX, double viewVectorZ) {

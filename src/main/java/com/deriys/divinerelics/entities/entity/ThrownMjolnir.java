@@ -3,6 +3,7 @@ package com.deriys.divinerelics.entities.entity;
 import com.deriys.divinerelics.capabilities.mjolnir.MjolnirBindingProvider;
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.entities.ai.thor.ThorShieldKnockback;
+import com.deriys.divinerelics.entities.ai.thor.ThorAttackState;
 import com.deriys.divinerelics.init.DREntitiyTypes;
 import com.deriys.divinerelics.init.DRItems;
 import com.deriys.divinerelics.items.Motosignir;
@@ -136,11 +137,11 @@ public class ThrownMjolnir extends AbstractArrow {
 
                 double fact = 0.05 * RETURNING_SPEED;
                 this.setDeltaMovement(this.getDeltaMovement().scale(0.95).add(vectorPM.normalize().scale(fact)));
-                if (!this.level.isClientSide && owner instanceof Player player) {
+                if (!this.level.isClientSide) {
                     // super.tick() moves the hammer by exactly this delta, so this is the path it covers this tick.
                     Vec3 pathEnd = this.position().add(this.getDeltaMovement());
-                    ReturnFlight.smashBlocks(this, player, pathStart, pathEnd);
-                    ReturnFlight.hitEntities(this, player, pathStart, pathEnd, this.returnHitEntityIds, this::canHitEntity, this::onHitEntity);
+                    ReturnFlight.smashBlocks(this, owner, pathStart, pathEnd);
+                    ReturnFlight.hitEntities(this, owner, pathStart, pathEnd, this.returnHitEntityIds, this::canHitEntity, this::onHitEntity);
                 }
                 if (this.clientSideReturnTridentTickCount == 0) {
                     this.playSound(DRSounds.MJOLNIR_RETURN.get(), 15.0F, 1.0F);
@@ -230,11 +231,23 @@ public class ThrownMjolnir extends AbstractArrow {
         SoundEvent soundEvent = DRSounds.MJOLNIR_IMPACT.get();
         float amount = (float) damage;
         // Whoever blocks the flying hammer with a shield is still thrown back by it, whoever threw it.
-        boolean hurt = entity instanceof LivingEntity livingTarget && !this.level.isClientSide
-                ? ThorShieldKnockback.knockBackAndHurt(livingTarget, this.position(), 0.0D, strength -> {
-                }, () -> livingTarget.hurt(this.getDamageSource(), amount))
-                : entity.hurt(this.getDamageSource(), amount);
+        boolean hurt;
+        if (entity instanceof LivingEntity livingTarget && !this.level.isClientSide) {
+            if (owner instanceof ThorEntity) {
+                this.hit = true;
+                hurt = ThorShieldKnockback.hurtWithKnockback(livingTarget, this, ThorAttackState.MJOLNIR_THROW, 0.0D,
+                        () -> livingTarget.hurt(this.getDamageSource(), amount));
+            } else {
+                hurt = ThorShieldKnockback.knockBackAndHurt(livingTarget, this.position(), 0.0D, strength -> {
+                }, () -> livingTarget.hurt(this.getDamageSource(), amount));
+            }
+        } else {
+            hurt = entity.hurt(this.getDamageSource(), amount);
+        }
         if (hurt) {
+            if (!this.level.isClientSide && this.isReturning() && entity instanceof Player && owner instanceof ThorEntity thor) {
+                thor.onReturningMjolnirHitPlayer();
+            }
             this.hit = true;
             Level level = this.level;
             BlockPos blockPos = entity.blockPosition();
@@ -281,9 +294,14 @@ public class ThrownMjolnir extends AbstractArrow {
     }
 
     public static void spawnLightning(Level level, BlockPos blockPos, Entity owner) {
+        spawnLightning(level, blockPos, owner, false);
+    }
+
+    private static void spawnLightning(Level level, BlockPos blockPos, Entity owner, boolean visualOnly) {
         LightningBolt lightningBolt = (LightningBolt)EntityType.LIGHTNING_BOLT.create(level);
         lightningBolt.moveTo(Vec3.atBottomCenterOf(blockPos));
         lightningBolt.setCause(owner instanceof ServerPlayer ? (ServerPlayer)owner : null);
+        lightningBolt.setVisualOnly(visualOnly);
         level.addFreshEntity(lightningBolt);
     }
 
@@ -299,12 +317,23 @@ public class ThrownMjolnir extends AbstractArrow {
      */
     public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, LivingEntity owner, DamageSource damageSource,
                                       double damage, double force, double strikeRadius, @Nullable IntSet alreadyStruck) {
+        onHitLighnting(level, hammer, blockPos, owner, damageSource, damage, force, strikeRadius, alreadyStruck, null);
+    }
+
+    public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, LivingEntity owner, DamageSource damageSource,
+                                    double damage, double force, double strikeRadius, @Nullable IntSet alreadyStruck,
+                                    @Nullable ThorAttackState thorAttack) {
+        boolean calibratedThorAttack = owner instanceof ThorEntity && thorAttack != null;
         List<LivingEntity> entitiesInArea =
-                Motosignir.getEntitiesInArea(level, hammer.getX(), hammer.getY(), hammer.getZ(), strikeRadius);
+                calibratedThorAttack ? level.getEntitiesOfClass(LivingEntity.class, hammer.getBoundingBox().inflate(strikeRadius))
+                        : Motosignir.getEntitiesInArea(level, hammer.getX(), hammer.getY(), hammer.getZ(), strikeRadius);
 
         int targetsInArea = 0;
         List<LivingEntity> struckNow = new ArrayList<>();
         for (LivingEntity entity : entitiesInArea) {
+            if (calibratedThorAttack && ThorShieldKnockback.surfaceDistance(hammer, entity) > strikeRadius) {
+                continue;
+            }
             if (entity != owner && !hasTeammate(owner, entity)) {
                 targetsInArea++;
                 if (alreadyStruck == null || alreadyStruck.add(entity.getId())) {
@@ -313,16 +342,16 @@ public class ThrownMjolnir extends AbstractArrow {
             }
         }
 
-        Motosignir.hurtAndKnockbackEntites(struckNow, owner, hammer, damageSource, damage, force);
+        Motosignir.hurtAndKnockbackEntites(struckNow, owner, hammer, damageSource, damage, force, strikeRadius, thorAttack);
         for (LivingEntity entity : struckNow) {
-            spawnLightning(level, entity.getOnPos(), owner);
+            spawnLightning(level, entity.getOnPos(), owner, calibratedThorAttack);
         }
 
         // Tops up sparse strikes (e.g. into the ground) with random bolts within 5 blocks. Targets that were struck
         // earlier count as well, so a crowd that already got its lightning gets no random bolts instead.
         int maxLightnings = DivineRelicsCommonConfig.THROWN_MJOLNIR_LIGHNTING_COUNT.get();
         for (int i = targetsInArea; i < maxLightnings; i++) {
-            spawnLightning(level, getRandBlockPos(blockPos), owner);
+            spawnLightning(level, getRandBlockPos(blockPos), owner, calibratedThorAttack);
         }
     }
 
@@ -367,12 +396,18 @@ public class ThrownMjolnir extends AbstractArrow {
     /** @param directTarget the entity that was hit, or {@code null} for a block impact */
     private void mjolnirHit(LivingEntity owner, Level level, BlockPos blockPos, @Nullable Entity directTarget) {
         // A living target gets its bolt from the area strike below, like everything around it, not a second one here.
-        if (!(directTarget instanceof LivingEntity) && (directTarget == null || this.areaStruckEntityIds.add(directTarget.getId()))) {
+        if (owner instanceof ThorEntity) {
+            // A direct hit already received its calibrated damage/launch; the surrounding strike must not stack on it.
+            if (directTarget == null || this.areaStruckEntityIds.add(directTarget.getId())) {
+                spawnLightning(level, blockPos, owner, true);
+            }
+        } else if (!(directTarget instanceof LivingEntity) && (directTarget == null || this.areaStruckEntityIds.add(directTarget.getId()))) {
             ThrownMjolnir.spawnLightning(level, blockPos, owner);
         }
-        onHitLighnting(level, this, blockPos, owner, this.getDamageSource(), STRIKE_DAMAGE, STRIKE_FORCE, STRIKE_RADIUS, this.areaStruckEntityIds);
+        onHitLighnting(level, this, blockPos, owner, this.getDamageSource(), STRIKE_DAMAGE, STRIKE_FORCE, STRIKE_RADIUS,
+                this.areaStruckEntityIds, owner instanceof ThorEntity ? ThorAttackState.MJOLNIR_THROW : null);
         if (owner instanceof Player player) {
-            player.getCooldowns().addCooldown(this.mjolnirItem.getItem(), this.COOLDOWN);
+            player.getCooldowns().addCooldown(this.mjolnirItem.getItem(), COOLDOWN);
         }
     }
 

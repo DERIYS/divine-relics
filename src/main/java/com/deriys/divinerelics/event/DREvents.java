@@ -155,7 +155,9 @@ public class DREvents {
         /** Runs last, so it only sees blocks that really happen: Thor's attacks still push through those. */
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void onShieldBlocked(ShieldBlockEvent event) {
-            ThorShieldKnockback.onShieldBlock(event.getEntity());
+            if (event.getBlockedDamage() > 0.0F) {
+                ThorShieldKnockback.onShieldBlock(event.getEntity());
+            }
         }
 
         @SubscribeEvent

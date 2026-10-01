@@ -1,10 +1,15 @@
 package com.deriys.divinerelics.entities.ai.thor;
 
 import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
+import com.deriys.divinerelics.core.networking.DRMessages;
+import com.deriys.divinerelics.core.networking.packets.ThorKnockbackS2CPacket;
 import com.deriys.divinerelics.items.GuardianShield;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
@@ -21,12 +26,6 @@ import java.util.function.DoubleConsumer;
 public final class ThorShieldKnockback {
     /** Highest speed per axis a motion packet can carry to a client (ClientboundSetEntityMotionPacket clamps it). */
     private static final double MAX_SYNCED_SPEED = 3.9D;
-    /** Movement physics of LivingEntity.travel for an entity without movement input. */
-    private static final double GRAVITY = 0.08D;
-    private static final double VERTICAL_DRAG = 0.98D;
-    private static final float AIR_FRICTION = 0.91F;
-    private static final double STOP_SPEED = 0.003D;
-
     /** The entity whose shield blocked the last hit (set from the ShieldBlockEvent, server thread only). */
     @Nullable
     private static LivingEntity lastShieldBlocker;
@@ -37,6 +36,94 @@ public final class ThorShieldKnockback {
     /** Called for every shield block that actually happens. */
     public static void onShieldBlock(LivingEntity blocker) {
         lastShieldBlocker = blocker;
+    }
+
+    public static double surfaceDistance(Entity source, LivingEntity target) {
+        AABB a = source.getBoundingBox();
+        AABB b = target.getBoundingBox();
+        return ThorKnockbackPhysics.surfaceDistance(a.minX, a.minY, a.minZ, a.maxX, a.maxY, a.maxZ,
+                b.minX, b.minY, b.minZ, b.maxX, b.maxY, b.maxZ);
+    }
+
+    public static double damageFactor(Entity source, LivingEntity target, double radius) {
+        return ThorKnockbackPhysics.falloff(surfaceDistance(source, target), radius,
+                DivineRelicsCommonConfig.THOR_AREA_MIN_DAMAGE_FACTOR.get());
+    }
+
+    private record Launch(double distance, double shieldDistance, double height) {
+    }
+
+    private static Launch launchFor(ThorAttackState attack) {
+        return switch (attack) {
+            case MELEE_ATTACK -> new Launch(DivineRelicsCommonConfig.THOR_MELEE_KNOCKBACK_DISTANCE.get(),
+                    DivineRelicsCommonConfig.THOR_MELEE_SHIELD_KNOCKBACK_DISTANCE.get(),
+                    DivineRelicsCommonConfig.THOR_MELEE_KNOCKBACK_HEIGHT.get());
+            case LEG_ATTACK -> new Launch(DivineRelicsCommonConfig.THOR_LEG_KNOCKBACK_DISTANCE.get(),
+                    DivineRelicsCommonConfig.THOR_LEG_SHIELD_KNOCKBACK_DISTANCE.get(),
+                    DivineRelicsCommonConfig.THOR_LEG_KNOCKBACK_HEIGHT.get());
+            case CLAP_ATTACK -> new Launch(DivineRelicsCommonConfig.THOR_CLAP_KNOCKBACK_DISTANCE.get(),
+                    DivineRelicsCommonConfig.THOR_CLAP_SHIELD_KNOCKBACK_DISTANCE.get(),
+                    DivineRelicsCommonConfig.THOR_CLAP_KNOCKBACK_HEIGHT.get());
+            case GROUND_ATTACK -> new Launch(DivineRelicsCommonConfig.THOR_GROUND_KNOCKBACK_DISTANCE.get(),
+                    DivineRelicsCommonConfig.THOR_GROUND_SHIELD_KNOCKBACK_DISTANCE.get(),
+                    DivineRelicsCommonConfig.THOR_GROUND_KNOCKBACK_HEIGHT.get());
+            case MJOLNIR_THROW -> new Launch(DivineRelicsCommonConfig.THOR_MJOLNIR_KNOCKBACK_DISTANCE.get(),
+                    DivineRelicsCommonConfig.THOR_MJOLNIR_SHIELD_KNOCKBACK_DISTANCE.get(),
+                    DivineRelicsCommonConfig.THOR_MJOLNIR_KNOCKBACK_HEIGHT.get());
+            default -> throw new IllegalArgumentException("No knockback profile for " + attack);
+        };
+    }
+
+    /** Applies a calibrated launch after hurt, replacing rather than stacking with vanilla damage knockback. */
+    public static boolean hurtWithKnockback(LivingEntity target, Entity source, ThorAttackState attack, double radius,
+                                            BooleanSupplier hurt) {
+        Launch launch = launchFor(attack);
+        Vec3 motionBefore = target.getDeltaMovement();
+        LivingEntity previousBlocker = lastShieldBlocker;
+        lastShieldBlocker = null;
+        boolean hurtTarget;
+        boolean blocked;
+        try {
+            hurtTarget = hurt.getAsBoolean();
+            blocked = lastShieldBlocker == target;
+        } finally {
+            lastShieldBlocker = previousBlocker;
+        }
+        if (blocked && target instanceof Player player && GuardianShield.isParrying(player)) {
+            target.setDeltaMovement(motionBefore);
+            return hurtTarget;
+        }
+        if (hurtTarget || blocked) {
+            double distance = blocked ? launch.shieldDistance : launch.distance;
+            if (attack == ThorAttackState.CLAP_ATTACK || attack == ThorAttackState.GROUND_ATTACK) {
+                double gap = surfaceDistance(source, target);
+                distance *= ThorKnockbackPhysics.falloff(gap, radius,
+                        DivineRelicsCommonConfig.THOR_AREA_MIN_KNOCKBACK_FACTOR.get());
+                distance *= ThorKnockbackPhysics.proximityMultiplier(gap,
+                        DivineRelicsCommonConfig.THOR_CLOSE_KNOCKBACK_RANGE.get(),
+                        DivineRelicsCommonConfig.THOR_CLOSE_KNOCKBACK_MULTIPLIER.get());
+            }
+            launch(target, source.position(), distance, launch.height);
+        }
+        return hurtTarget;
+    }
+
+    private static void launch(LivingEntity target, Vec3 from, double distance, double height) {
+        Vec3 away = horizontalDirection(target, from);
+        BlockPos below = new BlockPos(target.getX(), target.getBoundingBox().minY - 0.5000001D, target.getZ());
+        float friction = target.level.getBlockState(below).getFriction(target.level, below, target);
+        double lift = ThorKnockbackPhysics.launchSpeed(height);
+        double speed = ThorKnockbackPhysics.horizontalSpeed(distance, friction, lift);
+        target.setDeltaMovement(away.x * speed, lift, away.z * speed);
+        target.hasImpulse = true;
+        if (target instanceof ServerPlayer player) {
+            // Vanilla's motion packet clamps each axis to 3.9, losing the close-range slam's 170% launch.
+            // Send the full motion directly, and suppress the later clamped packet to this player.
+            target.hurtMarked = false;
+            DRMessages.sendToPlayer(new ThorKnockbackS2CPacket(target.getDeltaMovement()), player);
+        } else {
+            target.hurtMarked = true;
+        }
     }
 
     /**
@@ -72,11 +159,7 @@ public final class ThorShieldKnockback {
      * along it dies out after a few blocks. In the air it keeps 0.91 per tick, which is what makes the blow carry.
      */
     public static void throwBack(LivingEntity target, Vec3 from) {
-        Vec3 away = new Vec3(target.getX() - from.x, 0.0D, target.getZ() - from.z);
-        if (away.lengthSqr() < 1.0E-4D) {
-            away = Vec3.directionFromRotation(0.0F, target.getYRot()).reverse(); // straight above/below: push backwards
-        }
-        away = away.normalize();
+        Vec3 away = horizontalDirection(target, from);
         BlockPos below = new BlockPos(target.getX(), target.getBoundingBox().minY - 0.5000001D, target.getZ());
         float friction = target.level.getBlockState(below).getFriction(target.level, below, target);
         double lift = launchSpeed(DivineRelicsCommonConfig.THOR_SHIELD_KNOCKBACK_HEIGHT.get());
@@ -89,29 +172,15 @@ public final class ThorShieldKnockback {
 
     /** Upward speed that lifts an entity {@code height} blocks at the top of its flight. */
     static double launchSpeed(double height) {
-        if (height <= 0.0D) {
-            return 0.0D;
-        }
-        double low = 0.0D;
-        double high = MAX_SYNCED_SPEED;
-        for (int i = 0; i < 30; i++) {
-            double mid = (low + high) / 2.0D;
-            if (apex(mid) < height) {
-                low = mid;
-            } else {
-                high = mid;
-            }
-        }
-        return high;
+        return ThorKnockbackPhysics.launchSpeed(height);
     }
 
-    private static double apex(double upwardSpeed) {
-        double height = 0.0D;
-        while (upwardSpeed > 0.0D) {
-            height += upwardSpeed;
-            upwardSpeed = (upwardSpeed - GRAVITY) * VERTICAL_DRAG;
+    private static Vec3 horizontalDirection(LivingEntity target, Vec3 from) {
+        Vec3 away = new Vec3(target.getX() - from.x, 0.0D, target.getZ() - from.z);
+        if (away.lengthSqr() < 1.0E-4D) {
+            away = Vec3.directionFromRotation(0.0F, target.getYRot()).reverse();
         }
-        return height;
+        return away.normalize();
     }
 
     /**
@@ -120,21 +189,6 @@ public final class ThorShieldKnockback {
      * (including the launch tick) or 0.91 in the air.
      */
     static double distancePerSpeed(float friction, double lift) {
-        double distance = 0.0D;
-        double speed = 1.0D;
-        double height = 0.0D;
-        double upwardSpeed = lift;
-        boolean onGround = true;
-        for (int tick = 0; tick < 1000 && speed >= STOP_SPEED; tick++) {
-            float keep = onGround ? friction * 0.91F : AIR_FRICTION;
-            distance += speed;
-            if (upwardSpeed > 0.0D || !onGround) {
-                height += upwardSpeed;
-                onGround = height <= 0.0D;
-            }
-            speed *= keep;
-            upwardSpeed = onGround ? 0.0D : (upwardSpeed - GRAVITY) * VERTICAL_DRAG;
-        }
-        return distance;
+        return ThorKnockbackPhysics.travelDistance(1.0D, friction, lift);
     }
 }

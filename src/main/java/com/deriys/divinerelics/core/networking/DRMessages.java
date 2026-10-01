@@ -12,8 +12,8 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class DRMessages {
-    /** Bump whenever a packet's layout changes (1.1: stuck spears carry their hit point and direction). */
-    private static final String PROTOCOL_VERSION = "1.1";
+    /** Bump whenever packet layouts or registrations change (1.2: unclamped Thor knockback). */
+    private static final String PROTOCOL_VERSION = "1.2";
     private static SimpleChannel INSTANCE;
 
     private static int packetId = 0;
@@ -92,6 +92,12 @@ public class DRMessages {
                 .decoder(ThorStopMusicS2CPacket::new)
                 .encoder(ThorStopMusicS2CPacket::toBytes)
                 .consumerMainThread(ThorStopMusicS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(ThorKnockbackS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(ThorKnockbackS2CPacket::new)
+                .encoder(ThorKnockbackS2CPacket::toBytes)
+                .consumerMainThread(ThorKnockbackS2CPacket::handle)
                 .add();
     }
 

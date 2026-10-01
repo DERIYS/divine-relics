@@ -4,6 +4,7 @@ import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.MotosignirParticleS2CPacket;
 import com.deriys.divinerelics.entities.ai.thor.ThorShieldKnockback;
+import com.deriys.divinerelics.entities.ai.thor.ThorAttackState;
 import com.deriys.divinerelics.entities.entity.ThorEntity;
 import com.deriys.divinerelics.init.DREffects;
 import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
@@ -135,6 +136,12 @@ public class Motosignir extends Item {
     }
 
     public static void hurtAndKnockbackEntites (List<LivingEntity> entities, LivingEntity owner, Entity attacker, DamageSource damageSource, double baseDamage, double force) {
+        hurtAndKnockbackEntites(entities, owner, attacker, damageSource, baseDamage, force, 0.0D, null);
+    }
+
+    public static void hurtAndKnockbackEntites(List<LivingEntity> entities, LivingEntity owner, Entity attacker,
+                                             DamageSource damageSource, double baseDamage, double force, double radius,
+                                             @Nullable ThorAttackState thorAttack) {
         for(LivingEntity livingEntity: entities) {
             if (livingEntity != owner && !hasTeammate(owner, livingEntity)) {
                 double entityX = livingEntity.getX();
@@ -156,9 +163,16 @@ public class Motosignir extends Item {
 
 //                owner.sendSystemMessage(Component.literal("Dealt " + Math.floor(Math.min(adjustedDamage, adjustedDamage * distanceFactor)*100)/100 + " damage to " + livingEntity.getDisplayName().getString() + " at " + Math.floor(distanceToEnemy*100)/100 + " distance"));
 
-                float damage = (float) Math.min(adjustedDamage, adjustedDamage * distanceFactor);
+                boolean calibratedThorAttack = owner instanceof ThorEntity && thorAttack != null;
+                boolean falloff = thorAttack == ThorAttackState.CLAP_ATTACK || thorAttack == ThorAttackState.GROUND_ATTACK;
+                float damage = calibratedThorAttack
+                        ? (float) (adjustedDamage * (falloff ? ThorShieldKnockback.damageFactor(attacker, livingEntity, radius) : 1.0D))
+                        : (float) Math.min(adjustedDamage, adjustedDamage * distanceFactor);
                 boolean thorsBlow = owner instanceof ThorEntity;
-                if (thorsBlow || attacker instanceof ThrownMjolnir) {
+                if (calibratedThorAttack) {
+                    ThorShieldKnockback.hurtWithKnockback(livingEntity, attacker, thorAttack, radius,
+                            () -> livingEntity.hurt(damageSource, damage));
+                } else if (thorsBlow || attacker instanceof ThrownMjolnir) {
                     // Thor's strikes and a flying Mjölnir's throw shield-blocking targets back as well.
                     ThorShieldKnockback.knockBackAndHurt(livingEntity, attacker.position(), force, strength -> {
                         if (thorsBlow || !livingEntity.hasEffect(DREffects.BIFROST_PROTECTION.get())) {

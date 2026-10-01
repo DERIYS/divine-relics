@@ -4,6 +4,7 @@ import it.unimi.dsi.fastutil.ints.IntSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.BlockGetter;
@@ -35,12 +36,12 @@ final class ReturnFlight {
      * Breaks every block the weapon flies straight into between {@code from} and {@code to}. Blocks it may not break
      * (unbreakable ones, chests, shulker boxes, protected areas) are left untouched and simply flown through.
      */
-    static void smashBlocks(Entity weapon, Player owner, Vec3 from, Vec3 to) {
-        if (!owner.mayBuild()) {
+    static void smashBlocks(Entity weapon, LivingEntity owner, Vec3 from, Vec3 to) {
+        Level level = weapon.level;
+        if (owner instanceof Player player ? !player.mayBuild() : !ForgeEventFactory.getMobGriefingEvent(level, owner)) {
             return;
         }
-        Level level = weapon.level;
-        boolean dropItems = !owner.getAbilities().instabuild;
+        boolean dropItems = !(owner instanceof Player player) || !player.getAbilities().instabuild;
         BlockGetter.traverseBlocks(from, to, null, (context, cursor) -> {
             BlockPos pos = cursor.immutable();
             BlockState state = level.getBlockState(pos);
@@ -52,13 +53,16 @@ final class ReturnFlight {
         }, context -> null);
     }
 
-    private static boolean canSmash(Level level, Player owner, BlockPos pos, BlockState state) {
+    private static boolean canSmash(Level level, LivingEntity owner, BlockPos pos, BlockState state) {
         if (state.getDestroySpeed(level, pos) < 0.0F || isChestOrShulkerBox(state)) {
             return false;
         }
-        // Lets spawn protection and claim/protection mods veto it, as if the owner had broken the block.
-        return level.mayInteract(owner, pos)
-                && !MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(level, pos, state, owner));
+        if (owner instanceof Player player) {
+            // Lets spawn protection and claim/protection mods veto it, as if the owner had broken the block.
+            return level.mayInteract(player, pos)
+                    && !MinecraftForge.EVENT_BUS.post(new BlockEvent.BreakEvent(level, pos, state, player));
+        }
+        return state.canEntityDestroy(level, pos, owner) && ForgeEventFactory.onEntityDestroyBlock(owner, pos, state);
     }
 
     private static boolean isChestOrShulkerBox(BlockState state) {
@@ -70,7 +74,7 @@ final class ReturnFlight {
      * Hits every entity between {@code from} and {@code to} that {@code canHit} accepts, except the owner and the ones
      * in {@code alreadyHit} (hit earlier on this return), which the newly hit ones are added to.
      */
-    static void hitEntities(Projectile weapon, Player owner, Vec3 from, Vec3 to, IntSet alreadyHit,
+    static void hitEntities(Projectile weapon, LivingEntity owner, Vec3 from, Vec3 to, IntSet alreadyHit,
                             Predicate<Entity> canHit, Consumer<EntityHitResult> onHit) {
         for (Entity target : weapon.level.getEntities(weapon, new AABB(from, to).inflate(1.0D), canHit)) {
             if (target == owner || owner.isPassengerOfSameVehicle(target) || alreadyHit.contains(target.getId())) {
@@ -80,7 +84,7 @@ final class ReturnFlight {
             if (!hitBox.contains(from) && hitBox.clip(from, to).isEmpty()) {
                 continue;
             }
-            if (target instanceof Player victim && !owner.canHarmPlayer(victim)) {
+            if (owner instanceof Player player && target instanceof Player victim && !player.canHarmPlayer(victim)) {
                 continue;
             }
             alreadyHit.add(target.getId());

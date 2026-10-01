@@ -316,6 +316,12 @@
         "divinerelics:thor_ambient_9"
       ]
     },
+    "thor_ambient_dumbass": {
+      "subtitle": "sounds.divinerelics.thor_ambient_dumbass",
+      "sounds": [
+        "divinerelics:thor_ambient_dumbass"
+      ]
+    },
     "thor_death_sound": {
       "subtitle": "sounds.divinerelics.thor_death_sound",
       "sounds": [
