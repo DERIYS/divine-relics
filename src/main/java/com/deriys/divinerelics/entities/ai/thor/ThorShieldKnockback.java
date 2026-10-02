@@ -4,11 +4,13 @@ import com.deriys.divinerelics.config.DivineRelicsCommonConfig;
 import com.deriys.divinerelics.core.networking.DRMessages;
 import com.deriys.divinerelics.core.networking.packets.ThorKnockbackS2CPacket;
 import com.deriys.divinerelics.items.GuardianShield;
+import com.deriys.divinerelics.items.ShieldReactions;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -18,7 +20,7 @@ import java.util.function.DoubleConsumer;
 
 /**
  * Blows of Thor and of a flying Mjölnir also reach whoever blocks them with a shield: no damage, but they are thrown
- * back several blocks. Only a successful Guardian Shield parry stops it completely.
+ * back several blocks. Guardian Shield parries reduce the launch speeds using the configured multiplier.
  * <p>
  * A fully blocked hit takes no damage, so vanilla never sends a player the new motion, and the knockback the attack
  * applied was lost.
@@ -29,13 +31,16 @@ public final class ThorShieldKnockback {
     /** The entity whose shield blocked the last hit (set from the ShieldBlockEvent, server thread only). */
     @Nullable
     private static LivingEntity lastShieldBlocker;
+    private static boolean lastShieldWasParried;
 
     private ThorShieldKnockback() {
     }
 
     /** Called for every shield block that actually happens. */
-    public static void onShieldBlock(LivingEntity blocker) {
+    public static boolean onShieldBlock(LivingEntity blocker) {
         lastShieldBlocker = blocker;
+        lastShieldWasParried = blocker instanceof Player player && GuardianShield.isParrying(player);
+        return lastShieldWasParried;
     }
 
     public static double surfaceDistance(Entity source, LivingEntity target) {
@@ -78,20 +83,21 @@ public final class ThorShieldKnockback {
     public static boolean hurtWithKnockback(LivingEntity target, Entity source, ThorAttackState attack, double radius,
                                             BooleanSupplier hurt) {
         Launch launch = launchFor(attack);
-        Vec3 motionBefore = target.getDeltaMovement();
+        Item shield = target.getUseItem().getItem();
         LivingEntity previousBlocker = lastShieldBlocker;
+        boolean previousParry = lastShieldWasParried;
         lastShieldBlocker = null;
+        lastShieldWasParried = false;
         boolean hurtTarget;
         boolean blocked;
+        boolean parried;
         try {
             hurtTarget = hurt.getAsBoolean();
             blocked = lastShieldBlocker == target;
+            parried = blocked && lastShieldWasParried;
         } finally {
             lastShieldBlocker = previousBlocker;
-        }
-        if (blocked && target instanceof Player player && GuardianShield.isParrying(player)) {
-            target.setDeltaMovement(motionBefore);
-            return hurtTarget;
+            lastShieldWasParried = previousParry;
         }
         if (hurtTarget || blocked) {
             double distance = blocked ? launch.shieldDistance : launch.distance;
@@ -103,18 +109,29 @@ public final class ThorShieldKnockback {
                         DivineRelicsCommonConfig.THOR_CLOSE_KNOCKBACK_RANGE.get(),
                         DivineRelicsCommonConfig.THOR_CLOSE_KNOCKBACK_MULTIPLIER.get());
             }
-            launch(target, source.position(), distance, launch.height);
+            double multiplier = parried ? DivineRelicsCommonConfig.THOR_PARRY_KNOCKBACK_MULTIPLIER.get() : 1.0D;
+            launch(target, source.position(), distance, launch.height, multiplier);
+            if (blocked && target instanceof Player player) {
+                if (parried) {
+                    ShieldReactions.releaseParry(player, shield);
+                } else if (attack == ThorAttackState.GROUND_ATTACK) {
+                    ShieldReactions.disableBlocking(player, shield);
+                } else if (attack == ThorAttackState.MELEE_ATTACK || attack == ThorAttackState.LEG_ATTACK
+                        || attack == ThorAttackState.CLAP_ATTACK) {
+                    ShieldReactions.interruptBlocking(player);
+                }
+            }
         }
         return hurtTarget;
     }
 
-    private static void launch(LivingEntity target, Vec3 from, double distance, double height) {
+    private static void launch(LivingEntity target, Vec3 from, double distance, double height, double multiplier) {
         Vec3 away = horizontalDirection(target, from);
         BlockPos below = new BlockPos(target.getX(), target.getBoundingBox().minY - 0.5000001D, target.getZ());
         float friction = target.level.getBlockState(below).getFriction(target.level, below, target);
         double lift = ThorKnockbackPhysics.launchSpeed(height);
         double speed = ThorKnockbackPhysics.horizontalSpeed(distance, friction, lift);
-        target.setDeltaMovement(away.x * speed, lift, away.z * speed);
+        target.setDeltaMovement(away.x * speed * multiplier, lift * multiplier, away.z * speed * multiplier);
         target.hasImpulse = true;
         if (target instanceof ServerPlayer player) {
             // Vanilla's motion packet clamps each axis to 3.9, losing the close-range slam's 170% launch.
@@ -128,7 +145,7 @@ public final class ThorShieldKnockback {
 
     /**
      * Knocks {@code target} back with {@code force} and then runs the attack's {@code hurt}. If the target blocks the
-     * hit with a shield, it is thrown back away from {@code from} instead (not after a Guardian Shield parry).
+     * hit with a shield, it is thrown back away from {@code from} instead, with reduced speeds after a parry.
      *
      * @param from      where the blow comes from
      * @param knockBack pushes the target away with the given strength (the attack's normal knockback, if any)
@@ -136,17 +153,33 @@ public final class ThorShieldKnockback {
      */
     public static boolean knockBackAndHurt(LivingEntity target, Vec3 from, double force, DoubleConsumer knockBack, BooleanSupplier hurt) {
         Vec3 motionBefore = target.getDeltaMovement();
+        Item shield = target.getUseItem().getItem();
         knockBack.accept(force);
+        LivingEntity previousBlocker = lastShieldBlocker;
+        boolean previousParry = lastShieldWasParried;
         lastShieldBlocker = null;
-        boolean hurtTarget = hurt.getAsBoolean();
-        boolean blocked = !hurtTarget && lastShieldBlocker == target;
-        lastShieldBlocker = null;
+        lastShieldWasParried = false;
+        boolean hurtTarget;
+        boolean blocked;
+        boolean parried;
+        try {
+            hurtTarget = hurt.getAsBoolean();
+            blocked = !hurtTarget && lastShieldBlocker == target;
+            parried = blocked && lastShieldWasParried;
+        } finally {
+            lastShieldBlocker = previousBlocker;
+            lastShieldWasParried = previousParry;
+        }
         if (blocked) {
             target.setDeltaMovement(motionBefore); // the attack's own knockback never reached a blocking player
-            if (!(target instanceof Player player && GuardianShield.isParrying(player))) {
-                throwBack(target, from);
-                target.hurtMarked = true; // sends the new motion to a player's client
+            throwBack(target, from);
+            if (parried) {
+                target.setDeltaMovement(target.getDeltaMovement().scale(DivineRelicsCommonConfig.THOR_PARRY_KNOCKBACK_MULTIPLIER.get()));
+                if (target instanceof Player player) {
+                    ShieldReactions.releaseParry(player, shield);
+                }
             }
+            target.hurtMarked = true; // sends the new motion to a player's client
         }
         return hurtTarget;
     }

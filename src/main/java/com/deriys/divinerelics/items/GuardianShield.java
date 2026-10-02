@@ -62,7 +62,7 @@ public class GuardianShield extends ShieldItem {
 
     /** Whether the player raised the Guardian Shield recently enough that an attack hitting it now is parried. */
     public static boolean isParrying(Player player) {
-        return player.isBlocking() && player.getOffhandItem().getItem() == DRItems.GUARDIAN_SHIELD.get()
+        return player.isBlocking() && player.getUseItem().getItem() instanceof GuardianShield
                 && player.getTicksUsingItem() <= DivineRelicsCommonConfig.GUARDIAN_SHIELD_PARRY_WINDOW.get();
     }
 

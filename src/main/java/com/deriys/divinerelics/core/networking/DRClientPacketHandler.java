@@ -7,6 +7,7 @@ import com.deriys.divinerelics.entities.entity.ThrownDraupnirSpear;
 import com.deriys.divinerelics.items.DraupnirSpear;
 import com.deriys.divinerelics.items.HeimdallGauntlet;
 import com.deriys.divinerelics.items.Motosignir;
+import com.deriys.divinerelics.event.DRClientEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.resources.sounds.SimpleSoundInstance;
@@ -32,6 +33,10 @@ import java.util.List;
  */
 public final class DRClientPacketHandler {
     private DRClientPacketHandler() {
+    }
+
+    public static void handleStopShieldUse() {
+        DRClientEvents.ForgeClientEvents.interruptShieldUse();
     }
 
     public static void handleThorKnockback(Vec3 motion) {

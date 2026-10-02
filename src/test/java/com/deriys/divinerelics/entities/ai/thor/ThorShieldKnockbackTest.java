@@ -14,6 +14,9 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.ItemCooldowns;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -24,6 +27,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
 import org.mockito.ArgumentCaptor;
 
@@ -39,6 +43,9 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
+import static org.mockito.ArgumentMatchers.anyInt;
 
 class ThorShieldKnockbackTest {
     private Player target;
@@ -71,6 +78,8 @@ class ThorShieldKnockbackTest {
         target = player;
         Level level = mock(Level.class);
         target.level = level;
+        when(target.getUseItem()).thenReturn(new ItemStack(Items.SHIELD));
+        when(target.getCooldowns()).thenReturn(mock(ItemCooldowns.class));
         when(level.getBlockState(any(BlockPos.class))).thenReturn(Blocks.STONE.defaultBlockState());
         when(target.getX()).thenReturn(0.8D);
         when(target.getZ()).thenReturn(0.0D);
@@ -133,26 +142,87 @@ class ThorShieldKnockbackTest {
         assertFalse(target.hasImpulse);
     }
 
-    @Test
-    void guardianParryRestoresMotionAndCancelsLaunch() {
-        Vec3 before = new Vec3(0.1D, 0.0D, 0.2D);
-        motion.set(before);
+    @ParameterizedTest
+    @CsvSource({"MELEE_ATTACK,1.5,0.2", "LEG_ATTACK,5,0.2", "CLAP_ATTACK,17,1",
+            "GROUND_ATTACK,25.5,2.5", "MJOLNIR_THROW,5,1"})
+    void guardianParryScalesBothLaunchSpeedsAndLowersShieldWithoutCooldown(ThorAttackState attack,
+                                                                         double blockedDistance, double height) {
         try (MockedStatic<GuardianShield> shield = mockStatic(GuardianShield.class)) {
             shield.when(() -> GuardianShield.isParrying(target)).thenReturn(true);
-            ThorShieldKnockback.hurtWithKnockback(target, source, ThorAttackState.GROUND_ATTACK, 8.0D, () -> {
+            ThorShieldKnockback.hurtWithKnockback(target, source, attack, 8.0D, () -> {
                 ThorShieldKnockback.onShieldBlock(target);
-                target.setDeltaMovement(new Vec3(0.4D, 0.4D, 0.0D));
+                shield.when(() -> GuardianShield.isParrying(target)).thenReturn(false);
                 return false;
             });
         }
-        assertEquals(before, motion.get());
-        assertFalse(target.hasImpulse);
+        double lift = ThorKnockbackPhysics.launchSpeed(height);
+        assertEquals(ThorKnockbackPhysics.horizontalSpeed(blockedDistance, 0.6F, lift) * 0.5D, motion.get().x, 1.0E-8D);
+        assertEquals(lift * 0.5D, motion.get().y, 1.0E-8D);
+        verify(target).stopUsingItem();
+        verify(target.getCooldowns(), never()).addCooldown(any(), anyInt());
+        verify(target.level, never()).broadcastEntityEvent(target, (byte) 30);
+    }
+
+    @ParameterizedTest
+    @CsvSource({"MELEE_ATTACK,true,false", "LEG_ATTACK,true,false", "CLAP_ATTACK,true,false",
+            "GROUND_ATTACK,true,true", "MJOLNIR_THROW,false,false"})
+    void ordinaryBlockAppliesAttackSpecificShieldReaction(ThorAttackState attack, boolean stopsUse, boolean disables) {
+        try (MockedStatic<GuardianShield> shield = mockStatic(GuardianShield.class)) {
+            assertFalse(ThorShieldKnockback.hurtWithKnockback(target, source, attack, 8.0D, () -> {
+                ThorShieldKnockback.onShieldBlock(target);
+                return false;
+            }));
+        }
+        if (stopsUse) {
+            verify(target).stopUsingItem();
+        } else {
+            verify(target, never()).stopUsingItem();
+        }
+        if (disables) {
+            verify(target.getCooldowns()).addCooldown(Items.SHIELD, 100);
+            verify(target.level).broadcastEntityEvent(target, (byte) 30);
+        } else {
+            verify(target.getCooldowns(), never()).addCooldown(any(), anyInt());
+            verify(target.level, never()).broadcastEntityEvent(target, (byte) 30);
+        }
+    }
+
+    @Test
+    void groundDisableUsesShieldThatBlockedEvenWhenUseItemChangesDuringHurt() {
+        try (MockedStatic<GuardianShield> shield = mockStatic(GuardianShield.class)) {
+            ThorShieldKnockback.hurtWithKnockback(target, source, ThorAttackState.GROUND_ATTACK, 8.0D, () -> {
+                ThorShieldKnockback.onShieldBlock(target);
+                when(target.getUseItem()).thenReturn(ItemStack.EMPTY);
+                return false;
+            });
+        }
+        verify(target.getCooldowns()).addCooldown(Items.SHIELD, 100);
+        verify(target.getCooldowns(), never()).addCooldown(Items.AIR, 100);
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {0.0D, 0.25D, 1.0D})
+    void configurableParryMultiplierScalesVelocityRatherThanDistance(double multiplier) {
+        DivineRelicsCommonConfig.THOR_PARRY_KNOCKBACK_MULTIPLIER.set(multiplier);
+        try (MockedStatic<GuardianShield> shield = mockStatic(GuardianShield.class)) {
+            shield.when(() -> GuardianShield.isParrying(target)).thenReturn(true);
+            ThorShieldKnockback.hurtWithKnockback(target, source, ThorAttackState.MELEE_ATTACK, 0.0D, () -> {
+                ThorShieldKnockback.onShieldBlock(target);
+                return false;
+            });
+            double lift = ThorKnockbackPhysics.launchSpeed(0.2D);
+            assertEquals(ThorKnockbackPhysics.horizontalSpeed(1.5D, 0.6F, lift) * multiplier, motion.get().x, 1.0E-8D);
+            assertEquals(lift * multiplier, motion.get().y, 1.0E-8D);
+        } finally {
+            DivineRelicsCommonConfig.THOR_PARRY_KNOCKBACK_MULTIPLIER.set(0.5D);
+        }
     }
 
     @Test
     void nestedHurtDoesNotLoseOuterShieldBlock() {
         LivingEntity other = mock(LivingEntity.class);
         when(other.getDeltaMovement()).thenReturn(Vec3.ZERO);
+        when(other.getUseItem()).thenReturn(ItemStack.EMPTY);
         try (MockedStatic<GuardianShield> shield = mockStatic(GuardianShield.class)) {
             ThorShieldKnockback.hurtWithKnockback(target, source, ThorAttackState.MELEE_ATTACK, 0.0D, () -> {
                 ThorShieldKnockback.onShieldBlock(target);
@@ -219,6 +289,24 @@ class ThorShieldKnockbackTest {
             });
         }
         assertLaunch(15.0D, 1.0D);
+    }
+
+    @Test
+    void playerOwnedHammerParryHasHalfSpeedsAndNoShieldCooldown() {
+        try (MockedStatic<GuardianShield> shield = mockStatic(GuardianShield.class)) {
+            shield.when(() -> GuardianShield.isParrying(target)).thenReturn(true);
+            ThorShieldKnockback.knockBackAndHurt(target, Vec3.ZERO, 0.0D, force -> {
+            }, () -> {
+                ThorShieldKnockback.onShieldBlock(target);
+                return false;
+            });
+        }
+        double lift = ThorKnockbackPhysics.launchSpeed(1.0D);
+        double normalSpeed = 15.0D / ThorShieldKnockback.distancePerSpeed(0.6F, lift);
+        assertEquals(normalSpeed * 0.5D, motion.get().x, 1.0E-8D);
+        assertEquals(lift * 0.5D, motion.get().y, 1.0E-8D);
+        verify(target).stopUsingItem();
+        verify(target.getCooldowns(), never()).addCooldown(any(), anyInt());
     }
 
     private void assertLaunch(double distance, double height) {

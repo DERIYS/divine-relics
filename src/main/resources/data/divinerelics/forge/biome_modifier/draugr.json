@@ -3,7 +3,7 @@
   "biomes": "#minecraft:is_taiga",
   "spawners": {
     "type": "divinerelics:draugr",
-    "weight": 50,
+    "weight": 30,
     "minCount": 1,
     "maxCount": 5
   }

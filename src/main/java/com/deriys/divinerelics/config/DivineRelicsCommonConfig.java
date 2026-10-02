@@ -98,6 +98,7 @@ public class DivineRelicsCommonConfig {
     public static final ForgeConfigSpec.DoubleValue THOR_AREA_MIN_KNOCKBACK_FACTOR;
     public static final ForgeConfigSpec.DoubleValue THOR_CLOSE_KNOCKBACK_RANGE;
     public static final ForgeConfigSpec.DoubleValue THOR_CLOSE_KNOCKBACK_MULTIPLIER;
+    public static final ForgeConfigSpec.DoubleValue THOR_PARRY_KNOCKBACK_MULTIPLIER;
     public static final ForgeConfigSpec.ConfigValue<Integer> THOR_XP_AMOUNT;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> BROK_AND_SINDRI_RESTOCK_TIME;
@@ -246,7 +247,7 @@ public class DivineRelicsCommonConfig {
                 .defineInRange("Thor Ground Force", 8.0f, 0f, 30f);
         THOR_GROUND_RADIUS = BUILDER.comment("Thor's Ground Attack Radius")
                 .defineInRange("Thor Ground Radius", 8.0f, 0f, 30f);
-        THOR_SHIELD_KNOCKBACK_DISTANCE = BUILDER.comment("Shield knockback distance for player-owned Mjölnir and Thor's summoning shockwave. Thor's combat attacks use their own distances below. A Guardian Shield parry stops knockback completely.")
+        THOR_SHIELD_KNOCKBACK_DISTANCE = BUILDER.comment("Shield knockback distance for player-owned Mjölnir and Thor's summoning shockwave. Thor's combat attacks use their own distances below. A Guardian Shield parry scales launch speeds by Thor Parry Knockback Multiplier.")
                 .defineInRange("Thor Shield Knockback Distance", 15.0f, 0f, 30f);
         THOR_SHIELD_KNOCKBACK_HEIGHT = BUILDER.comment("How many blocks high that blow lifts them. In the air the throw keeps its momentum; along the ground friction and every bump stop it after a few blocks. 0 slides them along the ground.")
                 .defineInRange("Thor Shield Knockback Height", 1.0f, 0f, 5f);
@@ -288,6 +289,8 @@ public class DivineRelicsCommonConfig {
                 .defineInRange("Thor Close Knockback Range", 1.5D, 0.0D, 5.0D);
         THOR_CLOSE_KNOCKBACK_MULTIPLIER = BUILDER.comment("Maximum horizontal clap/ground knockback multiplier at hitbox contact, fading to 1 at the proximity range.")
                 .defineInRange("Thor Close Knockback Multiplier", 1.7D, 1.0D, 3.0D);
+        THOR_PARRY_KNOCKBACK_MULTIPLIER = BUILDER.comment("Multiplier on both horizontal and vertical shield-blocking launch speeds after a Guardian Shield parry of Thor or flying Mjolnir. 0 removes the launch; 1 keeps ordinary blocking speeds.")
+                .defineInRange("Thor Parry Knockback Multiplier", 0.5D, 0.0D, 1.0D);
         THOR_FOLLOW_RANGE = BUILDER.comment("How far Thor can see its target")
                 .defineInRange("Thor Follow Range", 50.0f, 0f, 1000f);
         THOR_SPEED_MODIFIER = BUILDER.comment("How fast Thor will follow you")

@@ -53,6 +53,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
@@ -240,10 +241,17 @@ public class ThorEntity extends Monster implements IAnimatable {
         }
     }
 
-    public void onReturningMjolnirHitPlayer() {
+    public void onReturningMjolnirHitPlayer(ServerPlayer player) {
         if (!this.level.isClientSide() && !this.hasTauntedReturningMjolnirHit) {
             this.hasTauntedReturningMjolnirHit = true;
-            this.playSound(DRSounds.THOR_AMBIENT_DUMBASS.get(), this.getSoundVolume(), this.getVoicePitch());
+            if (!this.isSilent()) {
+                SoundEvent sound = DRSounds.THOR_AMBIENT_DUMBASS.get();
+                float volume = this.getSoundVolume();
+                float pitch = this.getVoicePitch();
+                this.level.playSound(player, this.getX(), this.getY(), this.getZ(), sound, SoundSource.HOSTILE, volume, pitch);
+                // A return hit can happen outside Thor's sound radius; notify its victim locally, exactly once.
+                player.playNotifySound(sound, SoundSource.HOSTILE, volume, pitch);
+            }
         }
     }
 
@@ -394,21 +402,7 @@ public class ThorEntity extends Monster implements IAnimatable {
             this.ticksWaitingForMjolnir = 0;
         }
 
-        BlockPos onPos = this.getOnPos();
-
-        if (!summoningComplete && !this.level.isClientSide) {
-            if (this.tickCount < INVULNERABLE_TICKS) {
-                if (contains(LIGHTNING_TICKS, this.tickCount)) {
-                    spawnLightning(this.level, getRandBlockPos(onPos.offset(0, -10, 0), 100, 100, 50), this);
-                }
-            } else if (this.tickCount == INVULNERABLE_TICKS) {
-                this.teleportTo(this.getX(), this.getY() - 10d, this.getZ());
-                spawnLightning(this.level, onPos, this);
-                onHitLighnting(this.level, this, onPos, this, this.thorDamageSource, 10f, 2f, 12);
-                this.setSummoningComplete(true);
-                this.setNoAi(false);
-            }
-        }
+        this.tickSummoning();
         LivingEntity target = this.getTarget();
         setChasing(this, FAST_SPEED_MODIFIER, SLOW_SPEED_MODIFIER, target != null && target.isAlive());
 
@@ -417,6 +411,26 @@ public class ThorEntity extends Monster implements IAnimatable {
         // After the goals ran, so an attack started this tick counts this tick as its first (tick 0).
         if (!this.level.isClientSide && this.isAlive()) {
             this.tickAttack();
+        }
+    }
+
+    void tickSummoning() {
+        if (this.isSummoningComplete() || this.level.isClientSide) {
+            return;
+        }
+        if (this.tickCount < INVULNERABLE_TICKS) {
+            if (contains(LIGHTNING_TICKS, this.tickCount)) {
+                BlockPos strikePos = getRandBlockPos(this.blockPosition(), 100, 100, 50);
+                spawnLightning(this.level, this.level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, strikePos), this);
+            }
+        } else if (this.tickCount == INVULNERABLE_TICKS) {
+            this.teleportTo(this.getX(), this.getY() - 10d, this.getZ());
+            BlockPos impactPos = this.level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, this.blockPosition());
+            spawnLightning(this.level, impactPos, this);
+            onHitLighnting(this.level, this, impactPos, this, this.thorDamageSource, 10f, 2f, 12,
+                    null, null, true);
+            this.setSummoningComplete(true);
+            this.setNoAi(false);
         }
     }
 

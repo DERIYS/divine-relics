@@ -12,8 +12,8 @@ import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.network.simple.SimpleChannel;
 
 public class DRMessages {
-    /** Bump whenever packet layouts or registrations change (1.2: unclamped Thor knockback). */
-    private static final String PROTOCOL_VERSION = "1.2";
+    /** Bump whenever packet layouts or registrations change (1.3: forced shield release). */
+    private static final String PROTOCOL_VERSION = "1.3";
     private static SimpleChannel INSTANCE;
 
     private static int packetId = 0;
@@ -98,6 +98,12 @@ public class DRMessages {
                 .decoder(ThorKnockbackS2CPacket::new)
                 .encoder(ThorKnockbackS2CPacket::toBytes)
                 .consumerMainThread(ThorKnockbackS2CPacket::handle)
+                .add();
+
+        net.messageBuilder(StopShieldUseS2CPacket.class, id(), NetworkDirection.PLAY_TO_CLIENT)
+                .decoder(StopShieldUseS2CPacket::new)
+                .encoder(StopShieldUseS2CPacket::toBytes)
+                .consumerMainThread(StopShieldUseS2CPacket::handle)
                 .add();
     }
 

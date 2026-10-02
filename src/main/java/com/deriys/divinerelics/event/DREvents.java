@@ -19,6 +19,7 @@ import com.deriys.divinerelics.items.GuardianShield;
 import com.deriys.divinerelics.items.LeviathanAxe;
 import com.deriys.divinerelics.items.Mjolnir;
 import com.deriys.divinerelics.items.Motosignir;
+import com.deriys.divinerelics.items.ShieldReactions;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
@@ -50,6 +51,7 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.EntityStruckByLightningEvent;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
@@ -146,7 +148,7 @@ public class DREvents {
             LivingEntity entity = event.getEntity();
             Entity attacker = event.getDamageSource().getDirectEntity();
             if (attacker instanceof ThrownMjolnir || attacker instanceof ThrownDraupnirSpear) {
-                if (entity.getOffhandItem().getItem() != DRItems.GUARDIAN_SHIELD.get()) {
+                if (!(entity.getUseItem().getItem() instanceof GuardianShield)) {
                     event.setCanceled(true);
                 }
             }
@@ -156,7 +158,17 @@ public class DREvents {
         @SubscribeEvent(priority = EventPriority.LOWEST)
         public static void onShieldBlocked(ShieldBlockEvent event) {
             if (event.getBlockedDamage() > 0.0F) {
-                ThorShieldKnockback.onShieldBlock(event.getEntity());
+                boolean parried = ThorShieldKnockback.onShieldBlock(event.getEntity());
+                if (parried && event.getEntity() instanceof Player player) {
+                    ShieldReactions.queueParryRelease(player);
+                }
+            }
+        }
+
+        @SubscribeEvent
+        public static void finishShieldParry(TickEvent.PlayerTickEvent event) {
+            if (event.phase == TickEvent.Phase.END && !event.player.level.isClientSide) {
+                ShieldReactions.finishParry(event.player);
             }
         }
 

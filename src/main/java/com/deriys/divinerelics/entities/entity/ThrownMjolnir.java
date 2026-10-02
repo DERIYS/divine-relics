@@ -29,6 +29,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
@@ -245,8 +246,8 @@ public class ThrownMjolnir extends AbstractArrow {
             hurt = entity.hurt(this.getDamageSource(), amount);
         }
         if (hurt) {
-            if (!this.level.isClientSide && this.isReturning() && entity instanceof Player && owner instanceof ThorEntity thor) {
-                thor.onReturningMjolnirHitPlayer();
+            if (!this.level.isClientSide && this.isReturning() && entity instanceof ServerPlayer player && owner instanceof ThorEntity thor) {
+                thor.onReturningMjolnirHitPlayer(player);
             }
             this.hit = true;
             Level level = this.level;
@@ -298,8 +299,13 @@ public class ThrownMjolnir extends AbstractArrow {
     }
 
     private static void spawnLightning(Level level, BlockPos blockPos, Entity owner, boolean visualOnly) {
+        spawnLightning(level, blockPos, owner, visualOnly, false);
+    }
+
+    private static void spawnLightning(Level level, BlockPos blockPos, Entity owner, boolean visualOnly, boolean groundLightning) {
         LightningBolt lightningBolt = (LightningBolt)EntityType.LIGHTNING_BOLT.create(level);
-        lightningBolt.moveTo(Vec3.atBottomCenterOf(blockPos));
+        BlockPos strikePos = groundLightning ? level.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, blockPos) : blockPos;
+        lightningBolt.moveTo(Vec3.atBottomCenterOf(strikePos));
         lightningBolt.setCause(owner instanceof ServerPlayer ? (ServerPlayer)owner : null);
         lightningBolt.setVisualOnly(visualOnly);
         level.addFreshEntity(lightningBolt);
@@ -323,6 +329,12 @@ public class ThrownMjolnir extends AbstractArrow {
     public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, LivingEntity owner, DamageSource damageSource,
                                     double damage, double force, double strikeRadius, @Nullable IntSet alreadyStruck,
                                     @Nullable ThorAttackState thorAttack) {
+        onHitLighnting(level, hammer, blockPos, owner, damageSource, damage, force, strikeRadius, alreadyStruck, thorAttack, false);
+    }
+
+    public static void onHitLighnting(Level level, Entity hammer, BlockPos blockPos, LivingEntity owner, DamageSource damageSource,
+                                    double damage, double force, double strikeRadius, @Nullable IntSet alreadyStruck,
+                                    @Nullable ThorAttackState thorAttack, boolean groundLightning) {
         boolean calibratedThorAttack = owner instanceof ThorEntity && thorAttack != null;
         List<LivingEntity> entitiesInArea =
                 calibratedThorAttack ? level.getEntitiesOfClass(LivingEntity.class, hammer.getBoundingBox().inflate(strikeRadius))
@@ -344,14 +356,14 @@ public class ThrownMjolnir extends AbstractArrow {
 
         Motosignir.hurtAndKnockbackEntites(struckNow, owner, hammer, damageSource, damage, force, strikeRadius, thorAttack);
         for (LivingEntity entity : struckNow) {
-            spawnLightning(level, entity.getOnPos(), owner, calibratedThorAttack);
+            spawnLightning(level, entity.getOnPos(), owner, calibratedThorAttack, groundLightning);
         }
 
         // Tops up sparse strikes (e.g. into the ground) with random bolts within 5 blocks. Targets that were struck
         // earlier count as well, so a crowd that already got its lightning gets no random bolts instead.
         int maxLightnings = DivineRelicsCommonConfig.THROWN_MJOLNIR_LIGHNTING_COUNT.get();
         for (int i = targetsInArea; i < maxLightnings; i++) {
-            spawnLightning(level, getRandBlockPos(blockPos), owner, calibratedThorAttack);
+            spawnLightning(level, getRandBlockPos(blockPos), owner, calibratedThorAttack, groundLightning);
         }
     }
 

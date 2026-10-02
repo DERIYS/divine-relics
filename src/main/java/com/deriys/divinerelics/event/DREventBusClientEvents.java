@@ -23,6 +23,6 @@ public class DREventBusClientEvents {
 
     @SubscribeEvent
     public static void onKeyRegister(RegisterKeyMappingsEvent event){
-        event.register(DRKeyBindings.GUARDIAN_SHIELD_KEY);
+        event.register(DRKeyBindings.OFFHAND_SHIELD_KEY);
     }
 }

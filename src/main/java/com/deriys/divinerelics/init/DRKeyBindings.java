@@ -7,8 +7,9 @@ import org.lwjgl.glfw.GLFW;
 
 public class DRKeyBindings {
     public static final String KEY_CATEGORY_MAIN = "key.category.divinerelics.main";
-    public static final String KEY_USE_GUARDIAN_SHIELD = "key.category.divinerelics.use_guardian_shield";
+    // Keep the saved key ID so existing player remappings survive the broader shield support.
+    public static final String KEY_USE_OFFHAND_SHIELD = "key.category.divinerelics.use_guardian_shield";
 
-    public static final KeyMapping GUARDIAN_SHIELD_KEY = new KeyMapping(KEY_USE_GUARDIAN_SHIELD, KeyConflictContext.IN_GAME,
+    public static final KeyMapping OFFHAND_SHIELD_KEY = new KeyMapping(KEY_USE_OFFHAND_SHIELD, KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_LEFT_ALT, KEY_CATEGORY_MAIN);
 }

@@ -3,7 +3,7 @@
   "biomes": "#forge:is_snowy",
   "spawners": {
     "type": "divinerelics:hel_walker",
-    "weight": 45,
+    "weight": 20,
     "minCount": 2,
     "maxCount": 6
   }
